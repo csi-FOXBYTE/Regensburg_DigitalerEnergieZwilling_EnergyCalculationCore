@@ -1,0 +1,37 @@
+{
+  "name": "@csi-foxbyte/Regensburg_DigitalerEnergieZwilling_EnergyCalculationCore",
+  "version": "0.0.0",
+  "description": "Domain-based TypeScript energy calculation core with JSON-configurable catalogs and rules for building envelope and heating evaluation.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "scripts": {
+    "test": "node --test --import tsx \"test/**/*.test.ts\"",
+    "build": "pnpm run lint && pnpm run test && tsdown",
+    "lint": "tsc --noEmit",
+    "docs:api": "typedoc --options typedoc.json",
+    "docs": "pnpm run docs:api",
+    "prepack": "pnpm run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "packageManager": "pnpm@10.7.1",
+  "devDependencies": {
+    "@types/node": "^25.3.5",
+    "publint": "^0.3.18",
+    "tsdown": "^0.21.0",
+    "tsx": "^4.21.0",
+    "typedoc": "^0.28.17",
+    "typedoc-plugin-markdown": "^4.10.0",
+    "typescript": "^5.9.3"
+  },
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  }
+}
