@@ -8,7 +8,7 @@
 
 > `const` **defaultCoreConfigJson**: `object`
 
-Defined in: [config/default-core-config.ts:21](https://github.com/csi-FOXBYTE/Regensburg_DigitalerEnergieZwilling_EnergyCalculationCore/blob/9a396a5d12cb19bc95d75d3a7e738b0448388936/src/config/default-core-config.ts#L21)
+Defined in: [config/default-core-config.ts:21](https://github.com/csi-FOXBYTE/Regensburg_DigitalerEnergieZwilling_EnergyCalculationCore/blob/0f9e37122197f8ca7609ecce54dd10328f548380/src/config/default-core-config.ts#L21)
 
 Default external JSON configuration used as project baseline.
 

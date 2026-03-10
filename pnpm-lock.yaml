@@ -11,6 +11,9 @@ importers:
       '@types/node':
         specifier: ^25.3.5
         version: 25.3.5
+      esbuild:
+        specifier: ^0.27.3
+        version: 0.27.3
       publint:
         specifier: ^0.3.18
         version: 0.3.18

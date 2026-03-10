@@ -68,5 +68,7 @@ export type {
   NormalizedCatalogMap,
 } from "./config/core-config-json";
 export type { CoreConfigJsonSchemaSource } from "./config/core-config-schema-source";
+export type { CoreInputSchemaSource } from "./config/core-input-schema-source";
 export { coreConfigFromJson } from "./config/core-config-json";
 export { defaultCoreConfig, defaultCoreConfigJson } from "./config/default-core-config";
+export { defaultCoreInputJson } from "./config/default-core-input";

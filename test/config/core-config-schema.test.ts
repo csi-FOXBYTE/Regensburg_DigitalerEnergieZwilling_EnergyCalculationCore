@@ -25,3 +25,25 @@ test("CoreConfigJsonSchemaSource can be converted to JSON Schema", () => {
   assert.ok("CoreConfigJsonSchemaSource" in schema.definitions);
   assert.ok("CoreConfigJson<JsonCatalogConfigMap,HeatingConfig,EnergyConfig>" in schema.definitions);
 });
+
+test("CoreInputSchemaSource can be converted to JSON Schema", () => {
+  const generator = createGenerator({
+    path: resolve(process.cwd(), "src/config/core-input-schema-source.ts"),
+    tsconfig: resolve(process.cwd(), "tsconfig.json"),
+    type: "CoreInputSchemaSource",
+    expose: "export",
+    additionalProperties: false,
+    jsDoc: "extended",
+    skipTypeCheck: false,
+  });
+
+  const schema = generator.createSchema("CoreInputSchemaSource") as {
+    $ref?: string;
+    definitions?: Record<string, unknown>;
+  };
+
+  assert.equal(schema.$ref, "#/definitions/CoreInputSchemaSource");
+  assert.ok(schema.definitions);
+  assert.ok("CoreInputSchemaSource" in schema.definitions);
+  assert.ok("CoreInput<UValueCatalogMap,string>" in schema.definitions);
+});

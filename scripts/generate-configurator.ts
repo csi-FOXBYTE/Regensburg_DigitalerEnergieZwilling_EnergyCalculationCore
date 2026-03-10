@@ -1,38 +1,73 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 
-import { defaultCoreConfigJson } from "../src/config/default-core-config";
+import { build } from "esbuild";
 import { createGenerator } from "ts-json-schema-generator";
 
+import { defaultCoreConfigJson } from "../src/config/default-core-config";
+import { defaultCoreInputJson } from "../src/config/default-core-input";
+
 const outputPath = resolve(process.cwd(), "docs/configurator.html");
-const schemaOutputPath = resolve(process.cwd(), "docs/core-config.schema.json");
+const configSchemaOutputPath = resolve(process.cwd(), "docs/core-config.schema.json");
+const inputSchemaOutputPath = resolve(process.cwd(), "docs/core-input.schema.json");
 
 async function main(): Promise<void> {
   await mkdir(dirname(outputPath), { recursive: true });
-  const schema = simplifyConfiguratorSchema(generateCoreConfigJsonSchema());
+
+  const configSchema = simplifyConfiguratorSchema(
+    generateJsonSchema("src/config/core-config-schema-source.ts", "CoreConfigJsonSchemaSource"),
+  );
+  const inputSchema = simplifyConfiguratorSchema(
+    generateJsonSchema("src/config/core-input-schema-source.ts", "CoreInputSchemaSource"),
+  );
+  const appBundle = await bundleBrowserApp();
 
   const html = renderConfiguratorHtml({
-    schema,
-    defaults: defaultCoreConfigJson,
+    configSchema,
+    inputSchema,
+    configDefaults: defaultCoreConfigJson,
+    inputDefaults: defaultCoreInputJson,
+    appBundle,
   });
 
-  await writeFile(schemaOutputPath, JSON.stringify(schema, null, 2), "utf8");
+  await writeFile(configSchemaOutputPath, JSON.stringify(configSchema, null, 2), "utf8");
+  await writeFile(inputSchemaOutputPath, JSON.stringify(inputSchema, null, 2), "utf8");
   await writeFile(outputPath, html, "utf8");
   console.log(`Configurator written to ${outputPath}`);
 }
 
-function generateCoreConfigJsonSchema(): unknown {
+function generateJsonSchema(path: string, type: string): unknown {
   const generator = createGenerator({
-    path: resolve(process.cwd(), "src/config/core-config-schema-source.ts"),
+    path: resolve(process.cwd(), path),
     tsconfig: resolve(process.cwd(), "tsconfig.json"),
-    type: "CoreConfigJsonSchemaSource",
+    type,
     expose: "export",
     additionalProperties: false,
     jsDoc: "extended",
     skipTypeCheck: false,
   });
 
-  return generator.createSchema("CoreConfigJsonSchemaSource");
+  return generator.createSchema(type);
+}
+
+async function bundleBrowserApp(): Promise<string> {
+  const result = await build({
+    entryPoints: [resolve(process.cwd(), "src/configurator/app.ts")],
+    bundle: true,
+    format: "iife",
+    platform: "browser",
+    target: ["es2020"],
+    minify: false,
+    sourcemap: false,
+    write: false,
+  });
+
+  const output = result.outputFiles[0];
+  if (!output) {
+    throw new Error("Bundled configurator app output is missing.");
+  }
+
+  return output.text;
 }
 
 function simplifyConfiguratorSchema(schema: unknown): unknown {
@@ -45,7 +80,7 @@ function simplifyConfiguratorSchema(schema: unknown): unknown {
     return schema;
   }
 
-  const resolvedRoot = resolveDefinitionRef(schema, definitions, schema.$ref);
+  const resolvedRoot = resolveDefinitionRef(definitions, schema.$ref);
 
   const normalizedSchema = {
     ...schema,
@@ -62,7 +97,6 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function resolveDefinitionRef(
-  _rootSchema: Record<string, unknown>,
   definitions: Record<string, unknown>,
   ref: unknown,
 ): Record<string, unknown> | undefined {
@@ -77,7 +111,7 @@ function resolveDefinitionRef(
   }
 
   if (typeof definition.$ref === "string") {
-    return resolveDefinitionRef(_rootSchema, definitions, definition.$ref) ?? definition;
+    return resolveDefinitionRef(definitions, definition.$ref) ?? definition;
   }
 
   return definition;
@@ -98,7 +132,8 @@ function dereferenceLocalRefs(node: unknown, rootSchema: Record<string, unknown>
       return node;
     }
 
-    const resolved = resolveDefinitionRef(rootSchema, rootSchema.definitions as Record<string, unknown>, ref);
+    const definitions = isRecord(rootSchema.definitions) ? rootSchema.definitions : {};
+    const resolved = resolveDefinitionRef(definitions, ref);
     if (!resolved) {
       return node;
     }
@@ -119,9 +154,17 @@ function dereferenceLocalRefs(node: unknown, rootSchema: Record<string, unknown>
   );
 }
 
-function renderConfiguratorHtml(input: { schema: unknown; defaults: unknown }): string {
-  const schemaJson = JSON.stringify(input.schema, null, 2);
-  const defaultsJson = JSON.stringify(input.defaults, null, 2);
+function renderConfiguratorHtml(input: {
+  configSchema: unknown;
+  inputSchema: unknown;
+  configDefaults: unknown;
+  inputDefaults: unknown;
+  appBundle: string;
+}): string {
+  const configSchemaJson = JSON.stringify(input.configSchema, null, 2);
+  const inputSchemaJson = JSON.stringify(input.inputSchema, null, 2);
+  const configDefaultsJson = JSON.stringify(input.configDefaults, null, 2);
+  const inputDefaultsJson = JSON.stringify(input.inputDefaults, null, 2);
 
   return `<!doctype html>
 <html lang="en">
@@ -131,15 +174,16 @@ function renderConfiguratorHtml(input: { schema: unknown; defaults: unknown }): 
     <title>Core Configurator</title>
     <style>
       :root {
-        --bg: #f4f1ea;
-        --panel: #fffdf8;
-        --panel-alt: #f1eadf;
-        --text: #1c1a17;
-        --muted: #6c655d;
-        --border: #d4c6b2;
-        --accent: #9b4d2f;
-        --accent-soft: #efe0d1;
-        --shadow: 0 18px 48px rgba(60, 44, 29, 0.12);
+        --bg: #f3f5f8;
+        --panel: #ffffff;
+        --panel-alt: #eef2f7;
+        --text: #17202b;
+        --muted: #5f6b7a;
+        --border: #cdd6e1;
+        --border-strong: #9aa7b8;
+        --accent: #1f4b99;
+        --accent-soft: #dbe8ff;
+        --shadow: 0 8px 24px rgba(22, 32, 43, 0.08);
       }
 
       * { box-sizing: border-box; }
@@ -149,68 +193,126 @@ function renderConfiguratorHtml(input: { schema: unknown; defaults: unknown }): 
         color: var(--text);
         font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
         background:
-          radial-gradient(circle at top left, rgba(155, 77, 47, 0.16), transparent 28%),
-          radial-gradient(circle at bottom right, rgba(47, 91, 77, 0.12), transparent 24%),
-          linear-gradient(180deg, #f7f2ea 0%, #ece4d8 100%);
+          linear-gradient(180deg, #f8fafc 0%, #eef3f8 100%);
       }
 
       .page {
-        width: min(1400px, calc(100vw - 32px));
+        width: min(1600px, calc(100vw - 32px));
         margin: 24px auto 40px;
       }
 
       .hero, .panel {
-        background: rgba(255, 253, 248, 0.9);
-        border: 1px solid rgba(212, 198, 178, 0.9);
-        border-radius: 24px;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 10px;
         box-shadow: var(--shadow);
-        backdrop-filter: blur(10px);
       }
 
       .hero {
-        padding: 28px;
+        padding: 20px 22px;
         margin-bottom: 20px;
       }
 
       .eyebrow {
         margin: 0 0 8px;
         color: var(--accent);
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 0.12em;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
         text-transform: uppercase;
       }
 
       h1 {
-        margin: 0 0 10px;
-        font-size: clamp(32px, 5vw, 56px);
-        line-height: 0.95;
-        font-family: "IBM Plex Serif", Georgia, serif;
+        margin: 0 0 8px;
+        font-size: clamp(26px, 4vw, 38px);
+        line-height: 1.1;
+        font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+        font-weight: 600;
       }
 
       .hero p {
-        max-width: 900px;
+        max-width: 1080px;
         margin: 0;
         color: var(--muted);
-        font-size: 16px;
-        line-height: 1.5;
+        font-size: 14px;
+        line-height: 1.6;
       }
 
-      .layout {
+      .tab-shell {
         display: grid;
-        grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
-        gap: 20px;
+        gap: 14px;
+      }
+
+      .tab-strip {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .tab-button {
+        appearance: none;
+        border: 1px solid var(--border);
+        background: var(--panel);
+        color: var(--muted);
+        padding: 9px 14px;
+        border-radius: 6px;
+        font: 13px/1.3 "IBM Plex Sans", "Segoe UI", sans-serif;
+        cursor: pointer;
+        transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+      }
+
+      .tab-button:hover {
+        border-color: var(--border-strong);
+        background: #f8fbff;
+        color: var(--text);
+      }
+
+      .tab-button.active {
+        border-color: var(--accent);
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+
+      .tab-panel {
+        display: none;
+      }
+
+      .tab-panel.active {
+        display: block;
       }
 
       .panel {
         padding: 20px;
       }
 
+      .panel-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 12px;
+        margin-bottom: 14px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .panel-heading h2 {
+        margin: 0;
+        font-size: 18px;
+        font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+        font-weight: 600;
+      }
+
+      .panel-heading p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
       .toolbar {
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 18px;
+        gap: 8px;
+        margin-bottom: 16px;
       }
 
       button, .button-label {
@@ -218,48 +320,51 @@ function renderConfiguratorHtml(input: { schema: unknown; defaults: unknown }): 
         border: 1px solid var(--border);
         background: var(--panel);
         color: var(--text);
-        padding: 10px 14px;
-        border-radius: 999px;
-        font: inherit;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font: 13px/1.3 "IBM Plex Sans", "Segoe UI", sans-serif;
         cursor: pointer;
-        transition: transform 140ms ease, background 140ms ease, border-color 140ms ease;
+        transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
       }
 
       button.primary {
         background: var(--accent);
         border-color: var(--accent);
-        color: #fffaf4;
+        color: #ffffff;
       }
 
       button:hover, .button-label:hover {
-        transform: translateY(-1px);
-        border-color: var(--accent);
+        border-color: var(--border-strong);
+        background: #f8fbff;
       }
 
       input[type="file"] { display: none; }
 
       .status {
         margin-bottom: 16px;
-        padding: 12px 14px;
-        border-radius: 16px;
+        padding: 10px 12px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
         background: var(--panel-alt);
         color: var(--muted);
-        font-size: 14px;
+        font-size: 12px;
       }
 
       .status.error {
-        background: #f8e0db;
-        color: #7f2819;
+        background: #fbecec;
+        border-color: #e3b9b9;
+        color: #8a2d2d;
       }
 
       .status.success {
-        background: #ddeee5;
-        color: #1f6149;
+        background: #e8f3ea;
+        border-color: #b9d5c0;
+        color: #235c35;
       }
 
       .section-title {
-        margin: 0 0 10px;
-        font-size: 13px;
+        margin: 14px 0 10px;
+        font-size: 11px;
         letter-spacing: 0.08em;
         text-transform: uppercase;
         color: var(--muted);
@@ -267,41 +372,49 @@ function renderConfiguratorHtml(input: { schema: unknown; defaults: unknown }): 
 
       textarea {
         width: 100%;
-        min-height: 420px;
+        min-height: 260px;
         resize: vertical;
         border: 1px solid var(--border);
-        border-radius: 18px;
-        padding: 16px;
+        border-radius: 6px;
+        padding: 12px;
         background: #fff;
         color: var(--text);
-        font: 13px/1.45 "IBM Plex Mono", "SFMono-Regular", monospace;
+        font: 12px/1.5 "IBM Plex Mono", "SFMono-Regular", monospace;
+      }
+
+      .result-preview {
+        min-height: 720px;
       }
 
       .notes {
         margin-top: 12px;
         color: var(--muted);
-        font-size: 13px;
-        line-height: 1.5;
+        font-size: 12px;
+        line-height: 1.6;
       }
 
-      #editor_holder .je-object__container,
-      #editor_holder .well {
-        border-radius: 16px;
+      #config-editor .je-object__container,
+      #config-editor .well,
+      #input-editor .je-object__container,
+      #input-editor .well {
+        border-radius: 6px;
+      }
+
+      @media (max-width: 1280px) {
+        .result-preview {
+          min-height: 420px;
+        }
       }
 
       @media (max-width: 980px) {
-        .layout {
-          grid-template-columns: 1fr;
-        }
-
         .page {
-          width: min(100vw - 20px, 1400px);
+          width: min(100vw - 20px, 1600px);
           margin: 10px auto 24px;
         }
 
         .hero,
         .panel {
-          border-radius: 20px;
+          border-radius: 8px;
         }
       }
     </style>
@@ -309,137 +422,91 @@ function renderConfiguratorHtml(input: { schema: unknown; defaults: unknown }): 
   <body>
     <div class="page">
       <section class="hero">
-        <p class="eyebrow">Energy Core Configurator</p>
-        <h1>Configure, validate, export.</h1>
+        <p class="eyebrow">Energy Calculation Core</p>
+        <h1>Configuration and Calculation Interface</h1>
         <p>
-          This form is generated from the project's TypeScript configuration types and rendered through Jedison.
-          It is intended for fast structural editing of the core configuration JSON.
+          Generated from the project's TypeScript types. Configuration and input are edited with Jedison, validated
+          against JSON Schema, and evaluated with the same calculation runtime as the library.
         </p>
       </section>
 
-      <div class="layout">
-        <section class="panel">
-          <div class="toolbar">
-            <button id="reset" type="button">Reset to Defaults</button>
-            <label class="button-label" for="import-file">Import JSON</label>
-            <input id="import-file" type="file" accept="application/json,.json" />
-            <button id="copy" class="primary" type="button">Copy JSON</button>
-            <button id="download" type="button">Download JSON</button>
-            <button id="validate" type="button">Validate</button>
+      <div class="tab-shell">
+        <div class="tab-strip" role="tablist" aria-label="Configurator sections">
+          <button class="tab-button active" type="button" role="tab" aria-selected="true" data-tab-target="configuration">
+            Configuration
+          </button>
+          <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab-target="input">
+            Input
+          </button>
+          <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab-target="result">
+            Result
+          </button>
+        </div>
+
+        <section class="panel tab-panel active" data-tab-panel="configuration">
+          <div class="panel-heading">
+            <h2>Configuration</h2>
+            <p>Catalogs, defaults, rules, factors</p>
           </div>
-          <div id="status" class="status">Loading editor...</div>
-          <div id="editor_holder"></div>
+          <div class="toolbar">
+            <button id="config-reset" type="button">Reset</button>
+            <label class="button-label" for="config-import-file">Import</label>
+            <input id="config-import-file" type="file" accept="application/json,.json" />
+            <button id="config-copy" class="primary" type="button">Copy</button>
+            <button id="config-download" type="button">Download</button>
+            <button id="config-validate" type="button">Validate</button>
+          </div>
+          <div id="config-status" class="status">Loading configuration editor...</div>
+          <div id="config-editor"></div>
+          <p class="section-title">Configuration JSON</p>
+          <textarea id="config-preview" spellcheck="false" readonly></textarea>
         </section>
 
-        <aside class="panel">
-          <p class="section-title">JSON Preview</p>
-          <textarea id="json-preview" spellcheck="false" readonly></textarea>
+        <section class="panel tab-panel" data-tab-panel="input" hidden>
+          <div class="panel-heading">
+            <h2>Input</h2>
+            <p>Building-specific input for one calculation run</p>
+          </div>
+          <div class="toolbar">
+            <button id="input-reset" type="button">Reset</button>
+            <label class="button-label" for="input-import-file">Import</label>
+            <input id="input-import-file" type="file" accept="application/json,.json" />
+            <button id="input-copy" class="primary" type="button">Copy</button>
+            <button id="input-download" type="button">Download</button>
+            <button id="input-validate" type="button">Validate</button>
+          </div>
+          <div id="input-status" class="status">Loading input editor...</div>
+          <div id="input-editor"></div>
+          <p class="section-title">Input JSON</p>
+          <textarea id="input-preview" spellcheck="false" readonly></textarea>
+        </section>
+
+        <aside class="panel tab-panel" data-tab-panel="result" hidden>
+          <div class="panel-heading">
+            <h2>Result</h2>
+            <p>Runtime output from <code>calculateCore(...)</code></p>
+          </div>
+          <div class="toolbar">
+            <button id="calculate" class="primary" type="button">Calculate</button>
+            <button id="result-copy" type="button">Copy</button>
+            <button id="result-download" type="button">Download</button>
+          </div>
+          <div id="result-status" class="status">Preparing runtime...</div>
+          <textarea id="result-preview" class="result-preview" spellcheck="false" readonly></textarea>
           <div class="notes">
-            This checks structural validity against the generated JSON Schema derived from the TypeScript types.
-            Project-specific semantic checks that depend on runtime code are not evaluated here.
+            Schema validation checks only structure. Runtime calculation can still fail if the input no longer matches
+            the edited configuration, for example when catalog or construction names differ.
           </div>
         </aside>
       </div>
     </div>
 
-    <script type="application/json" id="core-config-schema">${schemaJson}</script>
-    <script type="application/json" id="core-config-defaults">${defaultsJson}</script>
+    <script type="application/json" id="core-config-schema">${configSchemaJson}</script>
+    <script type="application/json" id="core-input-schema">${inputSchemaJson}</script>
+    <script type="application/json" id="core-config-defaults">${configDefaultsJson}</script>
+    <script type="application/json" id="core-input-defaults">${inputDefaultsJson}</script>
     <script src="https://cdn.jsdelivr.net/npm/jedison@1.5.1/dist/umd/jedison.umd.js"></script>
-    <script>
-      const schema = JSON.parse(document.getElementById("core-config-schema").textContent);
-      const defaults = JSON.parse(document.getElementById("core-config-defaults").textContent);
-      const holder = document.getElementById("editor_holder");
-      const status = document.getElementById("status");
-      const preview = document.getElementById("json-preview");
-      const fileInput = document.getElementById("import-file");
-
-      const editor = new Jedison.Create({
-        container: holder,
-        theme: new Jedison.Theme(),
-        schema,
-      });
-      editor.setValue(structuredClone(defaults));
-
-      function setStatus(message, tone) {
-        status.textContent = message;
-        status.className = "status" + (tone ? " " + tone : "");
-      }
-
-      function refreshPreview() {
-        const value = editor.getValue();
-        preview.value = JSON.stringify(value, null, 2);
-      }
-
-      function validateEditor() {
-        const errors = editor.getErrors();
-        if (errors.length === 0) {
-          setStatus("Schema validation passed.", "success");
-          return true;
-        }
-
-        const first = errors[0];
-        editor.showValidationErrors(errors);
-        const message = first.messages && first.messages[0] ? first.messages[0] : "Unknown validation error.";
-        setStatus("Schema validation failed: " + first.path + " " + message, "error");
-        return false;
-      }
-
-      editor.on("change", () => {
-        refreshPreview();
-        setStatus("Edited. Validate or export when ready.");
-      });
-
-      document.getElementById("reset").addEventListener("click", () => {
-        editor.setValue(structuredClone(defaults));
-        refreshPreview();
-        setStatus("Defaults restored.", "success");
-      });
-
-      document.getElementById("validate").addEventListener("click", () => {
-        validateEditor();
-      });
-
-      document.getElementById("copy").addEventListener("click", async () => {
-        refreshPreview();
-        await navigator.clipboard.writeText(preview.value);
-        setStatus("JSON copied to clipboard.", "success");
-      });
-
-      document.getElementById("download").addEventListener("click", () => {
-        refreshPreview();
-        const blob = new Blob([preview.value], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = "core-config.json";
-        link.click();
-        URL.revokeObjectURL(url);
-        setStatus("JSON download started.", "success");
-      });
-
-      fileInput.addEventListener("change", async (event) => {
-        const file = event.target.files && event.target.files[0];
-        if (!file) {
-          return;
-        }
-
-        try {
-          const text = await file.text();
-          const value = JSON.parse(text);
-          editor.setValue(value);
-          refreshPreview();
-          setStatus("JSON imported.", "success");
-        } catch (error) {
-          const message = error instanceof Error ? error.message : String(error);
-          setStatus("Import failed: " + message, "error");
-        } finally {
-          fileInput.value = "";
-        }
-      });
-
-      refreshPreview();
-      setStatus("Editor ready.");
-    </script>
+    <script>${input.appBundle}</script>
   </body>
 </html>
 `;

@@ -8,7 +8,7 @@
 
 > **CoreConfigJson**\<`TCatalogs`, `THeatingConfig`, `TEnergyConfig`\> = `Readonly`\<\{ `envelope`: `Readonly`\<\{ `defaultFactor`: `number`; `defaultDeltaUwb`: `number`; `componentDefaults?`: [`EnvelopeComponentDefaults`](EnvelopeComponentDefaults.md); `catalogs`: `TCatalogs`; `recommendations`: [`EnvelopeRecommendationConfig`](EnvelopeRecommendationConfig.md); \}\>; `heating`: `THeatingConfig`; `energy`: `TEnergyConfig`; \}\>
 
-Defined in: [config/core-config-json.ts:44](https://github.com/csi-FOXBYTE/Regensburg_DigitalerEnergieZwilling_EnergyCalculationCore/blob/9a396a5d12cb19bc95d75d3a7e738b0448388936/src/config/core-config-json.ts#L44)
+Defined in: [config/core-config-json.ts:44](https://github.com/csi-FOXBYTE/Regensburg_DigitalerEnergieZwilling_EnergyCalculationCore/blob/0f9e37122197f8ca7609ecce54dd10328f548380/src/config/core-config-json.ts#L44)
 
 JSON input schema for external core configuration.
 

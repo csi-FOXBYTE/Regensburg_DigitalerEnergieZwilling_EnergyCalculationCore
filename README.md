@@ -46,7 +46,9 @@ pnpm run configurator:build
 
 - Standalone configurator output: [docs/configurator.html](docs/configurator.html)
 - Generated JSON Schema: [docs/core-config.schema.json](docs/core-config.schema.json)
+- Generated input Schema: [docs/core-input.schema.json](docs/core-input.schema.json)
 - Build it from the TypeScript config types: `pnpm run configurator:build`
+- The page includes separate editors for config and user input plus a runtime result panel
 - Full docs + configurator: `pnpm run docs`
 
 ## Usage

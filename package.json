@@ -19,6 +19,7 @@
   "packageManager": "pnpm@10.7.1",
   "devDependencies": {
     "@types/node": "^25.3.5",
+    "esbuild": "^0.27.3",
     "publint": "^0.3.18",
     "ts-json-schema-generator": "^2.9.0",
     "tsdown": "^0.21.0",

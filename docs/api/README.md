@@ -69,8 +69,10 @@
 - [CoreConfigJson](type-aliases/CoreConfigJson.md)
 - [coreConfigFromJson](functions/coreConfigFromJson.md)
 - [CoreConfigJsonSchemaSource](type-aliases/CoreConfigJsonSchemaSource.md)
+- [CoreInputSchemaSource](type-aliases/CoreInputSchemaSource.md)
 - [defaultCoreConfigJson](variables/defaultCoreConfigJson.md)
 - [defaultCoreConfig](variables/defaultCoreConfig.md)
+- [defaultCoreInputJson](variables/defaultCoreInputJson.md)
 
 ## Shared
 

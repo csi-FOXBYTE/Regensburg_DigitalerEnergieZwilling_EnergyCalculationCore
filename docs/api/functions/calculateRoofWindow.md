@@ -8,7 +8,7 @@
 
 > **calculateRoofWindow**\<`TCatalogs`\>(`input`, `config`): [`RoofWindowResult`](../type-aliases/RoofWindowResult.md)
 
-Defined in: [envelope/calculators.ts:31](https://github.com/csi-FOXBYTE/Regensburg_DigitalerEnergieZwilling_EnergyCalculationCore/blob/9a396a5d12cb19bc95d75d3a7e738b0448388936/src/envelope/calculators.ts#L31)
+Defined in: [envelope/calculators.ts:31](https://github.com/csi-FOXBYTE/Regensburg_DigitalerEnergieZwilling_EnergyCalculationCore/blob/0f9e37122197f8ca7609ecce54dd10328f548380/src/envelope/calculators.ts#L31)
 
 Calculates roof + roof-window transmission heat losses and derived indicators.
 

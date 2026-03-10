@@ -8,7 +8,7 @@
 
 > **LiteralUnion**\<`TKnown`\> = `TKnown` \| `string` & `object`
 
-Defined in: [heating/types.ts:23](https://github.com/csi-FOXBYTE/Regensburg_DigitalerEnergieZwilling_EnergyCalculationCore/blob/9a396a5d12cb19bc95d75d3a7e738b0448388936/src/heating/types.ts#L23)
+Defined in: [heating/types.ts:23](https://github.com/csi-FOXBYTE/Regensburg_DigitalerEnergieZwilling_EnergyCalculationCore/blob/0f9e37122197f8ca7609ecce54dd10328f548380/src/heating/types.ts#L23)
 
 String literal union that keeps editor completion for known values while
 still allowing custom strings.
