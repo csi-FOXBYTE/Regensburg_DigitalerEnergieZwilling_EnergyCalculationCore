@@ -24,6 +24,21 @@ test("calculateRoofWindow computes HT with deltaUwb and recommendations", () => 
   assert.equal(result.recommendations[1]?.action, "none");
 });
 
+test("calculateRoofWindow uses configured roof-window default factor", () => {
+  const result = calculateRoofWindow(
+    {
+      roof: { uValue: 0.2, area: 10 },
+      roofWindow: { uValue: 1.0, area: 2 },
+    },
+    defaultCoreConfig.envelope,
+  );
+
+  assert.equal(result.roof.ht, 2);
+  assert.equal(result.roofWindow.factor, 0.93);
+  assert.equal(result.roofWindow.ht, 1.86);
+  assert.ok(Math.abs(result.totalHt - 5.06) < 1e-12);
+});
+
 test("calculateWallWindow computes HT and age-based recommendations", () => {
   const result = calculateWallWindow(
     {
@@ -54,6 +69,31 @@ test("calculateWallWindow computes HT and age-based recommendations", () => {
   assert.equal(result.recommendations[1]?.action, "none");
 });
 
+test("calculateWallWindow returns insulation replacement when facade insulation is very old", () => {
+  const result = calculateWallWindow(
+    {
+      wall: {
+        uValue: 0.4,
+        area: 80,
+        ageYears: 80,
+        details: {
+          insulationPresent: true,
+          insulationAgeYears: 55,
+        },
+      },
+      window: {
+        uValue: 1.3,
+        area: 20,
+        ageYears: 12,
+      },
+    },
+    defaultCoreConfig.envelope,
+  );
+
+  assert.equal(result.recommendations[0]?.action, "replace_insulation");
+  assert.equal(result.recommendations[1]?.action, "none");
+});
+
 test("calculateWallWindow uses explicit envelopeArea when provided", () => {
   const result = calculateWallWindow(
     {
@@ -72,12 +112,47 @@ test("calculateWallWindow uses explicit envelopeArea when provided", () => {
 test("calculateSingleSurface handles zero area safely", () => {
   const result = calculateSingleSurface(
     { uValue: 0.5, area: 0, ageYears: 50 },
-    defaultCoreConfig.envelope.recommendations.ogd,
-    "ogd",
+    defaultCoreConfig.envelope.recommendations.topFloorCeiling,
+    "topFloorCeiling",
     defaultCoreConfig.envelope,
   );
 
   assert.equal(result.totalHt, 0);
   assert.equal(result.htPrime, 0);
   assert.equal(result.recommendations[0]?.action, "insulate");
+});
+
+test("calculateSingleSurface supports conditional recommendation rules for LOD2/3 details", () => {
+  const result = calculateSingleSurface(
+    {
+      uValue: 0.5,
+      area: 20,
+      ageYears: 45,
+      details: {
+        insulationPresent: false,
+        renovationRequested: true,
+      },
+    },
+    [
+      {
+        minAge: 40,
+        conditions: [
+          { field: "details.insulationPresent", equals: false },
+          { field: "details.renovationRequested", equals: true },
+        ],
+        action: "full_renovation",
+        reason: "No insulation is present and renovation was explicitly requested.",
+      },
+      {
+        minAge: 40,
+        action: "insulate",
+        reason: "Fallback",
+      },
+    ],
+    "topFloorCeiling",
+    defaultCoreConfig.envelope,
+  );
+
+  assert.equal(result.recommendations[0]?.action, "full_renovation");
+  assert.equal(result.recommendations[0]?.reason, "No insulation is present and renovation was explicitly requested.");
 });

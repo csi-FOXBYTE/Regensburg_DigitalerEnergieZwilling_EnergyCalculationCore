@@ -4,10 +4,16 @@
 
 [@csi-foxbyte/Regensburg_DigitalerEnergieZwilling_EnergyCalculationCore](../README.md) / WallWindowInput
 
-# Type Alias: WallWindowInput
+# Type Alias: WallWindowInput\<TCatalogs\>
 
-> **WallWindowInput** = `Readonly`\<\{ `wall`: [`SurfaceInput`](SurfaceInput.md); `window`: [`SurfaceInput`](SurfaceInput.md); `envelopeArea?`: `number`; \}\>
+> **WallWindowInput**\<`TCatalogs`\> = `Readonly`\<\{ `wall`: [`SurfaceInput`](SurfaceInput.md)\<`TCatalogs`\>; `window`: [`SurfaceInput`](SurfaceInput.md)\<`TCatalogs`\>; `envelopeArea?`: `number`; \}\>
 
-Defined in: envelope/types.ts:32
+Defined in: [envelope/types.ts:62](https://github.com/csi-FOXBYTE/Regensburg_DigitalerEnergieZwilling_EnergyCalculationCore/blob/9a396a5d12cb19bc95d75d3a7e738b0448388936/src/envelope/types.ts#L62)
 
 Input for the wall + window block.
+
+## Type Parameters
+
+### TCatalogs
+
+`TCatalogs` *extends* [`UValueCatalogMap`](UValueCatalogMap.md) = [`UValueCatalogMap`](UValueCatalogMap.md)

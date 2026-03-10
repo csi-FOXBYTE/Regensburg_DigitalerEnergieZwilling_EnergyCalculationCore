@@ -4,10 +4,16 @@
 
 [@csi-foxbyte/Regensburg_DigitalerEnergieZwilling_EnergyCalculationCore](../README.md) / HeatingResult
 
-# Type Alias: HeatingResult
+# Type Alias: HeatingResult\<THeatingType\>
 
-> **HeatingResult** = `Readonly`\<\{ `ageYears?`: `number`; `recommendation`: [`HeatingRecommendation`](HeatingRecommendation.md); \}\>
+> **HeatingResult**\<`THeatingType`\> = `Readonly`\<\{ `ageYears?`: `number`; `recommendation`: [`HeatingRecommendation`](HeatingRecommendation.md)\<`THeatingType`\>; \}\>
 
-Defined in: heating/types.ts:65
+Defined in: [heating/types.ts:148](https://github.com/csi-FOXBYTE/Regensburg_DigitalerEnergieZwilling_EnergyCalculationCore/blob/9a396a5d12cb19bc95d75d3a7e738b0448388936/src/heating/types.ts#L148)
 
 Heating evaluation result.
+
+## Type Parameters
+
+### THeatingType
+
+`THeatingType` *extends* `string` = `string`

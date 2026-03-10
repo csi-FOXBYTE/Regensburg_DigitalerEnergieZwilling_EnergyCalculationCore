@@ -1,57 +1,90 @@
-import { yearBandsFromLayout } from "../catalogs/u-value";
-import type { YearBand, YearBandRange } from "../catalogs/types";
+import type { YearBand } from "../catalogs/types";
 import type { CoreConfig } from "../core/types";
-import type { EnvelopeRecommendationConfig } from "../envelope/types";
+import type { EnergyConfig } from "../energy/types";
+import type { EnvelopeComponentDefaults, EnvelopeRecommendationConfig } from "../envelope/types";
 import type { HeatingConfig } from "../heating/types";
 
 /**
  * JSON representation for one construction entry in a catalog.
  *
- * Numeric arrays are interpreted via `envelope.yearBandLayout`.
- * Explicit year-band arrays can be passed directly.
+ * @group Configuration
+ */
+export type JsonConstructionConfig = readonly YearBand[];
+
+/**
+ * Mapping of `construction -> raw JSON construction config`.
  *
  * @group Configuration
  */
-export type JsonConstructionConfig = readonly number[] | readonly YearBand[];
+export type JsonCatalogConfig = Readonly<Record<string, JsonConstructionConfig>>;
+
+/**
+ * Mapping of `catalog -> raw JSON catalog config`.
+ *
+ * @group Configuration
+ */
+export type JsonCatalogConfigMap = Readonly<Record<string, JsonCatalogConfig>>;
+
+/**
+ * Runtime catalog map derived from a JSON catalog config map.
+ *
+ * @group Configuration
+ */
+export type NormalizedCatalogMap<TCatalogs extends JsonCatalogConfigMap> = Readonly<{
+  [TCatalog in keyof TCatalogs]: Readonly<{
+    [TConstruction in keyof TCatalogs[TCatalog]]: readonly YearBand[];
+  }>;
+}>;
 
 /**
  * JSON input schema for external core configuration.
  *
  * @group Configuration
  */
-export type CoreConfigJson = Readonly<{
+export type CoreConfigJson<
+  TCatalogs extends JsonCatalogConfigMap = JsonCatalogConfigMap,
+  THeatingConfig extends HeatingConfig = HeatingConfig,
+  TEnergyConfig extends EnergyConfig = EnergyConfig,
+> = Readonly<{
   envelope: Readonly<{
     defaultFactor: number;
     defaultDeltaUwb: number;
-    yearBandLayout?: readonly YearBandRange[];
-    catalogs: Readonly<Record<string, Readonly<Record<string, JsonConstructionConfig>>>>;
+    componentDefaults?: EnvelopeComponentDefaults;
+    catalogs: TCatalogs;
     recommendations: EnvelopeRecommendationConfig;
   }>;
-  heating: HeatingConfig;
+  heating: THeatingConfig;
+  energy: TEnergyConfig;
 }>;
 
 /**
  * Converts an external JSON configuration object into the internal runtime config.
  *
- * Numeric construction arrays are expanded using `envelope.yearBandLayout`.
- * Explicit `{ from?, to?, value }` arrays are forwarded as-is.
- *
  * @param input - External JSON configuration object.
  * @returns Internal normalized core configuration.
  * @group Configuration
  */
-export function coreConfigFromJson(input: CoreConfigJson): CoreConfig {
-  const catalogs: Record<string, Record<string, readonly YearBand[]>> = {};
+export function coreConfigFromJson<
+  const TCatalogs extends JsonCatalogConfigMap,
+  const THeatingConfig extends HeatingConfig,
+  const TEnergyConfig extends EnergyConfig,
+>(
+  input: CoreConfigJson<TCatalogs, THeatingConfig, TEnergyConfig>,
+): CoreConfig<NormalizedCatalogMap<TCatalogs>, THeatingConfig, TEnergyConfig> {
+  const catalogs = {} as {
+    -readonly [TCatalog in keyof TCatalogs]: {
+      -readonly [TConstruction in keyof TCatalogs[TCatalog]]: readonly YearBand[];
+    };
+  };
 
   for (const [catalogName, constructions] of Object.entries(input.envelope.catalogs)) {
-    const normalizedConstructions: Record<string, readonly YearBand[]> = {};
+    const normalizedConstructions = {} as {
+      -readonly [TConstruction in keyof TCatalogs[Extract<keyof TCatalogs, typeof catalogName>]]: readonly YearBand[];
+    };
     for (const [constructionName, config] of Object.entries(constructions)) {
-      normalizedConstructions[constructionName] = normalizeConstructionConfig(
-        config,
-        input.envelope.yearBandLayout,
-      );
+      normalizedConstructions[constructionName as keyof typeof normalizedConstructions] = normalizeConstructionConfig(config);
     }
-    catalogs[catalogName] = normalizedConstructions;
+    catalogs[catalogName as keyof typeof catalogs] = normalizedConstructions;
   }
 
   return {
@@ -60,38 +93,24 @@ export function coreConfigFromJson(input: CoreConfigJson): CoreConfig {
       defaultDeltaUwb: input.envelope.defaultDeltaUwb,
       catalogs,
       recommendations: input.envelope.recommendations,
+      ...(input.envelope.componentDefaults ? { componentDefaults: input.envelope.componentDefaults } : {}),
     },
     heating: input.heating,
+    energy: input.energy,
   };
 }
 
 /**
  * Normalizes a single construction config entry into explicit year bands.
  *
- * @param input - Either numeric values or explicit year bands.
- * @param layout - Optional year-band layout used for numeric arrays.
+ * @param input - Explicit year bands.
  * @returns Explicit year-band list.
- * @throws If input is empty or numeric input is provided without layout.
+ * @throws If input is empty.
  */
-function normalizeConstructionConfig(
-  input: JsonConstructionConfig,
-  layout?: readonly YearBandRange[],
-): readonly YearBand[] {
+function normalizeConstructionConfig(input: JsonConstructionConfig): readonly YearBand[] {
   if (input.length === 0) {
     throw new Error("Construction config must not be empty.");
   }
 
-  const [first] = input;
-  if (typeof first === "number") {
-    if (!layout) {
-      throw new Error("Missing 'yearBandLayout' for numeric array construction config.");
-    }
-    return yearBandsFromLayout(input as readonly number[], layout);
-  }
-
-  if (typeof first === "object" && first !== null) {
-    return input as readonly YearBand[];
-  }
-
-  throw new Error("Invalid construction config format.");
+  return input;
 }

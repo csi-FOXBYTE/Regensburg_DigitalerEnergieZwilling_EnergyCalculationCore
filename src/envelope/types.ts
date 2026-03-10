@@ -1,15 +1,45 @@
 import type { UValueCatalogMap, UValueSource } from "../catalogs/types";
+import type { RuleCondition, RuleValue } from "../shared/rule-conditions";
+
+/**
+ * Supported per-surface identifiers for envelope defaults.
+ *
+ * @group Envelope
+ */
+export type EnvelopeSurfaceKind = "roof" | "roofWindow" | "wall" | "window" | "topFloorCeiling" | "lowestFloor";
+
+/**
+ * Optional LOD2/LOD3 metadata for envelope surfaces.
+ *
+ * @group Envelope
+ */
+export type SurfaceDetails = Readonly<{
+  insulationPresent?: boolean;
+  insulationThicknessM?: number;
+  insulationConductivityWPerMK?: number;
+  insulationAgeYears?: number;
+  heatedSpaceAdjacent?: boolean;
+  roofShape?: string;
+  constructionType?: string;
+  frameType?: string;
+  glazingType?: string;
+  areaSource?: string;
+  uValueSource?: string;
+  renovationRequested?: boolean;
+  attributes?: Readonly<Record<string, RuleValue>>;
+}>;
 
 /**
  * Input for a single envelope surface.
  *
  * @group Envelope
  */
-export type SurfaceInput = UValueSource &
+export type SurfaceInput<TCatalogs extends UValueCatalogMap = UValueCatalogMap> = UValueSource<TCatalogs> &
   Readonly<{
     area: number;
     factor?: number;
     ageYears?: number;
+    details?: SurfaceDetails;
   }>;
 
 /**
@@ -17,9 +47,9 @@ export type SurfaceInput = UValueSource &
  *
  * @group Envelope
  */
-export type RoofWindowInput = Readonly<{
-  roof: SurfaceInput;
-  roofWindow: SurfaceInput;
+export type RoofWindowInput<TCatalogs extends UValueCatalogMap = UValueCatalogMap> = Readonly<{
+  roof: SurfaceInput<TCatalogs>;
+  roofWindow: SurfaceInput<TCatalogs>;
   deltaUwb?: number;
   envelopeArea?: number;
 }>;
@@ -29,9 +59,9 @@ export type RoofWindowInput = Readonly<{
  *
  * @group Envelope
  */
-export type WallWindowInput = Readonly<{
-  wall: SurfaceInput;
-  window: SurfaceInput;
+export type WallWindowInput<TCatalogs extends UValueCatalogMap = UValueCatalogMap> = Readonly<{
+  wall: SurfaceInput<TCatalogs>;
+  window: SurfaceInput<TCatalogs>;
   envelopeArea?: number;
 }>;
 
@@ -52,7 +82,7 @@ export type HtBlock = Readonly<{
  *
  * @group Envelope
  */
-export type RecommendationAction = "none" | "insulate" | "replace" | "full_renovation";
+export type RecommendationAction = "none" | "insulate" | "replace" | "replace_insulation" | "full_renovation";
 
 /**
  * Recommendation payload for one envelope component.
@@ -74,10 +104,28 @@ export type EnvelopeRecommendation = Readonly<{
 export type AgeRecommendationRule = Readonly<{
   minAge?: number;
   maxAge?: number;
+  conditions?: readonly RuleCondition[];
   action: RecommendationAction;
   reason: string;
   targetUValue?: number;
 }>;
+
+/**
+ * Optional component-specific defaults used when an input does not provide
+ * an explicit value.
+ *
+ * @group Envelope
+ */
+export type EnvelopeComponentDefaults = Readonly<
+  Partial<
+    Record<
+      EnvelopeSurfaceKind,
+      Readonly<{
+        factor?: number;
+      }>
+    >
+  >
+>;
 
 /**
  * Recommendation rules grouped by envelope component.
@@ -89,8 +137,8 @@ export type EnvelopeRecommendationConfig = Readonly<{
   roofWindow: readonly AgeRecommendationRule[];
   wall: readonly AgeRecommendationRule[];
   wallWindow: readonly AgeRecommendationRule[];
-  ogd: readonly AgeRecommendationRule[];
-  ugd: readonly AgeRecommendationRule[];
+  topFloorCeiling: readonly AgeRecommendationRule[];
+  lowestFloor: readonly AgeRecommendationRule[];
 }>;
 
 /**
@@ -98,11 +146,12 @@ export type EnvelopeRecommendationConfig = Readonly<{
  *
  * @group Envelope
  */
-export type EnvelopeConfig = Readonly<{
+export type EnvelopeConfig<TCatalogs extends UValueCatalogMap = UValueCatalogMap> = Readonly<{
   defaultFactor: number;
   defaultDeltaUwb: number;
-  catalogs: UValueCatalogMap;
+  catalogs: TCatalogs;
   recommendations: EnvelopeRecommendationConfig;
+  componentDefaults?: EnvelopeComponentDefaults;
 }>;
 
 /**

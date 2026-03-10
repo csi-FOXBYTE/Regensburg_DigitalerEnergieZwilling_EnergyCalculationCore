@@ -6,9 +6,9 @@
 
 # Function: calculateRoofWindow()
 
-> **calculateRoofWindow**(`input`, `config`): [`RoofWindowResult`](../type-aliases/RoofWindowResult.md)
+> **calculateRoofWindow**\<`TCatalogs`\>(`input`, `config`): [`RoofWindowResult`](../type-aliases/RoofWindowResult.md)
 
-Defined in: envelope/calculators.ts:29
+Defined in: [envelope/calculators.ts:31](https://github.com/csi-FOXBYTE/Regensburg_DigitalerEnergieZwilling_EnergyCalculationCore/blob/9a396a5d12cb19bc95d75d3a7e738b0448388936/src/envelope/calculators.ts#L31)
 
 Calculates roof + roof-window transmission heat losses and derived indicators.
 
@@ -18,17 +18,23 @@ Formula basis:
 - `totalHt = sumHt + bridgeHt`
 - `htPrime = totalHt / referenceArea`
 
+## Type Parameters
+
+### TCatalogs
+
+`TCatalogs` *extends* `Readonly`\<`Record`\<`string`, `Readonly`\<`Record`\<`string`, readonly `Readonly`\<\{ `from?`: `number`; `to?`: `number`; `value`: `number`; \}\>[]\>\>\>\>
+
 ## Parameters
 
 ### input
 
-[`RoofWindowInput`](../type-aliases/RoofWindowInput.md)
+[`RoofWindowInput`](../type-aliases/RoofWindowInput.md)\<`TCatalogs`\>
 
 Roof/roof-window input values including optional overrides.
 
 ### config
 
-[`EnvelopeConfig`](../type-aliases/EnvelopeConfig.md)
+[`EnvelopeConfig`](../type-aliases/EnvelopeConfig.md)\<`TCatalogs`\>
 
 Envelope calculation configuration.
 

@@ -6,11 +6,8 @@
 
 # Type Alias: JsonConstructionConfig
 
-> **JsonConstructionConfig** = readonly `number`[] \| readonly [`YearBand`](YearBand.md)[]
+> **JsonConstructionConfig** = readonly [`YearBand`](YearBand.md)[]
 
-Defined in: config/core-config-json.ts:15
+Defined in: [config/core-config-json.ts:12](https://github.com/csi-FOXBYTE/Regensburg_DigitalerEnergieZwilling_EnergyCalculationCore/blob/9a396a5d12cb19bc95d75d3a7e738b0448388936/src/config/core-config-json.ts#L12)
 
 JSON representation for one construction entry in a catalog.
-
-Numeric arrays are interpreted via `envelope.yearBandLayout`.
-Explicit year-band arrays can be passed directly.

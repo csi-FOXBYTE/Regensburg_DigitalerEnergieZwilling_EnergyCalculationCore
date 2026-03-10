@@ -1,8 +1,10 @@
+import type { UValueCatalogMap } from "../catalogs/types";
 import { resolveUValue } from "../catalogs/u-value";
 import { safeDivide } from "../shared/math";
 import { evaluateAgeRecommendation } from "./recommendations";
 import type {
   EnvelopeConfig,
+  EnvelopeSurfaceKind,
   HtBlock,
   RoofWindowInput,
   RoofWindowResult,
@@ -26,9 +28,12 @@ import type {
  * @returns Detailed component result plus recommendations.
  * @group Envelope
  */
-export function calculateRoofWindow(input: RoofWindowInput, config: EnvelopeConfig): RoofWindowResult {
-  const roof = toHtBlock(input.roof, config);
-  const roofWindow = toHtBlock(input.roofWindow, config);
+export function calculateRoofWindow<TCatalogs extends UValueCatalogMap>(
+  input: RoofWindowInput<TCatalogs>,
+  config: EnvelopeConfig<TCatalogs>,
+): RoofWindowResult {
+  const roof = toHtBlock(input.roof, "roof", config);
+  const roofWindow = toHtBlock(input.roofWindow, "roofWindow", config);
   const sumHt = roof.ht + roofWindow.ht;
   const referenceArea = input.envelopeArea ?? roof.area + roofWindow.area;
   const deltaUwb = input.deltaUwb ?? config.defaultDeltaUwb;
@@ -36,8 +41,8 @@ export function calculateRoofWindow(input: RoofWindowInput, config: EnvelopeConf
   const totalHt = sumHt + bridgeHt;
 
   const recommendations = [
-    evaluateAgeRecommendation("roof", input.roof.ageYears, config.recommendations.roof),
-    evaluateAgeRecommendation("roofWindow", input.roofWindow.ageYears, config.recommendations.roofWindow),
+    evaluateAgeRecommendation("roof", input.roof, config.recommendations.roof),
+    evaluateAgeRecommendation("roofWindow", input.roofWindow, config.recommendations.roofWindow),
   ].filter((entry) => entry !== undefined);
 
   return {
@@ -65,15 +70,18 @@ export function calculateRoofWindow(input: RoofWindowInput, config: EnvelopeConf
  * @returns Detailed component result plus recommendations.
  * @group Envelope
  */
-export function calculateWallWindow(input: WallWindowInput, config: EnvelopeConfig): WallWindowResult {
-  const wall = toHtBlock(input.wall, config);
-  const window = toHtBlock(input.window, config);
+export function calculateWallWindow<TCatalogs extends UValueCatalogMap>(
+  input: WallWindowInput<TCatalogs>,
+  config: EnvelopeConfig<TCatalogs>,
+): WallWindowResult {
+  const wall = toHtBlock(input.wall, "wall", config);
+  const window = toHtBlock(input.window, "window", config);
   const totalHt = wall.ht + window.ht;
   const referenceArea = input.envelopeArea ?? wall.area + window.area;
 
   const recommendations = [
-    evaluateAgeRecommendation("wall", input.wall.ageYears, config.recommendations.wall),
-    evaluateAgeRecommendation("wallWindow", input.window.ageYears, config.recommendations.wallWindow),
+    evaluateAgeRecommendation("wall", input.wall, config.recommendations.wall),
+    evaluateAgeRecommendation("wallWindow", input.window, config.recommendations.wallWindow),
   ].filter((entry) => entry !== undefined);
 
   return {
@@ -96,14 +104,14 @@ export function calculateWallWindow(input: WallWindowInput, config: EnvelopeConf
  * @returns Surface HT result plus optional recommendation.
  * @group Envelope
  */
-export function calculateSingleSurface(
-  input: SurfaceInput,
+export function calculateSingleSurface<TCatalogs extends UValueCatalogMap>(
+  input: SurfaceInput<TCatalogs>,
   rules: readonly import("./types").AgeRecommendationRule[],
   component: string,
-  config: EnvelopeConfig,
+  config: EnvelopeConfig<TCatalogs>,
 ): SingleSurfaceResult {
-  const surface = toHtBlock(input, config);
-  const recommendation = evaluateAgeRecommendation(component, input.ageYears, rules);
+  const surface = toHtBlock(input, component as EnvelopeSurfaceKind, config);
+  const recommendation = evaluateAgeRecommendation(component, input, rules);
 
   return {
     surface,
@@ -121,9 +129,13 @@ export function calculateSingleSurface(
  * @param config - Envelope calculation configuration.
  * @returns Normalized HT block.
  */
-function toHtBlock(input: SurfaceInput, config: EnvelopeConfig): HtBlock {
+function toHtBlock<TCatalogs extends UValueCatalogMap>(
+  input: SurfaceInput<TCatalogs>,
+  component: EnvelopeSurfaceKind,
+  config: EnvelopeConfig<TCatalogs>,
+): HtBlock {
   const uValue = resolveUValue(input, config.catalogs);
-  const factor = input.factor ?? config.defaultFactor;
+  const factor = input.factor ?? config.componentDefaults?.[component]?.factor ?? config.defaultFactor;
 
   return {
     area: input.area,

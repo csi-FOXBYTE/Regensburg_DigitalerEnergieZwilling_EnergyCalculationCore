@@ -9,7 +9,8 @@
     "build": "pnpm run lint && pnpm run test && tsdown",
     "lint": "tsc --noEmit",
     "docs:api": "typedoc --options typedoc.json",
-    "docs": "pnpm run docs:api",
+    "configurator:build": "tsx scripts/generate-configurator.ts",
+    "docs": "pnpm run docs:api && pnpm run configurator:build",
     "prepack": "pnpm run build"
   },
   "keywords": [],
@@ -19,6 +20,7 @@
   "devDependencies": {
     "@types/node": "^25.3.5",
     "publint": "^0.3.18",
+    "ts-json-schema-generator": "^2.9.0",
     "tsdown": "^0.21.0",
     "tsx": "^4.21.0",
     "typedoc": "^0.28.17",

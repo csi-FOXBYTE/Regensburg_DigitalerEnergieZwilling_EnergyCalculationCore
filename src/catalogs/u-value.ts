@@ -9,7 +9,7 @@ import type { UValueCatalogMap, UValueSource, YearBand, YearBandRange } from "./
  * @throws If catalog/construction is missing or no year band matches.
  * @group Catalogs
  */
-export function resolveUValue(source: UValueSource, catalogs: UValueCatalogMap): number {
+export function resolveUValue<TCatalogs extends UValueCatalogMap>(source: UValueSource<TCatalogs>, catalogs: TCatalogs): number {
   if ("uValue" in source) {
     return source.uValue;
   }

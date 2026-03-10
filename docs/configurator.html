@@ -1,0 +1,5953 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Core Configurator</title>
+    <style>
+      :root {
+        --bg: #f4f1ea;
+        --panel: #fffdf8;
+        --panel-alt: #f1eadf;
+        --text: #1c1a17;
+        --muted: #6c655d;
+        --border: #d4c6b2;
+        --accent: #9b4d2f;
+        --accent-soft: #efe0d1;
+        --shadow: 0 18px 48px rgba(60, 44, 29, 0.12);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        color: var(--text);
+        font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(155, 77, 47, 0.16), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(47, 91, 77, 0.12), transparent 24%),
+          linear-gradient(180deg, #f7f2ea 0%, #ece4d8 100%);
+      }
+
+      .page {
+        width: min(1400px, calc(100vw - 32px));
+        margin: 24px auto 40px;
+      }
+
+      .hero, .panel {
+        background: rgba(255, 253, 248, 0.9);
+        border: 1px solid rgba(212, 198, 178, 0.9);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(10px);
+      }
+
+      .hero {
+        padding: 28px;
+        margin-bottom: 20px;
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0 0 10px;
+        font-size: clamp(32px, 5vw, 56px);
+        line-height: 0.95;
+        font-family: "IBM Plex Serif", Georgia, serif;
+      }
+
+      .hero p {
+        max-width: 900px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.5;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
+        gap: 20px;
+      }
+
+      .panel {
+        padding: 20px;
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+
+      button, .button-label {
+        appearance: none;
+        border: 1px solid var(--border);
+        background: var(--panel);
+        color: var(--text);
+        padding: 10px 14px;
+        border-radius: 999px;
+        font: inherit;
+        cursor: pointer;
+        transition: transform 140ms ease, background 140ms ease, border-color 140ms ease;
+      }
+
+      button.primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fffaf4;
+      }
+
+      button:hover, .button-label:hover {
+        transform: translateY(-1px);
+        border-color: var(--accent);
+      }
+
+      input[type="file"] { display: none; }
+
+      .status {
+        margin-bottom: 16px;
+        padding: 12px 14px;
+        border-radius: 16px;
+        background: var(--panel-alt);
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .status.error {
+        background: #f8e0db;
+        color: #7f2819;
+      }
+
+      .status.success {
+        background: #ddeee5;
+        color: #1f6149;
+      }
+
+      .section-title {
+        margin: 0 0 10px;
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 420px;
+        resize: vertical;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 16px;
+        background: #fff;
+        color: var(--text);
+        font: 13px/1.45 "IBM Plex Mono", "SFMono-Regular", monospace;
+      }
+
+      .notes {
+        margin-top: 12px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      #editor_holder .je-object__container,
+      #editor_holder .well {
+        border-radius: 16px;
+      }
+
+      @media (max-width: 980px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .page {
+          width: min(100vw - 20px, 1400px);
+          margin: 10px auto 24px;
+        }
+
+        .hero,
+        .panel {
+          border-radius: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <section class="hero">
+        <p class="eyebrow">Energy Core Configurator</p>
+        <h1>Configure, validate, export.</h1>
+        <p>
+          This form is generated from the project's TypeScript configuration types and rendered through Jedison.
+          It is intended for fast structural editing of the core configuration JSON.
+        </p>
+      </section>
+
+      <div class="layout">
+        <section class="panel">
+          <div class="toolbar">
+            <button id="reset" type="button">Reset to Defaults</button>
+            <label class="button-label" for="import-file">Import JSON</label>
+            <input id="import-file" type="file" accept="application/json,.json" />
+            <button id="copy" class="primary" type="button">Copy JSON</button>
+            <button id="download" type="button">Download JSON</button>
+            <button id="validate" type="button">Validate</button>
+          </div>
+          <div id="status" class="status">Loading editor...</div>
+          <div id="editor_holder"></div>
+        </section>
+
+        <aside class="panel">
+          <p class="section-title">JSON Preview</p>
+          <textarea id="json-preview" spellcheck="false" readonly></textarea>
+          <div class="notes">
+            This checks structural validity against the generated JSON Schema derived from the TypeScript types.
+            Project-specific semantic checks that depend on runtime code are not evaluated here.
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <script type="application/json" id="core-config-schema">{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "CoreConfigJsonSchemaSource": {
+      "type": "object",
+      "properties": {
+        "envelope": {
+          "type": "object",
+          "properties": {
+            "defaultFactor": {
+              "type": "number"
+            },
+            "defaultDeltaUwb": {
+              "type": "number"
+            },
+            "componentDefaults": {
+              "type": "object",
+              "properties": {
+                "roof": {
+                  "type": "object",
+                  "properties": {
+                    "factor": {
+                      "type": "number"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "roofWindow": {
+                  "type": "object",
+                  "properties": {
+                    "factor": {
+                      "type": "number"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "wall": {
+                  "type": "object",
+                  "properties": {
+                    "factor": {
+                      "type": "number"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "window": {
+                  "type": "object",
+                  "properties": {
+                    "factor": {
+                      "type": "number"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "topFloorCeiling": {
+                  "type": "object",
+                  "properties": {
+                    "factor": {
+                      "type": "number"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "lowestFloor": {
+                  "type": "object",
+                  "properties": {
+                    "factor": {
+                      "type": "number"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false,
+              "description": "Optional component-specific defaults used when an input does not provide an explicit value."
+            },
+            "catalogs": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "from": {
+                        "type": "number"
+                      },
+                      "to": {
+                        "type": "number"
+                      },
+                      "value": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "value"
+                    ],
+                    "additionalProperties": false,
+                    "description": "Year-bounded U-value entry."
+                  },
+                  "description": "JSON representation for one construction entry in a catalog."
+                },
+                "description": "Mapping of `construction -> raw JSON construction config`."
+              },
+              "description": "Mapping of `catalog -> raw JSON catalog config`."
+            },
+            "recommendations": {
+              "type": "object",
+              "properties": {
+                "roof": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "minAge": {
+                        "type": "number"
+                      },
+                      "maxAge": {
+                        "type": "number"
+                      },
+                      "conditions": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "field": {
+                              "type": "string"
+                            },
+                            "equals": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            },
+                            "notEquals": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            },
+                            "oneOf": {
+                              "type": "array",
+                              "items": {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean"
+                                ]
+                              }
+                            },
+                            "min": {
+                              "type": "number"
+                            },
+                            "max": {
+                              "type": "number"
+                            },
+                            "exists": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "field"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                        }
+                      },
+                      "action": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "insulate",
+                          "replace",
+                          "replace_insulation",
+                          "full_renovation"
+                        ],
+                        "description": "Supported recommendation action set for envelope components."
+                      },
+                      "reason": {
+                        "type": "string"
+                      },
+                      "targetUValue": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "action",
+                      "reason"
+                    ],
+                    "additionalProperties": false,
+                    "description": "Age-based recommendation rule."
+                  }
+                },
+                "roofWindow": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "minAge": {
+                        "type": "number"
+                      },
+                      "maxAge": {
+                        "type": "number"
+                      },
+                      "conditions": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "field": {
+                              "type": "string"
+                            },
+                            "equals": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            },
+                            "notEquals": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            },
+                            "oneOf": {
+                              "type": "array",
+                              "items": {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean"
+                                ]
+                              }
+                            },
+                            "min": {
+                              "type": "number"
+                            },
+                            "max": {
+                              "type": "number"
+                            },
+                            "exists": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "field"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                        }
+                      },
+                      "action": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "insulate",
+                          "replace",
+                          "replace_insulation",
+                          "full_renovation"
+                        ],
+                        "description": "Supported recommendation action set for envelope components."
+                      },
+                      "reason": {
+                        "type": "string"
+                      },
+                      "targetUValue": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "action",
+                      "reason"
+                    ],
+                    "additionalProperties": false,
+                    "description": "Age-based recommendation rule."
+                  }
+                },
+                "wall": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "minAge": {
+                        "type": "number"
+                      },
+                      "maxAge": {
+                        "type": "number"
+                      },
+                      "conditions": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "field": {
+                              "type": "string"
+                            },
+                            "equals": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            },
+                            "notEquals": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            },
+                            "oneOf": {
+                              "type": "array",
+                              "items": {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean"
+                                ]
+                              }
+                            },
+                            "min": {
+                              "type": "number"
+                            },
+                            "max": {
+                              "type": "number"
+                            },
+                            "exists": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "field"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                        }
+                      },
+                      "action": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "insulate",
+                          "replace",
+                          "replace_insulation",
+                          "full_renovation"
+                        ],
+                        "description": "Supported recommendation action set for envelope components."
+                      },
+                      "reason": {
+                        "type": "string"
+                      },
+                      "targetUValue": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "action",
+                      "reason"
+                    ],
+                    "additionalProperties": false,
+                    "description": "Age-based recommendation rule."
+                  }
+                },
+                "wallWindow": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "minAge": {
+                        "type": "number"
+                      },
+                      "maxAge": {
+                        "type": "number"
+                      },
+                      "conditions": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "field": {
+                              "type": "string"
+                            },
+                            "equals": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            },
+                            "notEquals": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            },
+                            "oneOf": {
+                              "type": "array",
+                              "items": {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean"
+                                ]
+                              }
+                            },
+                            "min": {
+                              "type": "number"
+                            },
+                            "max": {
+                              "type": "number"
+                            },
+                            "exists": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "field"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                        }
+                      },
+                      "action": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "insulate",
+                          "replace",
+                          "replace_insulation",
+                          "full_renovation"
+                        ],
+                        "description": "Supported recommendation action set for envelope components."
+                      },
+                      "reason": {
+                        "type": "string"
+                      },
+                      "targetUValue": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "action",
+                      "reason"
+                    ],
+                    "additionalProperties": false,
+                    "description": "Age-based recommendation rule."
+                  }
+                },
+                "topFloorCeiling": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "minAge": {
+                        "type": "number"
+                      },
+                      "maxAge": {
+                        "type": "number"
+                      },
+                      "conditions": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "field": {
+                              "type": "string"
+                            },
+                            "equals": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            },
+                            "notEquals": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            },
+                            "oneOf": {
+                              "type": "array",
+                              "items": {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean"
+                                ]
+                              }
+                            },
+                            "min": {
+                              "type": "number"
+                            },
+                            "max": {
+                              "type": "number"
+                            },
+                            "exists": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "field"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                        }
+                      },
+                      "action": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "insulate",
+                          "replace",
+                          "replace_insulation",
+                          "full_renovation"
+                        ],
+                        "description": "Supported recommendation action set for envelope components."
+                      },
+                      "reason": {
+                        "type": "string"
+                      },
+                      "targetUValue": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "action",
+                      "reason"
+                    ],
+                    "additionalProperties": false,
+                    "description": "Age-based recommendation rule."
+                  }
+                },
+                "lowestFloor": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "minAge": {
+                        "type": "number"
+                      },
+                      "maxAge": {
+                        "type": "number"
+                      },
+                      "conditions": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "field": {
+                              "type": "string"
+                            },
+                            "equals": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            },
+                            "notEquals": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            },
+                            "oneOf": {
+                              "type": "array",
+                              "items": {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean"
+                                ]
+                              }
+                            },
+                            "min": {
+                              "type": "number"
+                            },
+                            "max": {
+                              "type": "number"
+                            },
+                            "exists": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "field"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                        }
+                      },
+                      "action": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "insulate",
+                          "replace",
+                          "replace_insulation",
+                          "full_renovation"
+                        ],
+                        "description": "Supported recommendation action set for envelope components."
+                      },
+                      "reason": {
+                        "type": "string"
+                      },
+                      "targetUValue": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "action",
+                      "reason"
+                    ],
+                    "additionalProperties": false,
+                    "description": "Age-based recommendation rule."
+                  }
+                }
+              },
+              "required": [
+                "roof",
+                "roofWindow",
+                "wall",
+                "wallWindow",
+                "topFloorCeiling",
+                "lowestFloor"
+              ],
+              "additionalProperties": false,
+              "description": "Recommendation rules grouped by envelope component."
+            }
+          },
+          "required": [
+            "defaultFactor",
+            "defaultDeltaUwb",
+            "catalogs",
+            "recommendations"
+          ],
+          "additionalProperties": false
+        },
+        "heating": {
+          "type": "object",
+          "properties": {
+            "referenceYear": {
+              "type": "number"
+            },
+            "replaceAfterYears": {
+              "type": "number"
+            },
+            "optimizeAfterYears": {
+              "type": "number"
+            },
+            "noActionTypes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "directReplaceTypes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "replacementByCarrier": {
+              "type": "object",
+              "properties": {
+                "oil": {
+                  "type": "string"
+                },
+                "gas": {
+                  "type": "string"
+                },
+                "biomass": {
+                  "type": "string"
+                },
+                "electricity": {
+                  "type": "string"
+                },
+                "district_heating": {
+                  "type": "string"
+                },
+                "other": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "oil",
+                "gas",
+                "biomass",
+                "electricity",
+                "district_heating",
+                "other"
+              ],
+              "additionalProperties": false
+            },
+            "rules": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "conditions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "field": {
+                          "type": "string"
+                        },
+                        "equals": {
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean"
+                          ]
+                        },
+                        "notEquals": {
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean"
+                          ]
+                        },
+                        "oneOf": {
+                          "type": "array",
+                          "items": {
+                            "type": [
+                              "string",
+                              "number",
+                              "boolean"
+                            ]
+                          }
+                        },
+                        "min": {
+                          "type": "number"
+                        },
+                        "max": {
+                          "type": "number"
+                        },
+                        "exists": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "field"
+                      ],
+                      "additionalProperties": false,
+                      "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                    }
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "optimize",
+                      "replace"
+                    ],
+                    "description": "Action set returned by heating recommendation logic."
+                  },
+                  "reason": {
+                    "type": "string"
+                  },
+                  "preferredReplacement": {
+                    "type": "string"
+                  },
+                  "useCarrierReplacement": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "action",
+                  "reason"
+                ],
+                "additionalProperties": false,
+                "description": "Configurable rule for detailed heating recommendations."
+              }
+            }
+          },
+          "required": [
+            "referenceYear",
+            "replaceAfterYears",
+            "optimizeAfterYears",
+            "noActionTypes",
+            "directReplaceTypes",
+            "replacementByCarrier"
+          ],
+          "additionalProperties": false,
+          "description": "Runtime heating-domain configuration."
+        },
+        "energy": {
+          "type": "object",
+          "properties": {
+            "usableAreaFactorFromVolume": {
+              "type": "number"
+            },
+            "internalGainWattsPerM2": {
+              "type": "number"
+            },
+            "heatingPeriodDays": {
+              "type": "number"
+            },
+            "degreeDayFactorMultiplier": {
+              "type": "number"
+            },
+            "ventilationCoefficient": {
+              "type": "number"
+            },
+            "defaultSolarGainUtilizationFactor": {
+              "type": "number"
+            },
+            "domesticHotWaterDemandPerPersonKWhPerYear": {
+              "type": "number"
+            },
+            "occupancyAreaPerPersonM2": {
+              "type": "number"
+            },
+            "defaultFinalEnergyFactor": {
+              "type": "number"
+            },
+            "defaultControlFactor": {
+              "type": "number"
+            },
+            "generationFactorByHeatingType": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "from": {
+                      "type": "number"
+                    },
+                    "to": {
+                      "type": "number"
+                    },
+                    "value": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "value"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Year-bounded U-value entry."
+                }
+              }
+            },
+            "controlFactorByType": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            },
+            "emitterFactorAdjustmentByType": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            },
+            "flowTemperatureAdjustmentBands": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "from": {
+                    "type": "number"
+                  },
+                  "to": {
+                    "type": "number"
+                  },
+                  "value": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "value"
+                ],
+                "additionalProperties": false,
+                "description": "Year-bounded U-value entry."
+              }
+            },
+            "radiatorPositionAdjustmentByType": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            },
+            "intermittentAdjustmentByEmitterType": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            },
+            "singleRoomControlAdjustmentByType": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            },
+            "primaryEnergyFactorByCarrier": {
+              "type": "object",
+              "properties": {
+                "oil": {
+                  "type": "number"
+                },
+                "gas": {
+                  "type": "number"
+                },
+                "biomass": {
+                  "type": "number"
+                },
+                "electricity": {
+                  "type": "number"
+                },
+                "district_heating": {
+                  "type": "number"
+                },
+                "other": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "oil",
+                "gas",
+                "biomass",
+                "electricity",
+                "district_heating",
+                "other"
+              ],
+              "additionalProperties": false
+            },
+            "fuelCarrierProfileByCarrier": {
+              "type": "object",
+              "properties": {
+                "oil": {
+                  "type": "object",
+                  "properties": {
+                    "unit": {
+                      "type": "string"
+                    },
+                    "unitsPerKWh": {
+                      "type": "number"
+                    },
+                    "pricePerUnit": {
+                      "type": "number"
+                    },
+                    "co2KgPerUnit": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "unit",
+                    "unitsPerKWh",
+                    "pricePerUnit",
+                    "co2KgPerUnit"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Fuel- and emission-related defaults per carrier."
+                },
+                "gas": {
+                  "type": "object",
+                  "properties": {
+                    "unit": {
+                      "type": "string"
+                    },
+                    "unitsPerKWh": {
+                      "type": "number"
+                    },
+                    "pricePerUnit": {
+                      "type": "number"
+                    },
+                    "co2KgPerUnit": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "unit",
+                    "unitsPerKWh",
+                    "pricePerUnit",
+                    "co2KgPerUnit"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Fuel- and emission-related defaults per carrier."
+                },
+                "biomass": {
+                  "type": "object",
+                  "properties": {
+                    "unit": {
+                      "type": "string"
+                    },
+                    "unitsPerKWh": {
+                      "type": "number"
+                    },
+                    "pricePerUnit": {
+                      "type": "number"
+                    },
+                    "co2KgPerUnit": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "unit",
+                    "unitsPerKWh",
+                    "pricePerUnit",
+                    "co2KgPerUnit"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Fuel- and emission-related defaults per carrier."
+                },
+                "electricity": {
+                  "type": "object",
+                  "properties": {
+                    "unit": {
+                      "type": "string"
+                    },
+                    "unitsPerKWh": {
+                      "type": "number"
+                    },
+                    "pricePerUnit": {
+                      "type": "number"
+                    },
+                    "co2KgPerUnit": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "unit",
+                    "unitsPerKWh",
+                    "pricePerUnit",
+                    "co2KgPerUnit"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Fuel- and emission-related defaults per carrier."
+                },
+                "district_heating": {
+                  "type": "object",
+                  "properties": {
+                    "unit": {
+                      "type": "string"
+                    },
+                    "unitsPerKWh": {
+                      "type": "number"
+                    },
+                    "pricePerUnit": {
+                      "type": "number"
+                    },
+                    "co2KgPerUnit": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "unit",
+                    "unitsPerKWh",
+                    "pricePerUnit",
+                    "co2KgPerUnit"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Fuel- and emission-related defaults per carrier."
+                },
+                "other": {
+                  "type": "object",
+                  "properties": {
+                    "unit": {
+                      "type": "string"
+                    },
+                    "unitsPerKWh": {
+                      "type": "number"
+                    },
+                    "pricePerUnit": {
+                      "type": "number"
+                    },
+                    "co2KgPerUnit": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "unit",
+                    "unitsPerKWh",
+                    "pricePerUnit",
+                    "co2KgPerUnit"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Fuel- and emission-related defaults per carrier."
+                }
+              },
+              "required": [
+                "oil",
+                "gas",
+                "biomass",
+                "electricity",
+                "district_heating",
+                "other"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "usableAreaFactorFromVolume",
+            "internalGainWattsPerM2",
+            "heatingPeriodDays",
+            "degreeDayFactorMultiplier",
+            "ventilationCoefficient",
+            "defaultSolarGainUtilizationFactor",
+            "domesticHotWaterDemandPerPersonKWhPerYear",
+            "occupancyAreaPerPersonM2",
+            "defaultFinalEnergyFactor",
+            "defaultControlFactor",
+            "generationFactorByHeatingType",
+            "controlFactorByType",
+            "emitterFactorAdjustmentByType",
+            "flowTemperatureAdjustmentBands",
+            "radiatorPositionAdjustmentByType",
+            "intermittentAdjustmentByEmitterType",
+            "singleRoomControlAdjustmentByType",
+            "primaryEnergyFactorByCarrier",
+            "fuelCarrierProfileByCarrier"
+          ],
+          "additionalProperties": false,
+          "description": "Runtime defaults and factor tables for annual energy-demand calculations."
+        }
+      },
+      "required": [
+        "envelope",
+        "heating",
+        "energy"
+      ],
+      "additionalProperties": false,
+      "description": "Non-generic schema source type used for JSON Schema generation from the public TypeScript configuration types."
+    },
+    "CoreConfigJson<JsonCatalogConfigMap,HeatingConfig,EnergyConfig>": {
+      "type": "object",
+      "properties": {
+        "envelope": {
+          "type": "object",
+          "properties": {
+            "defaultFactor": {
+              "type": "number"
+            },
+            "defaultDeltaUwb": {
+              "type": "number"
+            },
+            "componentDefaults": {
+              "type": "object",
+              "properties": {
+                "roof": {
+                  "type": "object",
+                  "properties": {
+                    "factor": {
+                      "type": "number"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "roofWindow": {
+                  "type": "object",
+                  "properties": {
+                    "factor": {
+                      "type": "number"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "wall": {
+                  "type": "object",
+                  "properties": {
+                    "factor": {
+                      "type": "number"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "window": {
+                  "type": "object",
+                  "properties": {
+                    "factor": {
+                      "type": "number"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "topFloorCeiling": {
+                  "type": "object",
+                  "properties": {
+                    "factor": {
+                      "type": "number"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "lowestFloor": {
+                  "type": "object",
+                  "properties": {
+                    "factor": {
+                      "type": "number"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false,
+              "description": "Optional component-specific defaults used when an input does not provide an explicit value."
+            },
+            "catalogs": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "from": {
+                        "type": "number"
+                      },
+                      "to": {
+                        "type": "number"
+                      },
+                      "value": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "value"
+                    ],
+                    "additionalProperties": false,
+                    "description": "Year-bounded U-value entry."
+                  },
+                  "description": "JSON representation for one construction entry in a catalog."
+                },
+                "description": "Mapping of `construction -> raw JSON construction config`."
+              },
+              "description": "Mapping of `catalog -> raw JSON catalog config`."
+            },
+            "recommendations": {
+              "type": "object",
+              "properties": {
+                "roof": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "minAge": {
+                        "type": "number"
+                      },
+                      "maxAge": {
+                        "type": "number"
+                      },
+                      "conditions": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "field": {
+                              "type": "string"
+                            },
+                            "equals": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            },
+                            "notEquals": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            },
+                            "oneOf": {
+                              "type": "array",
+                              "items": {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean"
+                                ]
+                              }
+                            },
+                            "min": {
+                              "type": "number"
+                            },
+                            "max": {
+                              "type": "number"
+                            },
+                            "exists": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "field"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                        }
+                      },
+                      "action": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "insulate",
+                          "replace",
+                          "replace_insulation",
+                          "full_renovation"
+                        ],
+                        "description": "Supported recommendation action set for envelope components."
+                      },
+                      "reason": {
+                        "type": "string"
+                      },
+                      "targetUValue": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "action",
+                      "reason"
+                    ],
+                    "additionalProperties": false,
+                    "description": "Age-based recommendation rule."
+                  }
+                },
+                "roofWindow": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "minAge": {
+                        "type": "number"
+                      },
+                      "maxAge": {
+                        "type": "number"
+                      },
+                      "conditions": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "field": {
+                              "type": "string"
+                            },
+                            "equals": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            },
+                            "notEquals": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            },
+                            "oneOf": {
+                              "type": "array",
+                              "items": {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean"
+                                ]
+                              }
+                            },
+                            "min": {
+                              "type": "number"
+                            },
+                            "max": {
+                              "type": "number"
+                            },
+                            "exists": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "field"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                        }
+                      },
+                      "action": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "insulate",
+                          "replace",
+                          "replace_insulation",
+                          "full_renovation"
+                        ],
+                        "description": "Supported recommendation action set for envelope components."
+                      },
+                      "reason": {
+                        "type": "string"
+                      },
+                      "targetUValue": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "action",
+                      "reason"
+                    ],
+                    "additionalProperties": false,
+                    "description": "Age-based recommendation rule."
+                  }
+                },
+                "wall": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "minAge": {
+                        "type": "number"
+                      },
+                      "maxAge": {
+                        "type": "number"
+                      },
+                      "conditions": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "field": {
+                              "type": "string"
+                            },
+                            "equals": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            },
+                            "notEquals": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            },
+                            "oneOf": {
+                              "type": "array",
+                              "items": {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean"
+                                ]
+                              }
+                            },
+                            "min": {
+                              "type": "number"
+                            },
+                            "max": {
+                              "type": "number"
+                            },
+                            "exists": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "field"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                        }
+                      },
+                      "action": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "insulate",
+                          "replace",
+                          "replace_insulation",
+                          "full_renovation"
+                        ],
+                        "description": "Supported recommendation action set for envelope components."
+                      },
+                      "reason": {
+                        "type": "string"
+                      },
+                      "targetUValue": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "action",
+                      "reason"
+                    ],
+                    "additionalProperties": false,
+                    "description": "Age-based recommendation rule."
+                  }
+                },
+                "wallWindow": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "minAge": {
+                        "type": "number"
+                      },
+                      "maxAge": {
+                        "type": "number"
+                      },
+                      "conditions": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "field": {
+                              "type": "string"
+                            },
+                            "equals": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            },
+                            "notEquals": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            },
+                            "oneOf": {
+                              "type": "array",
+                              "items": {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean"
+                                ]
+                              }
+                            },
+                            "min": {
+                              "type": "number"
+                            },
+                            "max": {
+                              "type": "number"
+                            },
+                            "exists": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "field"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                        }
+                      },
+                      "action": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "insulate",
+                          "replace",
+                          "replace_insulation",
+                          "full_renovation"
+                        ],
+                        "description": "Supported recommendation action set for envelope components."
+                      },
+                      "reason": {
+                        "type": "string"
+                      },
+                      "targetUValue": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "action",
+                      "reason"
+                    ],
+                    "additionalProperties": false,
+                    "description": "Age-based recommendation rule."
+                  }
+                },
+                "topFloorCeiling": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "minAge": {
+                        "type": "number"
+                      },
+                      "maxAge": {
+                        "type": "number"
+                      },
+                      "conditions": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "field": {
+                              "type": "string"
+                            },
+                            "equals": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            },
+                            "notEquals": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            },
+                            "oneOf": {
+                              "type": "array",
+                              "items": {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean"
+                                ]
+                              }
+                            },
+                            "min": {
+                              "type": "number"
+                            },
+                            "max": {
+                              "type": "number"
+                            },
+                            "exists": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "field"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                        }
+                      },
+                      "action": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "insulate",
+                          "replace",
+                          "replace_insulation",
+                          "full_renovation"
+                        ],
+                        "description": "Supported recommendation action set for envelope components."
+                      },
+                      "reason": {
+                        "type": "string"
+                      },
+                      "targetUValue": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "action",
+                      "reason"
+                    ],
+                    "additionalProperties": false,
+                    "description": "Age-based recommendation rule."
+                  }
+                },
+                "lowestFloor": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "minAge": {
+                        "type": "number"
+                      },
+                      "maxAge": {
+                        "type": "number"
+                      },
+                      "conditions": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "field": {
+                              "type": "string"
+                            },
+                            "equals": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            },
+                            "notEquals": {
+                              "type": [
+                                "string",
+                                "number",
+                                "boolean"
+                              ]
+                            },
+                            "oneOf": {
+                              "type": "array",
+                              "items": {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean"
+                                ]
+                              }
+                            },
+                            "min": {
+                              "type": "number"
+                            },
+                            "max": {
+                              "type": "number"
+                            },
+                            "exists": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "field"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                        }
+                      },
+                      "action": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "insulate",
+                          "replace",
+                          "replace_insulation",
+                          "full_renovation"
+                        ],
+                        "description": "Supported recommendation action set for envelope components."
+                      },
+                      "reason": {
+                        "type": "string"
+                      },
+                      "targetUValue": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "action",
+                      "reason"
+                    ],
+                    "additionalProperties": false,
+                    "description": "Age-based recommendation rule."
+                  }
+                }
+              },
+              "required": [
+                "roof",
+                "roofWindow",
+                "wall",
+                "wallWindow",
+                "topFloorCeiling",
+                "lowestFloor"
+              ],
+              "additionalProperties": false,
+              "description": "Recommendation rules grouped by envelope component."
+            }
+          },
+          "required": [
+            "defaultFactor",
+            "defaultDeltaUwb",
+            "catalogs",
+            "recommendations"
+          ],
+          "additionalProperties": false
+        },
+        "heating": {
+          "type": "object",
+          "properties": {
+            "referenceYear": {
+              "type": "number"
+            },
+            "replaceAfterYears": {
+              "type": "number"
+            },
+            "optimizeAfterYears": {
+              "type": "number"
+            },
+            "noActionTypes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "directReplaceTypes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "replacementByCarrier": {
+              "type": "object",
+              "properties": {
+                "oil": {
+                  "type": "string"
+                },
+                "gas": {
+                  "type": "string"
+                },
+                "biomass": {
+                  "type": "string"
+                },
+                "electricity": {
+                  "type": "string"
+                },
+                "district_heating": {
+                  "type": "string"
+                },
+                "other": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "oil",
+                "gas",
+                "biomass",
+                "electricity",
+                "district_heating",
+                "other"
+              ],
+              "additionalProperties": false
+            },
+            "rules": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "conditions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "field": {
+                          "type": "string"
+                        },
+                        "equals": {
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean"
+                          ]
+                        },
+                        "notEquals": {
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean"
+                          ]
+                        },
+                        "oneOf": {
+                          "type": "array",
+                          "items": {
+                            "type": [
+                              "string",
+                              "number",
+                              "boolean"
+                            ]
+                          }
+                        },
+                        "min": {
+                          "type": "number"
+                        },
+                        "max": {
+                          "type": "number"
+                        },
+                        "exists": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "field"
+                      ],
+                      "additionalProperties": false,
+                      "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                    }
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "optimize",
+                      "replace"
+                    ],
+                    "description": "Action set returned by heating recommendation logic."
+                  },
+                  "reason": {
+                    "type": "string"
+                  },
+                  "preferredReplacement": {
+                    "type": "string"
+                  },
+                  "useCarrierReplacement": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "action",
+                  "reason"
+                ],
+                "additionalProperties": false,
+                "description": "Configurable rule for detailed heating recommendations."
+              }
+            }
+          },
+          "required": [
+            "referenceYear",
+            "replaceAfterYears",
+            "optimizeAfterYears",
+            "noActionTypes",
+            "directReplaceTypes",
+            "replacementByCarrier"
+          ],
+          "additionalProperties": false,
+          "description": "Runtime heating-domain configuration."
+        },
+        "energy": {
+          "type": "object",
+          "properties": {
+            "usableAreaFactorFromVolume": {
+              "type": "number"
+            },
+            "internalGainWattsPerM2": {
+              "type": "number"
+            },
+            "heatingPeriodDays": {
+              "type": "number"
+            },
+            "degreeDayFactorMultiplier": {
+              "type": "number"
+            },
+            "ventilationCoefficient": {
+              "type": "number"
+            },
+            "defaultSolarGainUtilizationFactor": {
+              "type": "number"
+            },
+            "domesticHotWaterDemandPerPersonKWhPerYear": {
+              "type": "number"
+            },
+            "occupancyAreaPerPersonM2": {
+              "type": "number"
+            },
+            "defaultFinalEnergyFactor": {
+              "type": "number"
+            },
+            "defaultControlFactor": {
+              "type": "number"
+            },
+            "generationFactorByHeatingType": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "from": {
+                      "type": "number"
+                    },
+                    "to": {
+                      "type": "number"
+                    },
+                    "value": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "value"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Year-bounded U-value entry."
+                }
+              }
+            },
+            "controlFactorByType": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            },
+            "emitterFactorAdjustmentByType": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            },
+            "flowTemperatureAdjustmentBands": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "from": {
+                    "type": "number"
+                  },
+                  "to": {
+                    "type": "number"
+                  },
+                  "value": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "value"
+                ],
+                "additionalProperties": false,
+                "description": "Year-bounded U-value entry."
+              }
+            },
+            "radiatorPositionAdjustmentByType": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            },
+            "intermittentAdjustmentByEmitterType": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            },
+            "singleRoomControlAdjustmentByType": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            },
+            "primaryEnergyFactorByCarrier": {
+              "type": "object",
+              "properties": {
+                "oil": {
+                  "type": "number"
+                },
+                "gas": {
+                  "type": "number"
+                },
+                "biomass": {
+                  "type": "number"
+                },
+                "electricity": {
+                  "type": "number"
+                },
+                "district_heating": {
+                  "type": "number"
+                },
+                "other": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "oil",
+                "gas",
+                "biomass",
+                "electricity",
+                "district_heating",
+                "other"
+              ],
+              "additionalProperties": false
+            },
+            "fuelCarrierProfileByCarrier": {
+              "type": "object",
+              "properties": {
+                "oil": {
+                  "type": "object",
+                  "properties": {
+                    "unit": {
+                      "type": "string"
+                    },
+                    "unitsPerKWh": {
+                      "type": "number"
+                    },
+                    "pricePerUnit": {
+                      "type": "number"
+                    },
+                    "co2KgPerUnit": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "unit",
+                    "unitsPerKWh",
+                    "pricePerUnit",
+                    "co2KgPerUnit"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Fuel- and emission-related defaults per carrier."
+                },
+                "gas": {
+                  "type": "object",
+                  "properties": {
+                    "unit": {
+                      "type": "string"
+                    },
+                    "unitsPerKWh": {
+                      "type": "number"
+                    },
+                    "pricePerUnit": {
+                      "type": "number"
+                    },
+                    "co2KgPerUnit": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "unit",
+                    "unitsPerKWh",
+                    "pricePerUnit",
+                    "co2KgPerUnit"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Fuel- and emission-related defaults per carrier."
+                },
+                "biomass": {
+                  "type": "object",
+                  "properties": {
+                    "unit": {
+                      "type": "string"
+                    },
+                    "unitsPerKWh": {
+                      "type": "number"
+                    },
+                    "pricePerUnit": {
+                      "type": "number"
+                    },
+                    "co2KgPerUnit": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "unit",
+                    "unitsPerKWh",
+                    "pricePerUnit",
+                    "co2KgPerUnit"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Fuel- and emission-related defaults per carrier."
+                },
+                "electricity": {
+                  "type": "object",
+                  "properties": {
+                    "unit": {
+                      "type": "string"
+                    },
+                    "unitsPerKWh": {
+                      "type": "number"
+                    },
+                    "pricePerUnit": {
+                      "type": "number"
+                    },
+                    "co2KgPerUnit": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "unit",
+                    "unitsPerKWh",
+                    "pricePerUnit",
+                    "co2KgPerUnit"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Fuel- and emission-related defaults per carrier."
+                },
+                "district_heating": {
+                  "type": "object",
+                  "properties": {
+                    "unit": {
+                      "type": "string"
+                    },
+                    "unitsPerKWh": {
+                      "type": "number"
+                    },
+                    "pricePerUnit": {
+                      "type": "number"
+                    },
+                    "co2KgPerUnit": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "unit",
+                    "unitsPerKWh",
+                    "pricePerUnit",
+                    "co2KgPerUnit"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Fuel- and emission-related defaults per carrier."
+                },
+                "other": {
+                  "type": "object",
+                  "properties": {
+                    "unit": {
+                      "type": "string"
+                    },
+                    "unitsPerKWh": {
+                      "type": "number"
+                    },
+                    "pricePerUnit": {
+                      "type": "number"
+                    },
+                    "co2KgPerUnit": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "unit",
+                    "unitsPerKWh",
+                    "pricePerUnit",
+                    "co2KgPerUnit"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Fuel- and emission-related defaults per carrier."
+                }
+              },
+              "required": [
+                "oil",
+                "gas",
+                "biomass",
+                "electricity",
+                "district_heating",
+                "other"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "usableAreaFactorFromVolume",
+            "internalGainWattsPerM2",
+            "heatingPeriodDays",
+            "degreeDayFactorMultiplier",
+            "ventilationCoefficient",
+            "defaultSolarGainUtilizationFactor",
+            "domesticHotWaterDemandPerPersonKWhPerYear",
+            "occupancyAreaPerPersonM2",
+            "defaultFinalEnergyFactor",
+            "defaultControlFactor",
+            "generationFactorByHeatingType",
+            "controlFactorByType",
+            "emitterFactorAdjustmentByType",
+            "flowTemperatureAdjustmentBands",
+            "radiatorPositionAdjustmentByType",
+            "intermittentAdjustmentByEmitterType",
+            "singleRoomControlAdjustmentByType",
+            "primaryEnergyFactorByCarrier",
+            "fuelCarrierProfileByCarrier"
+          ],
+          "additionalProperties": false,
+          "description": "Runtime defaults and factor tables for annual energy-demand calculations."
+        }
+      },
+      "required": [
+        "envelope",
+        "heating",
+        "energy"
+      ],
+      "additionalProperties": false,
+      "description": "JSON input schema for external core configuration."
+    },
+    "EnvelopeComponentDefaults": {
+      "type": "object",
+      "properties": {
+        "roof": {
+          "type": "object",
+          "properties": {
+            "factor": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        },
+        "roofWindow": {
+          "type": "object",
+          "properties": {
+            "factor": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        },
+        "wall": {
+          "type": "object",
+          "properties": {
+            "factor": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        },
+        "window": {
+          "type": "object",
+          "properties": {
+            "factor": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        },
+        "topFloorCeiling": {
+          "type": "object",
+          "properties": {
+            "factor": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        },
+        "lowestFloor": {
+          "type": "object",
+          "properties": {
+            "factor": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "description": "Optional component-specific defaults used when an input does not provide an explicit value."
+    },
+    "JsonCatalogConfigMap": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "from": {
+                "type": "number"
+              },
+              "to": {
+                "type": "number"
+              },
+              "value": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "value"
+            ],
+            "additionalProperties": false,
+            "description": "Year-bounded U-value entry."
+          },
+          "description": "JSON representation for one construction entry in a catalog."
+        },
+        "description": "Mapping of `construction -> raw JSON construction config`."
+      },
+      "description": "Mapping of `catalog -> raw JSON catalog config`."
+    },
+    "JsonCatalogConfig": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "from": {
+              "type": "number"
+            },
+            "to": {
+              "type": "number"
+            },
+            "value": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "value"
+          ],
+          "additionalProperties": false,
+          "description": "Year-bounded U-value entry."
+        },
+        "description": "JSON representation for one construction entry in a catalog."
+      },
+      "description": "Mapping of `construction -> raw JSON construction config`."
+    },
+    "JsonConstructionConfig": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "number"
+          },
+          "to": {
+            "type": "number"
+          },
+          "value": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "value"
+        ],
+        "additionalProperties": false,
+        "description": "Year-bounded U-value entry."
+      },
+      "description": "JSON representation for one construction entry in a catalog."
+    },
+    "YearBand": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "number"
+        },
+        "to": {
+          "type": "number"
+        },
+        "value": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "additionalProperties": false,
+      "description": "Year-bounded U-value entry."
+    },
+    "EnvelopeRecommendationConfig": {
+      "type": "object",
+      "properties": {
+        "roof": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "minAge": {
+                "type": "number"
+              },
+              "maxAge": {
+                "type": "number"
+              },
+              "conditions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string"
+                    },
+                    "equals": {
+                      "type": [
+                        "string",
+                        "number",
+                        "boolean"
+                      ]
+                    },
+                    "notEquals": {
+                      "type": [
+                        "string",
+                        "number",
+                        "boolean"
+                      ]
+                    },
+                    "oneOf": {
+                      "type": "array",
+                      "items": {
+                        "type": [
+                          "string",
+                          "number",
+                          "boolean"
+                        ]
+                      }
+                    },
+                    "min": {
+                      "type": "number"
+                    },
+                    "max": {
+                      "type": "number"
+                    },
+                    "exists": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "field"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                }
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "insulate",
+                  "replace",
+                  "replace_insulation",
+                  "full_renovation"
+                ],
+                "description": "Supported recommendation action set for envelope components."
+              },
+              "reason": {
+                "type": "string"
+              },
+              "targetUValue": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "action",
+              "reason"
+            ],
+            "additionalProperties": false,
+            "description": "Age-based recommendation rule."
+          }
+        },
+        "roofWindow": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "minAge": {
+                "type": "number"
+              },
+              "maxAge": {
+                "type": "number"
+              },
+              "conditions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string"
+                    },
+                    "equals": {
+                      "type": [
+                        "string",
+                        "number",
+                        "boolean"
+                      ]
+                    },
+                    "notEquals": {
+                      "type": [
+                        "string",
+                        "number",
+                        "boolean"
+                      ]
+                    },
+                    "oneOf": {
+                      "type": "array",
+                      "items": {
+                        "type": [
+                          "string",
+                          "number",
+                          "boolean"
+                        ]
+                      }
+                    },
+                    "min": {
+                      "type": "number"
+                    },
+                    "max": {
+                      "type": "number"
+                    },
+                    "exists": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "field"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                }
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "insulate",
+                  "replace",
+                  "replace_insulation",
+                  "full_renovation"
+                ],
+                "description": "Supported recommendation action set for envelope components."
+              },
+              "reason": {
+                "type": "string"
+              },
+              "targetUValue": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "action",
+              "reason"
+            ],
+            "additionalProperties": false,
+            "description": "Age-based recommendation rule."
+          }
+        },
+        "wall": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "minAge": {
+                "type": "number"
+              },
+              "maxAge": {
+                "type": "number"
+              },
+              "conditions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string"
+                    },
+                    "equals": {
+                      "type": [
+                        "string",
+                        "number",
+                        "boolean"
+                      ]
+                    },
+                    "notEquals": {
+                      "type": [
+                        "string",
+                        "number",
+                        "boolean"
+                      ]
+                    },
+                    "oneOf": {
+                      "type": "array",
+                      "items": {
+                        "type": [
+                          "string",
+                          "number",
+                          "boolean"
+                        ]
+                      }
+                    },
+                    "min": {
+                      "type": "number"
+                    },
+                    "max": {
+                      "type": "number"
+                    },
+                    "exists": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "field"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                }
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "insulate",
+                  "replace",
+                  "replace_insulation",
+                  "full_renovation"
+                ],
+                "description": "Supported recommendation action set for envelope components."
+              },
+              "reason": {
+                "type": "string"
+              },
+              "targetUValue": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "action",
+              "reason"
+            ],
+            "additionalProperties": false,
+            "description": "Age-based recommendation rule."
+          }
+        },
+        "wallWindow": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "minAge": {
+                "type": "number"
+              },
+              "maxAge": {
+                "type": "number"
+              },
+              "conditions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string"
+                    },
+                    "equals": {
+                      "type": [
+                        "string",
+                        "number",
+                        "boolean"
+                      ]
+                    },
+                    "notEquals": {
+                      "type": [
+                        "string",
+                        "number",
+                        "boolean"
+                      ]
+                    },
+                    "oneOf": {
+                      "type": "array",
+                      "items": {
+                        "type": [
+                          "string",
+                          "number",
+                          "boolean"
+                        ]
+                      }
+                    },
+                    "min": {
+                      "type": "number"
+                    },
+                    "max": {
+                      "type": "number"
+                    },
+                    "exists": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "field"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                }
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "insulate",
+                  "replace",
+                  "replace_insulation",
+                  "full_renovation"
+                ],
+                "description": "Supported recommendation action set for envelope components."
+              },
+              "reason": {
+                "type": "string"
+              },
+              "targetUValue": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "action",
+              "reason"
+            ],
+            "additionalProperties": false,
+            "description": "Age-based recommendation rule."
+          }
+        },
+        "topFloorCeiling": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "minAge": {
+                "type": "number"
+              },
+              "maxAge": {
+                "type": "number"
+              },
+              "conditions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string"
+                    },
+                    "equals": {
+                      "type": [
+                        "string",
+                        "number",
+                        "boolean"
+                      ]
+                    },
+                    "notEquals": {
+                      "type": [
+                        "string",
+                        "number",
+                        "boolean"
+                      ]
+                    },
+                    "oneOf": {
+                      "type": "array",
+                      "items": {
+                        "type": [
+                          "string",
+                          "number",
+                          "boolean"
+                        ]
+                      }
+                    },
+                    "min": {
+                      "type": "number"
+                    },
+                    "max": {
+                      "type": "number"
+                    },
+                    "exists": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "field"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                }
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "insulate",
+                  "replace",
+                  "replace_insulation",
+                  "full_renovation"
+                ],
+                "description": "Supported recommendation action set for envelope components."
+              },
+              "reason": {
+                "type": "string"
+              },
+              "targetUValue": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "action",
+              "reason"
+            ],
+            "additionalProperties": false,
+            "description": "Age-based recommendation rule."
+          }
+        },
+        "lowestFloor": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "minAge": {
+                "type": "number"
+              },
+              "maxAge": {
+                "type": "number"
+              },
+              "conditions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string"
+                    },
+                    "equals": {
+                      "type": [
+                        "string",
+                        "number",
+                        "boolean"
+                      ]
+                    },
+                    "notEquals": {
+                      "type": [
+                        "string",
+                        "number",
+                        "boolean"
+                      ]
+                    },
+                    "oneOf": {
+                      "type": "array",
+                      "items": {
+                        "type": [
+                          "string",
+                          "number",
+                          "boolean"
+                        ]
+                      }
+                    },
+                    "min": {
+                      "type": "number"
+                    },
+                    "max": {
+                      "type": "number"
+                    },
+                    "exists": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "field"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                }
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "insulate",
+                  "replace",
+                  "replace_insulation",
+                  "full_renovation"
+                ],
+                "description": "Supported recommendation action set for envelope components."
+              },
+              "reason": {
+                "type": "string"
+              },
+              "targetUValue": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "action",
+              "reason"
+            ],
+            "additionalProperties": false,
+            "description": "Age-based recommendation rule."
+          }
+        }
+      },
+      "required": [
+        "roof",
+        "roofWindow",
+        "wall",
+        "wallWindow",
+        "topFloorCeiling",
+        "lowestFloor"
+      ],
+      "additionalProperties": false,
+      "description": "Recommendation rules grouped by envelope component."
+    },
+    "AgeRecommendationRule": {
+      "type": "object",
+      "properties": {
+        "minAge": {
+          "type": "number"
+        },
+        "maxAge": {
+          "type": "number"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "field": {
+                "type": "string"
+              },
+              "equals": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              },
+              "notEquals": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              },
+              "oneOf": {
+                "type": "array",
+                "items": {
+                  "type": [
+                    "string",
+                    "number",
+                    "boolean"
+                  ]
+                }
+              },
+              "min": {
+                "type": "number"
+              },
+              "max": {
+                "type": "number"
+              },
+              "exists": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "field"
+            ],
+            "additionalProperties": false,
+            "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+          }
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "none",
+            "insulate",
+            "replace",
+            "replace_insulation",
+            "full_renovation"
+          ],
+          "description": "Supported recommendation action set for envelope components."
+        },
+        "reason": {
+          "type": "string"
+        },
+        "targetUValue": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "action",
+        "reason"
+      ],
+      "additionalProperties": false,
+      "description": "Age-based recommendation rule."
+    },
+    "RuleCondition": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "equals": {
+          "type": [
+            "string",
+            "number",
+            "boolean"
+          ]
+        },
+        "notEquals": {
+          "type": [
+            "string",
+            "number",
+            "boolean"
+          ]
+        },
+        "oneOf": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "boolean"
+            ]
+          }
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "exists": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "field"
+      ],
+      "additionalProperties": false,
+      "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+    },
+    "RuleValue": {
+      "type": [
+        "string",
+        "number",
+        "boolean"
+      ]
+    },
+    "RecommendationAction": {
+      "type": "string",
+      "enum": [
+        "none",
+        "insulate",
+        "replace",
+        "replace_insulation",
+        "full_renovation"
+      ],
+      "description": "Supported recommendation action set for envelope components."
+    },
+    "HeatingConfig": {
+      "type": "object",
+      "properties": {
+        "referenceYear": {
+          "type": "number"
+        },
+        "replaceAfterYears": {
+          "type": "number"
+        },
+        "optimizeAfterYears": {
+          "type": "number"
+        },
+        "noActionTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "directReplaceTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "replacementByCarrier": {
+          "type": "object",
+          "properties": {
+            "oil": {
+              "type": "string"
+            },
+            "gas": {
+              "type": "string"
+            },
+            "biomass": {
+              "type": "string"
+            },
+            "electricity": {
+              "type": "string"
+            },
+            "district_heating": {
+              "type": "string"
+            },
+            "other": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "oil",
+            "gas",
+            "biomass",
+            "electricity",
+            "district_heating",
+            "other"
+          ],
+          "additionalProperties": false
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "conditions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string"
+                    },
+                    "equals": {
+                      "type": [
+                        "string",
+                        "number",
+                        "boolean"
+                      ]
+                    },
+                    "notEquals": {
+                      "type": [
+                        "string",
+                        "number",
+                        "boolean"
+                      ]
+                    },
+                    "oneOf": {
+                      "type": "array",
+                      "items": {
+                        "type": [
+                          "string",
+                          "number",
+                          "boolean"
+                        ]
+                      }
+                    },
+                    "min": {
+                      "type": "number"
+                    },
+                    "max": {
+                      "type": "number"
+                    },
+                    "exists": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "field"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                }
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "optimize",
+                  "replace"
+                ],
+                "description": "Action set returned by heating recommendation logic."
+              },
+              "reason": {
+                "type": "string"
+              },
+              "preferredReplacement": {
+                "type": "string"
+              },
+              "useCarrierReplacement": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "action",
+              "reason"
+            ],
+            "additionalProperties": false,
+            "description": "Configurable rule for detailed heating recommendations."
+          }
+        }
+      },
+      "required": [
+        "referenceYear",
+        "replaceAfterYears",
+        "optimizeAfterYears",
+        "noActionTypes",
+        "directReplaceTypes",
+        "replacementByCarrier"
+      ],
+      "additionalProperties": false,
+      "description": "Runtime heating-domain configuration."
+    },
+    "HeatingRecommendationRule<string>": {
+      "type": "object",
+      "properties": {
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "field": {
+                "type": "string"
+              },
+              "equals": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              },
+              "notEquals": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              },
+              "oneOf": {
+                "type": "array",
+                "items": {
+                  "type": [
+                    "string",
+                    "number",
+                    "boolean"
+                  ]
+                }
+              },
+              "min": {
+                "type": "number"
+              },
+              "max": {
+                "type": "number"
+              },
+              "exists": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "field"
+            ],
+            "additionalProperties": false,
+            "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+          }
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "none",
+            "optimize",
+            "replace"
+          ],
+          "description": "Action set returned by heating recommendation logic."
+        },
+        "reason": {
+          "type": "string"
+        },
+        "preferredReplacement": {
+          "type": "string"
+        },
+        "useCarrierReplacement": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "action",
+        "reason"
+      ],
+      "additionalProperties": false,
+      "description": "Configurable rule for detailed heating recommendations."
+    },
+    "HeatingRecommendationAction": {
+      "type": "string",
+      "enum": [
+        "none",
+        "optimize",
+        "replace"
+      ],
+      "description": "Action set returned by heating recommendation logic."
+    },
+    "EnergyConfig": {
+      "type": "object",
+      "properties": {
+        "usableAreaFactorFromVolume": {
+          "type": "number"
+        },
+        "internalGainWattsPerM2": {
+          "type": "number"
+        },
+        "heatingPeriodDays": {
+          "type": "number"
+        },
+        "degreeDayFactorMultiplier": {
+          "type": "number"
+        },
+        "ventilationCoefficient": {
+          "type": "number"
+        },
+        "defaultSolarGainUtilizationFactor": {
+          "type": "number"
+        },
+        "domesticHotWaterDemandPerPersonKWhPerYear": {
+          "type": "number"
+        },
+        "occupancyAreaPerPersonM2": {
+          "type": "number"
+        },
+        "defaultFinalEnergyFactor": {
+          "type": "number"
+        },
+        "defaultControlFactor": {
+          "type": "number"
+        },
+        "generationFactorByHeatingType": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "from": {
+                  "type": "number"
+                },
+                "to": {
+                  "type": "number"
+                },
+                "value": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "value"
+              ],
+              "additionalProperties": false,
+              "description": "Year-bounded U-value entry."
+            }
+          }
+        },
+        "controlFactorByType": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "emitterFactorAdjustmentByType": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "flowTemperatureAdjustmentBands": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "from": {
+                "type": "number"
+              },
+              "to": {
+                "type": "number"
+              },
+              "value": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "value"
+            ],
+            "additionalProperties": false,
+            "description": "Year-bounded U-value entry."
+          }
+        },
+        "radiatorPositionAdjustmentByType": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "intermittentAdjustmentByEmitterType": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "singleRoomControlAdjustmentByType": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "primaryEnergyFactorByCarrier": {
+          "type": "object",
+          "properties": {
+            "oil": {
+              "type": "number"
+            },
+            "gas": {
+              "type": "number"
+            },
+            "biomass": {
+              "type": "number"
+            },
+            "electricity": {
+              "type": "number"
+            },
+            "district_heating": {
+              "type": "number"
+            },
+            "other": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "oil",
+            "gas",
+            "biomass",
+            "electricity",
+            "district_heating",
+            "other"
+          ],
+          "additionalProperties": false
+        },
+        "fuelCarrierProfileByCarrier": {
+          "type": "object",
+          "properties": {
+            "oil": {
+              "type": "object",
+              "properties": {
+                "unit": {
+                  "type": "string"
+                },
+                "unitsPerKWh": {
+                  "type": "number"
+                },
+                "pricePerUnit": {
+                  "type": "number"
+                },
+                "co2KgPerUnit": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "unit",
+                "unitsPerKWh",
+                "pricePerUnit",
+                "co2KgPerUnit"
+              ],
+              "additionalProperties": false,
+              "description": "Fuel- and emission-related defaults per carrier."
+            },
+            "gas": {
+              "type": "object",
+              "properties": {
+                "unit": {
+                  "type": "string"
+                },
+                "unitsPerKWh": {
+                  "type": "number"
+                },
+                "pricePerUnit": {
+                  "type": "number"
+                },
+                "co2KgPerUnit": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "unit",
+                "unitsPerKWh",
+                "pricePerUnit",
+                "co2KgPerUnit"
+              ],
+              "additionalProperties": false,
+              "description": "Fuel- and emission-related defaults per carrier."
+            },
+            "biomass": {
+              "type": "object",
+              "properties": {
+                "unit": {
+                  "type": "string"
+                },
+                "unitsPerKWh": {
+                  "type": "number"
+                },
+                "pricePerUnit": {
+                  "type": "number"
+                },
+                "co2KgPerUnit": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "unit",
+                "unitsPerKWh",
+                "pricePerUnit",
+                "co2KgPerUnit"
+              ],
+              "additionalProperties": false,
+              "description": "Fuel- and emission-related defaults per carrier."
+            },
+            "electricity": {
+              "type": "object",
+              "properties": {
+                "unit": {
+                  "type": "string"
+                },
+                "unitsPerKWh": {
+                  "type": "number"
+                },
+                "pricePerUnit": {
+                  "type": "number"
+                },
+                "co2KgPerUnit": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "unit",
+                "unitsPerKWh",
+                "pricePerUnit",
+                "co2KgPerUnit"
+              ],
+              "additionalProperties": false,
+              "description": "Fuel- and emission-related defaults per carrier."
+            },
+            "district_heating": {
+              "type": "object",
+              "properties": {
+                "unit": {
+                  "type": "string"
+                },
+                "unitsPerKWh": {
+                  "type": "number"
+                },
+                "pricePerUnit": {
+                  "type": "number"
+                },
+                "co2KgPerUnit": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "unit",
+                "unitsPerKWh",
+                "pricePerUnit",
+                "co2KgPerUnit"
+              ],
+              "additionalProperties": false,
+              "description": "Fuel- and emission-related defaults per carrier."
+            },
+            "other": {
+              "type": "object",
+              "properties": {
+                "unit": {
+                  "type": "string"
+                },
+                "unitsPerKWh": {
+                  "type": "number"
+                },
+                "pricePerUnit": {
+                  "type": "number"
+                },
+                "co2KgPerUnit": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "unit",
+                "unitsPerKWh",
+                "pricePerUnit",
+                "co2KgPerUnit"
+              ],
+              "additionalProperties": false,
+              "description": "Fuel- and emission-related defaults per carrier."
+            }
+          },
+          "required": [
+            "oil",
+            "gas",
+            "biomass",
+            "electricity",
+            "district_heating",
+            "other"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "usableAreaFactorFromVolume",
+        "internalGainWattsPerM2",
+        "heatingPeriodDays",
+        "degreeDayFactorMultiplier",
+        "ventilationCoefficient",
+        "defaultSolarGainUtilizationFactor",
+        "domesticHotWaterDemandPerPersonKWhPerYear",
+        "occupancyAreaPerPersonM2",
+        "defaultFinalEnergyFactor",
+        "defaultControlFactor",
+        "generationFactorByHeatingType",
+        "controlFactorByType",
+        "emitterFactorAdjustmentByType",
+        "flowTemperatureAdjustmentBands",
+        "radiatorPositionAdjustmentByType",
+        "intermittentAdjustmentByEmitterType",
+        "singleRoomControlAdjustmentByType",
+        "primaryEnergyFactorByCarrier",
+        "fuelCarrierProfileByCarrier"
+      ],
+      "additionalProperties": false,
+      "description": "Runtime defaults and factor tables for annual energy-demand calculations."
+    },
+    "FuelCarrierProfile": {
+      "type": "object",
+      "properties": {
+        "unit": {
+          "type": "string"
+        },
+        "unitsPerKWh": {
+          "type": "number"
+        },
+        "pricePerUnit": {
+          "type": "number"
+        },
+        "co2KgPerUnit": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "unit",
+        "unitsPerKWh",
+        "pricePerUnit",
+        "co2KgPerUnit"
+      ],
+      "additionalProperties": false,
+      "description": "Fuel- and emission-related defaults per carrier."
+    }
+  },
+  "type": "object",
+  "properties": {
+    "envelope": {
+      "type": "object",
+      "properties": {
+        "defaultFactor": {
+          "type": "number"
+        },
+        "defaultDeltaUwb": {
+          "type": "number"
+        },
+        "componentDefaults": {
+          "type": "object",
+          "properties": {
+            "roof": {
+              "type": "object",
+              "properties": {
+                "factor": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            },
+            "roofWindow": {
+              "type": "object",
+              "properties": {
+                "factor": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            },
+            "wall": {
+              "type": "object",
+              "properties": {
+                "factor": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            },
+            "window": {
+              "type": "object",
+              "properties": {
+                "factor": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            },
+            "topFloorCeiling": {
+              "type": "object",
+              "properties": {
+                "factor": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            },
+            "lowestFloor": {
+              "type": "object",
+              "properties": {
+                "factor": {
+                  "type": "number"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "description": "Optional component-specific defaults used when an input does not provide an explicit value."
+        },
+        "catalogs": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "from": {
+                    "type": "number"
+                  },
+                  "to": {
+                    "type": "number"
+                  },
+                  "value": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "value"
+                ],
+                "additionalProperties": false,
+                "description": "Year-bounded U-value entry."
+              },
+              "description": "JSON representation for one construction entry in a catalog."
+            },
+            "description": "Mapping of `construction -> raw JSON construction config`."
+          },
+          "description": "Mapping of `catalog -> raw JSON catalog config`."
+        },
+        "recommendations": {
+          "type": "object",
+          "properties": {
+            "roof": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "minAge": {
+                    "type": "number"
+                  },
+                  "maxAge": {
+                    "type": "number"
+                  },
+                  "conditions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "field": {
+                          "type": "string"
+                        },
+                        "equals": {
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean"
+                          ]
+                        },
+                        "notEquals": {
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean"
+                          ]
+                        },
+                        "oneOf": {
+                          "type": "array",
+                          "items": {
+                            "type": [
+                              "string",
+                              "number",
+                              "boolean"
+                            ]
+                          }
+                        },
+                        "min": {
+                          "type": "number"
+                        },
+                        "max": {
+                          "type": "number"
+                        },
+                        "exists": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "field"
+                      ],
+                      "additionalProperties": false,
+                      "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                    }
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "insulate",
+                      "replace",
+                      "replace_insulation",
+                      "full_renovation"
+                    ],
+                    "description": "Supported recommendation action set for envelope components."
+                  },
+                  "reason": {
+                    "type": "string"
+                  },
+                  "targetUValue": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "action",
+                  "reason"
+                ],
+                "additionalProperties": false,
+                "description": "Age-based recommendation rule."
+              }
+            },
+            "roofWindow": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "minAge": {
+                    "type": "number"
+                  },
+                  "maxAge": {
+                    "type": "number"
+                  },
+                  "conditions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "field": {
+                          "type": "string"
+                        },
+                        "equals": {
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean"
+                          ]
+                        },
+                        "notEquals": {
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean"
+                          ]
+                        },
+                        "oneOf": {
+                          "type": "array",
+                          "items": {
+                            "type": [
+                              "string",
+                              "number",
+                              "boolean"
+                            ]
+                          }
+                        },
+                        "min": {
+                          "type": "number"
+                        },
+                        "max": {
+                          "type": "number"
+                        },
+                        "exists": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "field"
+                      ],
+                      "additionalProperties": false,
+                      "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                    }
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "insulate",
+                      "replace",
+                      "replace_insulation",
+                      "full_renovation"
+                    ],
+                    "description": "Supported recommendation action set for envelope components."
+                  },
+                  "reason": {
+                    "type": "string"
+                  },
+                  "targetUValue": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "action",
+                  "reason"
+                ],
+                "additionalProperties": false,
+                "description": "Age-based recommendation rule."
+              }
+            },
+            "wall": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "minAge": {
+                    "type": "number"
+                  },
+                  "maxAge": {
+                    "type": "number"
+                  },
+                  "conditions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "field": {
+                          "type": "string"
+                        },
+                        "equals": {
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean"
+                          ]
+                        },
+                        "notEquals": {
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean"
+                          ]
+                        },
+                        "oneOf": {
+                          "type": "array",
+                          "items": {
+                            "type": [
+                              "string",
+                              "number",
+                              "boolean"
+                            ]
+                          }
+                        },
+                        "min": {
+                          "type": "number"
+                        },
+                        "max": {
+                          "type": "number"
+                        },
+                        "exists": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "field"
+                      ],
+                      "additionalProperties": false,
+                      "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                    }
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "insulate",
+                      "replace",
+                      "replace_insulation",
+                      "full_renovation"
+                    ],
+                    "description": "Supported recommendation action set for envelope components."
+                  },
+                  "reason": {
+                    "type": "string"
+                  },
+                  "targetUValue": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "action",
+                  "reason"
+                ],
+                "additionalProperties": false,
+                "description": "Age-based recommendation rule."
+              }
+            },
+            "wallWindow": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "minAge": {
+                    "type": "number"
+                  },
+                  "maxAge": {
+                    "type": "number"
+                  },
+                  "conditions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "field": {
+                          "type": "string"
+                        },
+                        "equals": {
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean"
+                          ]
+                        },
+                        "notEquals": {
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean"
+                          ]
+                        },
+                        "oneOf": {
+                          "type": "array",
+                          "items": {
+                            "type": [
+                              "string",
+                              "number",
+                              "boolean"
+                            ]
+                          }
+                        },
+                        "min": {
+                          "type": "number"
+                        },
+                        "max": {
+                          "type": "number"
+                        },
+                        "exists": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "field"
+                      ],
+                      "additionalProperties": false,
+                      "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                    }
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "insulate",
+                      "replace",
+                      "replace_insulation",
+                      "full_renovation"
+                    ],
+                    "description": "Supported recommendation action set for envelope components."
+                  },
+                  "reason": {
+                    "type": "string"
+                  },
+                  "targetUValue": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "action",
+                  "reason"
+                ],
+                "additionalProperties": false,
+                "description": "Age-based recommendation rule."
+              }
+            },
+            "topFloorCeiling": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "minAge": {
+                    "type": "number"
+                  },
+                  "maxAge": {
+                    "type": "number"
+                  },
+                  "conditions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "field": {
+                          "type": "string"
+                        },
+                        "equals": {
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean"
+                          ]
+                        },
+                        "notEquals": {
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean"
+                          ]
+                        },
+                        "oneOf": {
+                          "type": "array",
+                          "items": {
+                            "type": [
+                              "string",
+                              "number",
+                              "boolean"
+                            ]
+                          }
+                        },
+                        "min": {
+                          "type": "number"
+                        },
+                        "max": {
+                          "type": "number"
+                        },
+                        "exists": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "field"
+                      ],
+                      "additionalProperties": false,
+                      "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                    }
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "insulate",
+                      "replace",
+                      "replace_insulation",
+                      "full_renovation"
+                    ],
+                    "description": "Supported recommendation action set for envelope components."
+                  },
+                  "reason": {
+                    "type": "string"
+                  },
+                  "targetUValue": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "action",
+                  "reason"
+                ],
+                "additionalProperties": false,
+                "description": "Age-based recommendation rule."
+              }
+            },
+            "lowestFloor": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "minAge": {
+                    "type": "number"
+                  },
+                  "maxAge": {
+                    "type": "number"
+                  },
+                  "conditions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "field": {
+                          "type": "string"
+                        },
+                        "equals": {
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean"
+                          ]
+                        },
+                        "notEquals": {
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean"
+                          ]
+                        },
+                        "oneOf": {
+                          "type": "array",
+                          "items": {
+                            "type": [
+                              "string",
+                              "number",
+                              "boolean"
+                            ]
+                          }
+                        },
+                        "min": {
+                          "type": "number"
+                        },
+                        "max": {
+                          "type": "number"
+                        },
+                        "exists": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "field"
+                      ],
+                      "additionalProperties": false,
+                      "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                    }
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "insulate",
+                      "replace",
+                      "replace_insulation",
+                      "full_renovation"
+                    ],
+                    "description": "Supported recommendation action set for envelope components."
+                  },
+                  "reason": {
+                    "type": "string"
+                  },
+                  "targetUValue": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "action",
+                  "reason"
+                ],
+                "additionalProperties": false,
+                "description": "Age-based recommendation rule."
+              }
+            }
+          },
+          "required": [
+            "roof",
+            "roofWindow",
+            "wall",
+            "wallWindow",
+            "topFloorCeiling",
+            "lowestFloor"
+          ],
+          "additionalProperties": false,
+          "description": "Recommendation rules grouped by envelope component."
+        }
+      },
+      "required": [
+        "defaultFactor",
+        "defaultDeltaUwb",
+        "catalogs",
+        "recommendations"
+      ],
+      "additionalProperties": false
+    },
+    "heating": {
+      "type": "object",
+      "properties": {
+        "referenceYear": {
+          "type": "number"
+        },
+        "replaceAfterYears": {
+          "type": "number"
+        },
+        "optimizeAfterYears": {
+          "type": "number"
+        },
+        "noActionTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "directReplaceTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "replacementByCarrier": {
+          "type": "object",
+          "properties": {
+            "oil": {
+              "type": "string"
+            },
+            "gas": {
+              "type": "string"
+            },
+            "biomass": {
+              "type": "string"
+            },
+            "electricity": {
+              "type": "string"
+            },
+            "district_heating": {
+              "type": "string"
+            },
+            "other": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "oil",
+            "gas",
+            "biomass",
+            "electricity",
+            "district_heating",
+            "other"
+          ],
+          "additionalProperties": false
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "conditions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string"
+                    },
+                    "equals": {
+                      "type": [
+                        "string",
+                        "number",
+                        "boolean"
+                      ]
+                    },
+                    "notEquals": {
+                      "type": [
+                        "string",
+                        "number",
+                        "boolean"
+                      ]
+                    },
+                    "oneOf": {
+                      "type": "array",
+                      "items": {
+                        "type": [
+                          "string",
+                          "number",
+                          "boolean"
+                        ]
+                      }
+                    },
+                    "min": {
+                      "type": "number"
+                    },
+                    "max": {
+                      "type": "number"
+                    },
+                    "exists": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "field"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Generic rule condition evaluated against a calculation input context.\n\n`field` supports dot-notation paths such as `details.insulationPresent` or `ageYears`."
+                }
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "optimize",
+                  "replace"
+                ],
+                "description": "Action set returned by heating recommendation logic."
+              },
+              "reason": {
+                "type": "string"
+              },
+              "preferredReplacement": {
+                "type": "string"
+              },
+              "useCarrierReplacement": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "action",
+              "reason"
+            ],
+            "additionalProperties": false,
+            "description": "Configurable rule for detailed heating recommendations."
+          }
+        }
+      },
+      "required": [
+        "referenceYear",
+        "replaceAfterYears",
+        "optimizeAfterYears",
+        "noActionTypes",
+        "directReplaceTypes",
+        "replacementByCarrier"
+      ],
+      "additionalProperties": false,
+      "description": "Runtime heating-domain configuration."
+    },
+    "energy": {
+      "type": "object",
+      "properties": {
+        "usableAreaFactorFromVolume": {
+          "type": "number"
+        },
+        "internalGainWattsPerM2": {
+          "type": "number"
+        },
+        "heatingPeriodDays": {
+          "type": "number"
+        },
+        "degreeDayFactorMultiplier": {
+          "type": "number"
+        },
+        "ventilationCoefficient": {
+          "type": "number"
+        },
+        "defaultSolarGainUtilizationFactor": {
+          "type": "number"
+        },
+        "domesticHotWaterDemandPerPersonKWhPerYear": {
+          "type": "number"
+        },
+        "occupancyAreaPerPersonM2": {
+          "type": "number"
+        },
+        "defaultFinalEnergyFactor": {
+          "type": "number"
+        },
+        "defaultControlFactor": {
+          "type": "number"
+        },
+        "generationFactorByHeatingType": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "from": {
+                  "type": "number"
+                },
+                "to": {
+                  "type": "number"
+                },
+                "value": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "value"
+              ],
+              "additionalProperties": false,
+              "description": "Year-bounded U-value entry."
+            }
+          }
+        },
+        "controlFactorByType": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "emitterFactorAdjustmentByType": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "flowTemperatureAdjustmentBands": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "from": {
+                "type": "number"
+              },
+              "to": {
+                "type": "number"
+              },
+              "value": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "value"
+            ],
+            "additionalProperties": false,
+            "description": "Year-bounded U-value entry."
+          }
+        },
+        "radiatorPositionAdjustmentByType": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "intermittentAdjustmentByEmitterType": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "singleRoomControlAdjustmentByType": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "primaryEnergyFactorByCarrier": {
+          "type": "object",
+          "properties": {
+            "oil": {
+              "type": "number"
+            },
+            "gas": {
+              "type": "number"
+            },
+            "biomass": {
+              "type": "number"
+            },
+            "electricity": {
+              "type": "number"
+            },
+            "district_heating": {
+              "type": "number"
+            },
+            "other": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "oil",
+            "gas",
+            "biomass",
+            "electricity",
+            "district_heating",
+            "other"
+          ],
+          "additionalProperties": false
+        },
+        "fuelCarrierProfileByCarrier": {
+          "type": "object",
+          "properties": {
+            "oil": {
+              "type": "object",
+              "properties": {
+                "unit": {
+                  "type": "string"
+                },
+                "unitsPerKWh": {
+                  "type": "number"
+                },
+                "pricePerUnit": {
+                  "type": "number"
+                },
+                "co2KgPerUnit": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "unit",
+                "unitsPerKWh",
+                "pricePerUnit",
+                "co2KgPerUnit"
+              ],
+              "additionalProperties": false,
+              "description": "Fuel- and emission-related defaults per carrier."
+            },
+            "gas": {
+              "type": "object",
+              "properties": {
+                "unit": {
+                  "type": "string"
+                },
+                "unitsPerKWh": {
+                  "type": "number"
+                },
+                "pricePerUnit": {
+                  "type": "number"
+                },
+                "co2KgPerUnit": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "unit",
+                "unitsPerKWh",
+                "pricePerUnit",
+                "co2KgPerUnit"
+              ],
+              "additionalProperties": false,
+              "description": "Fuel- and emission-related defaults per carrier."
+            },
+            "biomass": {
+              "type": "object",
+              "properties": {
+                "unit": {
+                  "type": "string"
+                },
+                "unitsPerKWh": {
+                  "type": "number"
+                },
+                "pricePerUnit": {
+                  "type": "number"
+                },
+                "co2KgPerUnit": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "unit",
+                "unitsPerKWh",
+                "pricePerUnit",
+                "co2KgPerUnit"
+              ],
+              "additionalProperties": false,
+              "description": "Fuel- and emission-related defaults per carrier."
+            },
+            "electricity": {
+              "type": "object",
+              "properties": {
+                "unit": {
+                  "type": "string"
+                },
+                "unitsPerKWh": {
+                  "type": "number"
+                },
+                "pricePerUnit": {
+                  "type": "number"
+                },
+                "co2KgPerUnit": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "unit",
+                "unitsPerKWh",
+                "pricePerUnit",
+                "co2KgPerUnit"
+              ],
+              "additionalProperties": false,
+              "description": "Fuel- and emission-related defaults per carrier."
+            },
+            "district_heating": {
+              "type": "object",
+              "properties": {
+                "unit": {
+                  "type": "string"
+                },
+                "unitsPerKWh": {
+                  "type": "number"
+                },
+                "pricePerUnit": {
+                  "type": "number"
+                },
+                "co2KgPerUnit": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "unit",
+                "unitsPerKWh",
+                "pricePerUnit",
+                "co2KgPerUnit"
+              ],
+              "additionalProperties": false,
+              "description": "Fuel- and emission-related defaults per carrier."
+            },
+            "other": {
+              "type": "object",
+              "properties": {
+                "unit": {
+                  "type": "string"
+                },
+                "unitsPerKWh": {
+                  "type": "number"
+                },
+                "pricePerUnit": {
+                  "type": "number"
+                },
+                "co2KgPerUnit": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "unit",
+                "unitsPerKWh",
+                "pricePerUnit",
+                "co2KgPerUnit"
+              ],
+              "additionalProperties": false,
+              "description": "Fuel- and emission-related defaults per carrier."
+            }
+          },
+          "required": [
+            "oil",
+            "gas",
+            "biomass",
+            "electricity",
+            "district_heating",
+            "other"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "usableAreaFactorFromVolume",
+        "internalGainWattsPerM2",
+        "heatingPeriodDays",
+        "degreeDayFactorMultiplier",
+        "ventilationCoefficient",
+        "defaultSolarGainUtilizationFactor",
+        "domesticHotWaterDemandPerPersonKWhPerYear",
+        "occupancyAreaPerPersonM2",
+        "defaultFinalEnergyFactor",
+        "defaultControlFactor",
+        "generationFactorByHeatingType",
+        "controlFactorByType",
+        "emitterFactorAdjustmentByType",
+        "flowTemperatureAdjustmentBands",
+        "radiatorPositionAdjustmentByType",
+        "intermittentAdjustmentByEmitterType",
+        "singleRoomControlAdjustmentByType",
+        "primaryEnergyFactorByCarrier",
+        "fuelCarrierProfileByCarrier"
+      ],
+      "additionalProperties": false,
+      "description": "Runtime defaults and factor tables for annual energy-demand calculations."
+    }
+  },
+  "required": [
+    "envelope",
+    "heating",
+    "energy"
+  ],
+  "additionalProperties": false,
+  "description": "JSON input schema for external core configuration."
+}</script>
+    <script type="application/json" id="core-config-defaults">{
+  "envelope": {
+    "defaultFactor": 1,
+    "defaultDeltaUwb": 0.1,
+    "componentDefaults": {
+      "roofWindow": {
+        "factor": 0.93
+      }
+    },
+    "catalogs": {
+      "category1": {
+        "roof_massive": [
+          {
+            "to": 1918,
+            "value": 2.1
+          },
+          {
+            "from": 1919,
+            "to": 1948,
+            "value": 2.1
+          },
+          {
+            "from": 1949,
+            "to": 1957,
+            "value": 2.1
+          },
+          {
+            "from": 1958,
+            "to": 1968,
+            "value": 1.3
+          },
+          {
+            "from": 1969,
+            "to": 1978,
+            "value": 1.3
+          },
+          {
+            "from": 1979,
+            "to": 1983,
+            "value": 0.6
+          },
+          {
+            "from": 1984,
+            "to": 1994,
+            "value": 0.4
+          },
+          {
+            "from": 1995,
+            "to": 2001,
+            "value": 0.3
+          },
+          {
+            "from": 2002,
+            "value": 0.2
+          }
+        ],
+        "roof_timber": [
+          {
+            "to": 1918,
+            "value": 2.6
+          },
+          {
+            "from": 1919,
+            "to": 1948,
+            "value": 1.4
+          },
+          {
+            "from": 1949,
+            "to": 1957,
+            "value": 1.4
+          },
+          {
+            "from": 1958,
+            "to": 1968,
+            "value": 1.4
+          },
+          {
+            "from": 1969,
+            "to": 1978,
+            "value": 0.8
+          },
+          {
+            "from": 1979,
+            "to": 1983,
+            "value": 0.7
+          },
+          {
+            "from": 1984,
+            "to": 1994,
+            "value": 0.5
+          },
+          {
+            "from": 1995,
+            "to": 2001,
+            "value": 0.3
+          },
+          {
+            "from": 2002,
+            "value": 0.2
+          }
+        ],
+        "topFloorCeiling_massive": [
+          {
+            "to": 1918,
+            "value": 2.1
+          },
+          {
+            "from": 1919,
+            "to": 1948,
+            "value": 2.1
+          },
+          {
+            "from": 1949,
+            "to": 1957,
+            "value": 2.1
+          },
+          {
+            "from": 1958,
+            "to": 1968,
+            "value": 2.1
+          },
+          {
+            "from": 1969,
+            "to": 1978,
+            "value": 0.6
+          },
+          {
+            "from": 1979,
+            "to": 1983,
+            "value": 0.6
+          },
+          {
+            "from": 1984,
+            "to": 1994,
+            "value": 0.3
+          },
+          {
+            "from": 1995,
+            "to": 2001,
+            "value": 0.3
+          },
+          {
+            "from": 2002,
+            "value": 0.2
+          }
+        ],
+        "wall_over_20cm": [
+          {
+            "to": 1918,
+            "value": 2.2
+          },
+          {
+            "from": 1919,
+            "to": 1948,
+            "value": 2.2
+          },
+          {
+            "from": 1949,
+            "to": 1957,
+            "value": 2.2
+          },
+          {
+            "from": 1958,
+            "to": 1968,
+            "value": 1.4
+          },
+          {
+            "from": 1969,
+            "to": 1978,
+            "value": 1
+          },
+          {
+            "from": 1979,
+            "to": 1983,
+            "value": 0.8
+          },
+          {
+            "from": 1984,
+            "to": 1994,
+            "value": 0.6
+          },
+          {
+            "from": 1995,
+            "to": 2001,
+            "value": 0.5
+          },
+          {
+            "from": 2002,
+            "value": 0.4
+          }
+        ],
+        "lowestFloor_concrete": [
+          {
+            "to": 1918,
+            "value": 1.6
+          },
+          {
+            "from": 1919,
+            "to": 1948,
+            "value": 1.6
+          },
+          {
+            "from": 1949,
+            "to": 1957,
+            "value": 2.3
+          },
+          {
+            "from": 1958,
+            "to": 1968,
+            "value": 1
+          },
+          {
+            "from": 1969,
+            "to": 1978,
+            "value": 1
+          },
+          {
+            "from": 1979,
+            "to": 1983,
+            "value": 0.8
+          },
+          {
+            "from": 1984,
+            "to": 1994,
+            "value": 0.6
+          },
+          {
+            "from": 1995,
+            "to": 2001,
+            "value": 0.6
+          },
+          {
+            "from": 2002,
+            "value": 0.5
+          }
+        ],
+        "lowestFloor_timber": [
+          {
+            "to": 1918,
+            "value": 1
+          },
+          {
+            "from": 1919,
+            "to": 1948,
+            "value": 1
+          },
+          {
+            "from": 1949,
+            "to": 1957,
+            "value": 1
+          },
+          {
+            "from": 1958,
+            "to": 1968,
+            "value": 0.8
+          },
+          {
+            "from": 1969,
+            "to": 1978,
+            "value": 0.6
+          },
+          {
+            "from": 1979,
+            "to": 1983,
+            "value": 0.6
+          },
+          {
+            "from": 1984,
+            "to": 1994,
+            "value": 0.4
+          },
+          {
+            "from": 1995,
+            "to": 2001,
+            "value": 0.4
+          },
+          {
+            "from": 2002,
+            "value": 0.4
+          }
+        ],
+        "window_wood_double": [
+          {
+            "to": 1978,
+            "value": 2.7
+          },
+          {
+            "from": 1979,
+            "to": 1983,
+            "value": 2.7
+          },
+          {
+            "from": 1984,
+            "to": 1994,
+            "value": 2.7
+          },
+          {
+            "from": 1995,
+            "to": 2001,
+            "value": 1.6
+          },
+          {
+            "from": 2002,
+            "value": 1.5
+          }
+        ],
+        "window_pvc_iso": [
+          {
+            "to": 1978,
+            "value": 3
+          },
+          {
+            "from": 1979,
+            "to": 1983,
+            "value": 3
+          },
+          {
+            "from": 1984,
+            "to": 1994,
+            "value": 3
+          },
+          {
+            "from": 1995,
+            "to": 2001,
+            "value": 1.9
+          },
+          {
+            "from": 2002,
+            "value": 1.5
+          }
+        ]
+      }
+    },
+    "recommendations": {
+      "roof": [
+        {
+          "maxAge": 19,
+          "action": "none",
+          "reason": "Roof is younger than 20 years and is treated as recently renovated."
+        },
+        {
+          "minAge": 20,
+          "maxAge": 40,
+          "conditions": [
+            {
+              "field": "details.insulationPresent",
+              "equals": false
+            }
+          ],
+          "action": "insulate",
+          "reason": "Roof is 20-40 years old and has no confirmed insulation.",
+          "targetUValue": 0.14
+        },
+        {
+          "minAge": 20,
+          "maxAge": 40,
+          "action": "insulate",
+          "reason": "Roof is 20-40 years old; the concept recommends insulation to BEG EM level.",
+          "targetUValue": 0.14
+        },
+        {
+          "minAge": 41,
+          "action": "full_renovation",
+          "reason": "Roof is older than 40 years and is treated as requiring full roof renovation.",
+          "targetUValue": 0.14
+        }
+      ],
+      "roofWindow": [
+        {
+          "maxAge": 29,
+          "action": "none",
+          "reason": "Roof window is younger than 30 years and is treated as a newer unit."
+        },
+        {
+          "minAge": 30,
+          "action": "replace",
+          "reason": "Roof window is 30 years or older and should be replaced.",
+          "targetUValue": 1
+        }
+      ],
+      "wall": [
+        {
+          "conditions": [
+            {
+              "field": "details.insulationPresent",
+              "equals": true
+            },
+            {
+              "field": "details.insulationAgeYears",
+              "max": 50
+            }
+          ],
+          "action": "none",
+          "reason": "External wall is confirmed as insulated and the insulation age is at most 50 years."
+        },
+        {
+          "conditions": [
+            {
+              "field": "details.insulationPresent",
+              "equals": false
+            }
+          ],
+          "action": "insulate",
+          "reason": "External wall is confirmed as uninsulated and should receive facade insulation.",
+          "targetUValue": 0.2
+        },
+        {
+          "conditions": [
+            {
+              "field": "details.insulationAgeYears",
+              "min": 51
+            }
+          ],
+          "action": "replace_insulation",
+          "reason": "Existing facade insulation is older than 50 years and should be replaced.",
+          "targetUValue": 0.2
+        },
+        {
+          "maxAge": 39,
+          "action": "none",
+          "reason": "External wall is younger than 40 years and is treated as insulated in the concept fallback."
+        },
+        {
+          "minAge": 40,
+          "maxAge": 50,
+          "action": "insulate",
+          "reason": "External wall is 40-50 years old and should be insulated to BEG EM level.",
+          "targetUValue": 0.2
+        },
+        {
+          "minAge": 51,
+          "action": "full_renovation",
+          "reason": "External wall is older than 50 years and should be comprehensively renovated if no insulation status is known.",
+          "targetUValue": 0.2
+        }
+      ],
+      "wallWindow": [
+        {
+          "maxAge": 29,
+          "action": "none",
+          "reason": "Window is younger than 30 years and is treated as a newer unit."
+        },
+        {
+          "minAge": 30,
+          "action": "replace",
+          "reason": "Window is 30 years or older and should be replaced.",
+          "targetUValue": 0.95
+        }
+      ],
+      "topFloorCeiling": [
+        {
+          "conditions": [
+            {
+              "field": "details.insulationPresent",
+              "equals": true
+            },
+            {
+              "field": "details.insulationAgeYears",
+              "max": 40
+            }
+          ],
+          "action": "none",
+          "reason": "Top floor ceiling is insulated and the insulation age is at most 40 years."
+        },
+        {
+          "conditions": [
+            {
+              "field": "details.insulationPresent",
+              "equals": false
+            }
+          ],
+          "action": "insulate",
+          "reason": "Top floor ceiling is not insulated and should be upgraded.",
+          "targetUValue": 0.14
+        },
+        {
+          "conditions": [
+            {
+              "field": "details.insulationAgeYears",
+              "min": 41
+            }
+          ],
+          "action": "full_renovation",
+          "reason": "Top floor ceiling insulation is older than 40 years and should be renewed comprehensively.",
+          "targetUValue": 0.14
+        },
+        {
+          "maxAge": 39,
+          "action": "none",
+          "reason": "Top floor ceiling is younger than 40 years in the age-based fallback."
+        },
+        {
+          "minAge": 40,
+          "action": "insulate",
+          "reason": "Top floor ceiling should be insulated to BEG EM level.",
+          "targetUValue": 0.14
+        }
+      ],
+      "lowestFloor": [
+        {
+          "conditions": [
+            {
+              "field": "details.insulationPresent",
+              "equals": true
+            }
+          ],
+          "action": "none",
+          "reason": "Bottom floor/slab is confirmed as insulated."
+        },
+        {
+          "conditions": [
+            {
+              "field": "details.insulationPresent",
+              "equals": false
+            }
+          ],
+          "action": "insulate",
+          "reason": "Bottom floor/slab is confirmed as uninsulated and should be upgraded.",
+          "targetUValue": 0.25
+        },
+        {
+          "maxAge": 39,
+          "action": "none",
+          "reason": "Bottom floor/slab is younger than 40 years in the age-based fallback."
+        },
+        {
+          "minAge": 40,
+          "action": "insulate",
+          "reason": "Bottom floor/slab insulation is recommended to BEG EM level.",
+          "targetUValue": 0.25
+        }
+      ]
+    }
+  },
+  "heating": {
+    "referenceYear": 2026,
+    "optimizeAfterYears": 15,
+    "replaceAfterYears": 25,
+    "noActionTypes": [
+      "pellet_boiler",
+      "log_wood_boiler",
+      "air_water_heat_pump",
+      "water_water_heat_pump",
+      "ground_source_heat_pump",
+      "district_heating"
+    ],
+    "directReplaceTypes": [
+      "direct_electric_heating",
+      "standard_boiler_oil",
+      "standard_boiler_gas"
+    ],
+    "replacementByCarrier": {
+      "oil": "air_water_heat_pump",
+      "gas": "air_water_heat_pump",
+      "biomass": "pellet_boiler",
+      "electricity": "air_water_heat_pump",
+      "district_heating": "district_heating",
+      "other": "air_water_heat_pump"
+    }
+  },
+  "energy": {
+    "usableAreaFactorFromVolume": 0.32,
+    "internalGainWattsPerM2": 5,
+    "heatingPeriodDays": 185,
+    "degreeDayFactorMultiplier": 0.024,
+    "ventilationCoefficient": 0.34,
+    "defaultSolarGainUtilizationFactor": 1,
+    "domesticHotWaterDemandPerPersonKWhPerYear": 500,
+    "occupancyAreaPerPersonM2": 40,
+    "defaultFinalEnergyFactor": 1,
+    "defaultControlFactor": 1.095,
+    "generationFactorByHeatingType": {
+      "standard_boiler_oil": [
+        {
+          "to": 1986,
+          "value": 1.6
+        },
+        {
+          "from": 1987,
+          "to": 1994,
+          "value": 1.5
+        },
+        {
+          "from": 1995,
+          "value": 1.4
+        }
+      ],
+      "standard_boiler_gas": [
+        {
+          "to": 1986,
+          "value": 1.6
+        },
+        {
+          "from": 1987,
+          "to": 1994,
+          "value": 1.5
+        },
+        {
+          "from": 1995,
+          "value": 1.4
+        }
+      ],
+      "low_temp_boiler_oil": [
+        {
+          "to": 1986,
+          "value": 1.4
+        },
+        {
+          "from": 1987,
+          "value": 1.3
+        }
+      ],
+      "low_temp_boiler_gas": [
+        {
+          "to": 1986,
+          "value": 1.4
+        },
+        {
+          "from": 1987,
+          "value": 1.3
+        }
+      ],
+      "condensing_boiler_gas": [
+        {
+          "value": 1.2
+        }
+      ],
+      "condensing_boiler_oil": [
+        {
+          "value": 1.2
+        }
+      ],
+      "log_wood_boiler": [
+        {
+          "to": 1986,
+          "value": 1.6
+        },
+        {
+          "from": 1987,
+          "to": 1994,
+          "value": 1.5
+        },
+        {
+          "from": 1995,
+          "value": 1.4
+        }
+      ],
+      "pellet_boiler": [
+        {
+          "to": 1986,
+          "value": 1.6
+        },
+        {
+          "from": 1987,
+          "to": 1994,
+          "value": 1.5
+        },
+        {
+          "from": 1995,
+          "value": 1.4
+        }
+      ],
+      "water_water_heat_pump": [
+        {
+          "to": 1994,
+          "value": 0.4
+        },
+        {
+          "from": 1995,
+          "value": 0.3
+        }
+      ],
+      "ground_source_heat_pump": [
+        {
+          "to": 1994,
+          "value": 0.4
+        },
+        {
+          "from": 1995,
+          "value": 0.3
+        }
+      ],
+      "air_water_heat_pump": [
+        {
+          "to": 1994,
+          "value": 0.5
+        },
+        {
+          "from": 1995,
+          "value": 0.4
+        }
+      ],
+      "direct_electric_heating": [
+        {
+          "value": 1
+        }
+      ],
+      "district_heating": [
+        {
+          "value": 1
+        }
+      ]
+    },
+    "controlFactorByType": {
+      "unregulated_central_flow": 1.149,
+      "lead_room_or_one_pipe": 1.107,
+      "room_temperature_control": 1.095,
+      "p_controller_pre_1988": 1.083,
+      "p_or_two_point": 1.042,
+      "pi_controller": 1.042,
+      "pid_optimized": 1.03
+    },
+    "emitterFactorAdjustmentByType": {
+      "underfloor_wet": 0.021,
+      "underfloor_dry": 0.012,
+      "underfloor_low_cover": 0.006,
+      "wall_heating": 0.045,
+      "ceiling_heating": 0.063,
+      "mechanical_ventilation_heating": 0,
+      "radiator": 0
+    },
+    "flowTemperatureAdjustmentBands": [
+      {
+        "from": 80,
+        "value": 0.036
+      },
+      {
+        "from": 62.5,
+        "to": 79.9999,
+        "value": 0.021
+      },
+      {
+        "from": 50,
+        "to": 62.4999,
+        "value": 0.015
+      },
+      {
+        "to": 49.9999,
+        "value": 0.012
+      }
+    ],
+    "radiatorPositionAdjustmentByType": {
+      "inside_wall": 0.039,
+      "glass_without_shield": 0.051,
+      "glass_with_shield": 0.036,
+      "exterior_wall": 0.009
+    },
+    "intermittentAdjustmentByEmitterType": {
+      "radiator": -0.018
+    },
+    "singleRoomControlAdjustmentByType": {
+      "independent": -0.03,
+      "self_adjusting": -0.06,
+      "networked": -0.072
+    },
+    "primaryEnergyFactorByCarrier": {
+      "oil": 1.1,
+      "gas": 1.1,
+      "biomass": 0.2,
+      "electricity": 1.8,
+      "district_heating": 0.7,
+      "other": 1
+    },
+    "fuelCarrierProfileByCarrier": {
+      "oil": {
+        "unit": "l",
+        "unitsPerKWh": 0.1,
+        "pricePerUnit": 1.1,
+        "co2KgPerUnit": 2.66
+      },
+      "gas": {
+        "unit": "m3",
+        "unitsPerKWh": 0.1,
+        "pricePerUnit": 1.2,
+        "co2KgPerUnit": 2.02
+      },
+      "biomass": {
+        "unit": "kg",
+        "unitsPerKWh": 0.2,
+        "pricePerUnit": 0.4,
+        "co2KgPerUnit": 0.18
+      },
+      "electricity": {
+        "unit": "kWh",
+        "unitsPerKWh": 1,
+        "pricePerUnit": 0.35,
+        "co2KgPerUnit": 0.38
+      },
+      "district_heating": {
+        "unit": "kWh",
+        "unitsPerKWh": 1,
+        "pricePerUnit": 0.15,
+        "co2KgPerUnit": 0.25
+      },
+      "other": {
+        "unit": "kWh",
+        "unitsPerKWh": 1,
+        "pricePerUnit": 0.12,
+        "co2KgPerUnit": 0.25
+      }
+    }
+  }
+}</script>
+    <script src="https://cdn.jsdelivr.net/npm/jedison@1.5.1/dist/umd/jedison.umd.js"></script>
+    <script>
+      const schema = JSON.parse(document.getElementById("core-config-schema").textContent);
+      const defaults = JSON.parse(document.getElementById("core-config-defaults").textContent);
+      const holder = document.getElementById("editor_holder");
+      const status = document.getElementById("status");
+      const preview = document.getElementById("json-preview");
+      const fileInput = document.getElementById("import-file");
+
+      const editor = new Jedison.Create({
+        container: holder,
+        theme: new Jedison.Theme(),
+        schema,
+      });
+      editor.setValue(structuredClone(defaults));
+
+      function setStatus(message, tone) {
+        status.textContent = message;
+        status.className = "status" + (tone ? " " + tone : "");
+      }
+
+      function refreshPreview() {
+        const value = editor.getValue();
+        preview.value = JSON.stringify(value, null, 2);
+      }
+
+      function validateEditor() {
+        const errors = editor.getErrors();
+        if (errors.length === 0) {
+          setStatus("Schema validation passed.", "success");
+          return true;
+        }
+
+        const first = errors[0];
+        editor.showValidationErrors(errors);
+        const message = first.messages && first.messages[0] ? first.messages[0] : "Unknown validation error.";
+        setStatus("Schema validation failed: " + first.path + " " + message, "error");
+        return false;
+      }
+
+      editor.on("change", () => {
+        refreshPreview();
+        setStatus("Edited. Validate or export when ready.");
+      });
+
+      document.getElementById("reset").addEventListener("click", () => {
+        editor.setValue(structuredClone(defaults));
+        refreshPreview();
+        setStatus("Defaults restored.", "success");
+      });
+
+      document.getElementById("validate").addEventListener("click", () => {
+        validateEditor();
+      });
+
+      document.getElementById("copy").addEventListener("click", async () => {
+        refreshPreview();
+        await navigator.clipboard.writeText(preview.value);
+        setStatus("JSON copied to clipboard.", "success");
+      });
+
+      document.getElementById("download").addEventListener("click", () => {
+        refreshPreview();
+        const blob = new Blob([preview.value], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "core-config.json";
+        link.click();
+        URL.revokeObjectURL(url);
+        setStatus("JSON download started.", "success");
+      });
+
+      fileInput.addEventListener("change", async (event) => {
+        const file = event.target.files && event.target.files[0];
+        if (!file) {
+          return;
+        }
+
+        try {
+          const text = await file.text();
+          const value = JSON.parse(text);
+          editor.setValue(value);
+          refreshPreview();
+          setStatus("JSON imported.", "success");
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          setStatus("Import failed: " + message, "error");
+        } finally {
+          fileInput.value = "";
+        }
+      });
+
+      refreshPreview();
+      setStatus("Editor ready.");
+    </script>
+  </body>
+</html>

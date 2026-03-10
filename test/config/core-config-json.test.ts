@@ -4,7 +4,10 @@ import assert from "node:assert/strict";
 import { coreConfigFromJson } from "../../src/config/core-config-json";
 import { defaultCoreConfigJson } from "../../src/config/default-core-config";
 
-test("coreConfigFromJson converts 9-value arrays to year bands", () => {
+const baseHeatingConfig = defaultCoreConfigJson.heating;
+const baseEnergyConfig = defaultCoreConfigJson.energy;
+
+test("coreConfigFromJson keeps explicit year bands from the default config", () => {
   const config = coreConfigFromJson(defaultCoreConfigJson);
   const category1 = config.envelope.catalogs.category1;
   assert.ok(category1);
@@ -14,6 +17,17 @@ test("coreConfigFromJson converts 9-value arrays to year bands", () => {
   assert.equal(bands.length, 9);
   assert.deepEqual(bands[0], { to: 1918, value: 2.1 });
   assert.deepEqual(bands[8], { from: 2002, value: 0.2 });
+});
+
+test("coreConfigFromJson keeps explicit window bands and component defaults", () => {
+  const config = coreConfigFromJson(defaultCoreConfigJson);
+  const category1 = config.envelope.catalogs.category1;
+
+  assert.ok(category1);
+  assert.deepEqual(category1.window_wood_double?.[0], { to: 1978, value: 2.7 });
+  assert.deepEqual(category1.window_wood_double?.[4], { from: 2002, value: 1.5 });
+  assert.deepEqual(category1.window_pvc_iso?.[2], { from: 1984, to: 1994, value: 3.0 });
+  assert.equal(config.envelope.componentDefaults?.roofWindow?.factor, 0.93);
 });
 
 test("coreConfigFromJson accepts explicit year bands as JSON object", () => {
@@ -34,122 +48,22 @@ test("coreConfigFromJson accepts explicit year bands as JSON object", () => {
         roofWindow: [],
         wall: [],
         wallWindow: [],
-        ogd: [],
-        ugd: [],
+        topFloorCeiling: [],
+        lowestFloor: [],
       },
     },
     heating: {
-      referenceYear: 2026,
-      optimizeAfterYears: 15,
-      replaceAfterYears: 25,
+      ...baseHeatingConfig,
       noActionTypes: [],
       directReplaceTypes: [],
-      replacementByCarrier: {
-        oil: "air_water_heat_pump",
-        gas: "air_water_heat_pump",
-        biomass: "pellet_boiler",
-        electricity: "air_water_heat_pump",
-        district_heating: "district_heating",
-        other: "air_water_heat_pump",
-      },
     },
+    energy: baseEnergyConfig,
   });
 
   const c1 = config.envelope.catalogs.c1;
   assert.ok(c1);
   assert.equal(c1.wall?.[0]?.value, 1.2);
   assert.equal(c1.wall?.[1]?.value, 0.5);
-});
-
-test("coreConfigFromJson supports numeric arrays with more than 9 values", () => {
-  const config = coreConfigFromJson({
-    envelope: {
-      defaultFactor: 1,
-      defaultDeltaUwb: 0.1,
-      yearBandLayout: [
-        { to: 1900 },
-        { from: 1901, to: 1910 },
-        { from: 1911, to: 1920 },
-        { from: 1921, to: 1930 },
-        { from: 1931, to: 1940 },
-        { from: 1941, to: 1950 },
-        { from: 1951, to: 1960 },
-        { from: 1961, to: 1970 },
-        { from: 1971, to: 1980 },
-        { from: 1981 },
-      ],
-      catalogs: {
-        c1: {
-          roof: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        },
-      },
-      recommendations: {
-        roof: [],
-        roofWindow: [],
-        wall: [],
-        wallWindow: [],
-        ogd: [],
-        ugd: [],
-      },
-    },
-    heating: {
-      referenceYear: 2026,
-      optimizeAfterYears: 15,
-      replaceAfterYears: 25,
-      noActionTypes: [],
-      directReplaceTypes: [],
-      replacementByCarrier: {
-        oil: "air_water_heat_pump",
-        gas: "air_water_heat_pump",
-        biomass: "pellet_boiler",
-        electricity: "air_water_heat_pump",
-        district_heating: "district_heating",
-        other: "air_water_heat_pump",
-      },
-    },
-  });
-
-  const c1 = config.envelope.catalogs.c1;
-  assert.ok(c1);
-  assert.equal(c1.roof?.length, 10);
-  assert.equal(c1.roof?.[9]?.value, 10);
-});
-
-test("coreConfigFromJson throws when numeric array is used without yearBandLayout", () => {
-  assert.throws(
-    () =>
-      coreConfigFromJson({
-        envelope: {
-          defaultFactor: 1,
-          defaultDeltaUwb: 0.1,
-          catalogs: { c1: { roof: [1, 2] } },
-          recommendations: {
-            roof: [],
-            roofWindow: [],
-            wall: [],
-            wallWindow: [],
-            ogd: [],
-            ugd: [],
-          },
-        },
-        heating: {
-          referenceYear: 2026,
-          optimizeAfterYears: 15,
-          replaceAfterYears: 25,
-          noActionTypes: [],
-          directReplaceTypes: [],
-          replacementByCarrier: {
-            oil: "air_water_heat_pump",
-            gas: "air_water_heat_pump",
-            biomass: "pellet_boiler",
-            electricity: "air_water_heat_pump",
-            district_heating: "district_heating",
-            other: "air_water_heat_pump",
-          },
-        },
-      }),
-    /Missing 'yearBandLayout'/,
-  );
 });
 
 test("coreConfigFromJson throws for empty construction config", () => {
@@ -165,25 +79,16 @@ test("coreConfigFromJson throws for empty construction config", () => {
             roofWindow: [],
             wall: [],
             wallWindow: [],
-            ogd: [],
-            ugd: [],
+            topFloorCeiling: [],
+            lowestFloor: [],
           },
         },
         heating: {
-          referenceYear: 2026,
-          optimizeAfterYears: 15,
-          replaceAfterYears: 25,
+          ...baseHeatingConfig,
           noActionTypes: [],
           directReplaceTypes: [],
-          replacementByCarrier: {
-            oil: "air_water_heat_pump",
-            gas: "air_water_heat_pump",
-            biomass: "pellet_boiler",
-            electricity: "air_water_heat_pump",
-            district_heating: "district_heating",
-            other: "air_water_heat_pump",
-          },
         },
+        energy: baseEnergyConfig,
       }),
     /must not be empty/,
   );

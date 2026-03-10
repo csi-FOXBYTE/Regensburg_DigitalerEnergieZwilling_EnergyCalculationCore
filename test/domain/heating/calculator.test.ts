@@ -80,3 +80,36 @@ test("calculateHeating handles missing year with none action", () => {
   assert.equal(result.ageYears, undefined);
   assert.equal(result.recommendation.action, "none");
 });
+
+test("calculateHeating supports conditional LOD2/3 rules", () => {
+  const result = calculateHeating(
+    {
+      mode: "central",
+      primaryCarrier: "gas",
+      primaryType: "condensing_boiler_custom",
+      yearOfConstruction: 2000,
+      details: {
+        districtHeatingAvailable: true,
+        flowTemperatureC: 60,
+      },
+    },
+    {
+      ...config,
+      rules: [
+        {
+          conditions: [
+            { field: "details.districtHeatingAvailable", equals: true },
+            { field: "ageYears", min: 20 },
+          ],
+          action: "replace",
+          reason: "District heating is available and the system is old enough.",
+          preferredReplacement: "district_heating",
+        },
+      ],
+    },
+  );
+
+  assert.equal(result.ageYears, 26);
+  assert.equal(result.recommendation.action, "replace");
+  assert.equal(result.recommendation.preferredReplacement, "district_heating");
+});

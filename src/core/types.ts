@@ -1,4 +1,6 @@
+import type { UValueCatalogMap } from "../catalogs/types";
 import type { EnvelopeConfig, RoofWindowInput, SingleSurfaceResult, SurfaceInput, WallWindowInput } from "../envelope/types";
+import type { EnergyConfig, EnergyInput, EnergyResult } from "../energy/types";
 import type { HeatingConfig, HeatingInput, HeatingResult } from "../heating/types";
 import type { RoofWindowResult, WallWindowResult } from "../envelope/types";
 
@@ -7,12 +9,16 @@ import type { RoofWindowResult, WallWindowResult } from "../envelope/types";
  *
  * @group Core
  */
-export type CoreInput = Readonly<{
-  roofWindow?: RoofWindowInput;
-  wallWindow?: WallWindowInput;
-  ogd?: SurfaceInput;
-  ugd?: SurfaceInput;
-  heating?: HeatingInput;
+export type CoreInput<
+  TCatalogs extends UValueCatalogMap = UValueCatalogMap,
+  THeatingType extends string = string,
+> = Readonly<{
+  roofWindow?: RoofWindowInput<TCatalogs>;
+  wallWindow?: WallWindowInput<TCatalogs>;
+  topFloorCeiling?: SurfaceInput<TCatalogs>;
+  lowestFloor?: SurfaceInput<TCatalogs>;
+  heating?: HeatingInput<THeatingType>;
+  energy?: EnergyInput;
   aggregateReferenceAreaOverride?: number;
 }>;
 
@@ -21,9 +27,14 @@ export type CoreInput = Readonly<{
  *
  * @group Core
  */
-export type CoreConfig = Readonly<{
-  envelope: EnvelopeConfig;
-  heating: HeatingConfig;
+export type CoreConfig<
+  TCatalogs extends UValueCatalogMap = UValueCatalogMap,
+  THeatingConfig extends HeatingConfig = HeatingConfig,
+  TEnergyConfig extends EnergyConfig = EnergyConfig,
+> = Readonly<{
+  envelope: EnvelopeConfig<TCatalogs>;
+  heating: THeatingConfig;
+  energy: TEnergyConfig;
 }>;
 
 /**
@@ -34,9 +45,10 @@ export type CoreConfig = Readonly<{
 export type CoreResult = Readonly<{
   roofWindow?: RoofWindowResult;
   wallWindow?: WallWindowResult;
-  ogd?: SingleSurfaceResult;
-  ugd?: SingleSurfaceResult;
+  topFloorCeiling?: SingleSurfaceResult;
+  lowestFloor?: SingleSurfaceResult;
   heating?: HeatingResult;
+  energy?: EnergyResult;
   aggregate: Readonly<{
     totalHt: number;
     totalReferenceArea: number;

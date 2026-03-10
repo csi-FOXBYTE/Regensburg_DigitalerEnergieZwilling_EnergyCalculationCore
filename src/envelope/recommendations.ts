@@ -1,4 +1,5 @@
 import type { AgeRecommendationRule, EnvelopeRecommendation } from "./types";
+import { matchesRuleConditions } from "../shared/rule-conditions";
 
 /**
  * Evaluates age-based recommendation rules for a single envelope component.
@@ -13,17 +14,16 @@ import type { AgeRecommendationRule, EnvelopeRecommendation } from "./types";
  */
 export function evaluateAgeRecommendation(
   component: string,
-  ageYears: number | undefined,
+  context: Readonly<Record<string, unknown>>,
   rules: readonly AgeRecommendationRule[],
 ): EnvelopeRecommendation | undefined {
-  if (ageYears === undefined) {
-    return undefined;
-  }
+  const ageYears = typeof context.ageYears === "number" ? context.ageYears : undefined;
 
   for (const rule of rules) {
-    const minOk = rule.minAge === undefined || ageYears >= rule.minAge;
-    const maxOk = rule.maxAge === undefined || ageYears <= rule.maxAge;
-    if (minOk && maxOk) {
+    const minOk = rule.minAge === undefined || (ageYears !== undefined && ageYears >= rule.minAge);
+    const maxOk = rule.maxAge === undefined || (ageYears !== undefined && ageYears <= rule.maxAge);
+    const conditionsOk = matchesRuleConditions(context, rule.conditions);
+    if (minOk && maxOk && conditionsOk) {
       return {
         component,
         action: rule.action,
