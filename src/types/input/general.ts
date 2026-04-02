@@ -7,5 +7,4 @@ export type DETGeneralInput = {
   livingArea?: number | null;
 
   type: BuildingType;
-  isBasementHeated: boolean;
 };
