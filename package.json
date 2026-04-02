@@ -1,5 +1,5 @@
 {
-  "name": "@csi-foxbyte/Regensburg_DigitalerEnergieZwilling_EnergyCalculationCore",
+  "name": "@csi-foxbyte/regensburg_digitalerenergiezwilling_energycalculationcore",
   "version": "0.0.0",
   "description": "Domain-based TypeScript energy calculation core with JSON-configurable catalogs and rules for building envelope and heating evaluation.",
   "type": "module",
@@ -16,10 +16,18 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/csi-FOXBYTE/Regensburg_DigitalerEnergieZwilling_EnergyCalculationCore.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "packageManager": "pnpm@10.7.1",
   "devDependencies": {
     "@types/node": "^25.3.5",
     "esbuild": "^0.27.3",
+    "prettier": "^3.8.1",
     "publint": "^0.3.18",
     "ts-json-schema-generator": "^2.9.0",
     "tsdown": "^0.21.0",

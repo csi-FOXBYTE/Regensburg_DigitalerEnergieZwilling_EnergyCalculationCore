@@ -1,74 +1,18 @@
-export { calculateCore } from "./core/calculate-core";
-
-export type { CoreConfig, CoreInput, CoreResult } from "./core/types";
+export type { KeyedValues } from "./types/keyed-values.js";
 export type {
-  CatalogName,
-  ConstructionName,
-  UValueCatalog,
-  UValueCatalogMap,
-  UValueLookupSource,
-  UValueSource,
-  YearBand,
-  YearBandRange,
-} from "./catalogs/types";
-export { resolveUValue } from "./catalogs/u-value";
-export type {
-  EnergyCalculationContext,
-  EnergyConfig,
-  EnergyInput,
-  EnergyResult,
-  FuelCarrierProfile,
-  SolarGainInput,
-} from "./energy/types";
-export { calculateEnergy } from "./energy/calculator";
+  RangeBands,
+  RangeFirst,
+  RangeMiddle,
+  RangeLast,
+  Ranges,
+  RangeKey,
+  YearBands,
+} from "./types/range-bands.js";
+export { BuildingType } from "./types/building-type.js";
+export type { DETInput } from "./types/input/index.js";
+export type { DETGeneralInput } from "./types/input/general.js";
+export type { DETConfig } from "./types/config/index.js";
+export type { DETGeneralConfig } from "./types/config/general.js";
 
-export type {
-  AgeRecommendationRule,
-  EnvelopeComponentDefaults,
-  EnvelopeConfig,
-  EnvelopeRecommendationConfig,
-  EnvelopeRecommendation,
-  EnvelopeSurfaceKind,
-  HtBlock,
-  RecommendationAction,
-  RoofWindowInput,
-  RoofWindowResult,
-  SurfaceDetails,
-  SingleSurfaceResult,
-  SurfaceInput,
-  WallWindowInput,
-  WallWindowResult,
-} from "./envelope/types";
-
-export { calculateRoofWindow, calculateSingleSurface, calculateWallWindow } from "./envelope/calculators";
-
-export type {
-  EnergyCarrier,
-  HeatingConfig,
-  HeatingDetails,
-  HeatingInput,
-  HeatingTypeFromConfig,
-  HeatingTypeFromConfigs,
-  HeatingMode,
-  LiteralUnion,
-  HeatingRecommendation,
-  HeatingRecommendationRule,
-  HeatingRecommendationAction,
-  HeatingResult,
-} from "./heating/types";
-
-export type { RuleCondition, RuleValue } from "./shared/rule-conditions";
-
-export { calculateHeating } from "./heating/calculator";
-export type {
-  CoreConfigJson,
-  JsonCatalogConfig,
-  JsonCatalogConfigMap,
-  JsonConstructionConfig,
-  NormalizedCatalogMap,
-} from "./config/core-config-json";
-export type { CoreConfigJsonSchemaSource } from "./config/core-config-schema-source";
-export type { CoreInputSchemaSource } from "./config/core-input-schema-source";
-export { coreConfigFromJson } from "./config/core-config-json";
-export { defaultCoreConfig, defaultCoreConfigJson } from "./config/default-core-config";
-export { defaultCoreInputJson } from "./config/default-core-input";
+export { resolveKeyedValue } from "./types/keyed-values.js";
+export { resolveRangeBand, resolveYearBand } from "./types/range-bands.js";
