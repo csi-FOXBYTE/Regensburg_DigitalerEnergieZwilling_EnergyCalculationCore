@@ -11,6 +11,7 @@ export type {
 export { BuildingType } from "./types/building-type.js";
 export type { DETInput } from "./types/input/index.js";
 export type { DETGeneralInput } from "./types/input/general.js";
+export type { DETHeatInput } from "./types/input/heat.js";
 export type { DETConfig } from "./types/config/index.js";
 export type { DETGeneralConfig } from "./types/config/general.js";
 
