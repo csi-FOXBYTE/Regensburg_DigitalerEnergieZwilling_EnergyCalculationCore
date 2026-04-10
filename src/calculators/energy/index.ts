@@ -11,6 +11,7 @@ import primaryEnergyCarrierData from "./resolvers/primaryEnergyCarrierData";
 import primaryEnergyCarrierEfficiencyFactor from "./resolvers/primaryEnergyCarrierEfficiencyFactor";
 import primaryEnergyDemand from "./resolvers/primaryEnergyDemand";
 import primaryEnergyDemandPerSquareMeter from "./resolvers/primaryEnergyDemandPerSquareMeter";
+import energyEfficiencyClass from "./resolvers/energyEfficiencyClass";
 import energyCarrierConsumption from "./resolvers/energyCarrierConsumption";
 import energyCarrierCost from "./resolvers/energyCarrierCost";
 import buildingYear from "./resolvers/buildingYear";
@@ -46,6 +47,31 @@ import totalEnergyDemandPerSquareMeter from "./resolvers/totalEnergyDemandPerSqu
 import usableFloorAreaFactor from "./resolvers/usableFloorAreaFactor";
 import ventilationHeatLoss from "./resolvers/ventilationHeatLoss";
 import ventilationHeatLossCorrectionFactor from "./resolvers/ventilationHeatLossCorrectionFactor";
+import exteriorWallWindowsArea from "./resolvers/exteriorWallWindows/exteriorWallWindowsArea";
+import exteriorWallWindowsHeatLoss from "./resolvers/exteriorWallWindows/exteriorWallWindowsHeatLoss";
+import exteriorWallWindowsHeatLossFactor from "./resolvers/exteriorWallWindows/exteriorWallWindowsHeatLossFactor";
+import exteriorWallWindowsType from "./resolvers/exteriorWallWindows/exteriorWallWindowsType";
+import exteriorWallWindowsUValue from "./resolvers/exteriorWallWindows/exteriorWallWindowsUValue";
+import exteriorWallWindowsYear from "./resolvers/exteriorWallWindows/exteriorWallWindowsYear";
+import roofArea from "./resolvers/roof/roofArea";
+import roofHeatLoss from "./resolvers/roof/roofHeatLoss";
+import roofHeatLossFactor from "./resolvers/roof/roofHeatLossFactor";
+import roofConstructionType from "./resolvers/roof/roofConstructionType";
+import roofInnerSurfaceThermalResistance from "./resolvers/roof/roofInnerSurfaceThermalResistance";
+import roofInsulationReductionFactor from "./resolvers/roof/roofInsulationReductionFactor";
+import roofInsulationThickness from "./resolvers/roof/roofInsulationThickness";
+import roofInsulationType from "./resolvers/roof/roofInsulationType";
+import roofOuterSurfaceThermalResistance from "./resolvers/roof/roofOuterSurfaceThermalResistance";
+import roofThermalConductivity from "./resolvers/roof/roofThermalConductivity";
+import roofTotalThermalResistance from "./resolvers/roof/roofTotalThermalResistance";
+import roofUValue from "./resolvers/roof/roofUValue";
+import roofYear from "./resolvers/roof/roofYear";
+import roofWindowsArea from "./resolvers/roofWindows/roofWindowsArea";
+import roofWindowsHeatLoss from "./resolvers/roofWindows/roofWindowsHeatLoss";
+import roofWindowsHeatLossFactor from "./resolvers/roofWindows/roofWindowsHeatLossFactor";
+import roofWindowsType from "./resolvers/roofWindows/roofWindowsType";
+import roofWindowsUValue from "./resolvers/roofWindows/roofWindowsUValue";
+import roofWindowsYear from "./resolvers/roofWindows/roofWindowsYear";
 
 export interface DETCalculatorRegistry {}
 
@@ -62,6 +88,7 @@ export const DETEnergyCaluclator = createCalculator<
   buildingBaseArea,
   co2Emissions,
   co2Factor,
+  energyEfficiencyClass,
   energyCarrierConsumption,
   energyCarrierCost,
   combinedHeatingPerformanceFactor,
@@ -103,4 +130,29 @@ export const DETEnergyCaluclator = createCalculator<
   usableFloorAreaFactor,
   ventilationHeatLoss,
   ventilationHeatLossCorrectionFactor,
+  exteriorWallWindowsArea,
+  exteriorWallWindowsHeatLoss,
+  exteriorWallWindowsHeatLossFactor,
+  exteriorWallWindowsType,
+  exteriorWallWindowsUValue,
+  exteriorWallWindowsYear,
+  roofArea,
+  roofConstructionType,
+  roofHeatLoss,
+  roofHeatLossFactor,
+  roofInnerSurfaceThermalResistance,
+  roofInsulationReductionFactor,
+  roofInsulationThickness,
+  roofInsulationType,
+  roofOuterSurfaceThermalResistance,
+  roofThermalConductivity,
+  roofTotalThermalResistance,
+  roofUValue,
+  roofYear,
+  roofWindowsArea,
+  roofWindowsHeatLoss,
+  roofWindowsHeatLossFactor,
+  roofWindowsType,
+  roofWindowsUValue,
+  roofWindowsYear,
 ]);

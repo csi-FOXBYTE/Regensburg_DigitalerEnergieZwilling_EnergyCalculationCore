@@ -1,4 +1,5 @@
 import type { BuildingType } from "../building-type";
+import type { HeatFlowDirection } from "../heat-flow-direction";
 import type { KeyedValues } from "../keyed-values";
 import type { RangeBands, YearBands } from "../range-bands";
 
@@ -25,4 +26,6 @@ export type DETHeatConfig = {
   primaryEnergyCarrierEfficiencyFactor: KeyedValues<string, number>;
   co2Factor: KeyedValues<string, number>;
   primaryEnergyCarrierData: KeyedValues<string, PrimaryEnergyCarrierData>;
+  innerSurfaceThermalResistance: KeyedValues<HeatFlowDirection, number>;
+  outerSurfaceThermalResistance: KeyedValues<HeatFlowDirection, number>;
 };

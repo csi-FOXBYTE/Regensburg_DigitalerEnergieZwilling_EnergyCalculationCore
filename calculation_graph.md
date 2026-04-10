@@ -629,3 +629,50 @@ style mco2 fill:#4CAF50
 style Qp fill:#4CAF50
 style qp fill:#4CAF50
 style H fill:#FFC107
+
+style const_bheiz fill:#4CAF50
+style const_barb fill:#4CAF50
+style const_bgrund fill:#4CAF50
+style Bverb fill:#4CAF50
+style Bcost fill:#4CAF50
+style bheiz fill:#4CAF50
+style barb fill:#4CAF50
+style bgrund fill:#4CAF50
+
+style user_roof_area fill:#4CAF50
+style user_roof_year fill:#4CAF50
+style Dach_massiv fill:#4CAF50
+style Dach_Dämmung_Art fill:#4CAF50
+style A_Dach1 fill:#4CAF50
+style Rsi_Dach fill:#4CAF50
+style Rse_Dach fill:#4CAF50
+style Sr_Dach fill:#4CAF50
+style L_Dach fill:#4CAF50
+style Fmin_Dach fill:#4CAF50
+style Rt_Dach fill:#4CAF50
+style U_Dach1 fill:#FFC107
+style U_Dach0 fill:#4CAF50
+style Ht_Dach fill:#4CAF50
+style F_Dach fill:#4CAF50
+
+style user_roof_window_area fill:#4CAF50
+style user_roof_window_year fill:#4CAF50
+style user_roof_window_frame fill:#4CAF50
+style user_roof_window_glass fill:#4CAF50
+style Bg_Dachfenster fill:#4CAF50
+style A_Dachfenster1 fill:#4CAF50
+style U_Dachfenster0 fill:#4CAF50
+style U_Dachfenster1 fill:#4CAF50
+style F_Dachfenster fill:#4CAF50
+style Ht_Dachfenster fill:#4CAF50
+
+style user_exterior_wall_window_area fill:#4CAF50
+style user_exterior_wall_window_year fill:#4CAF50
+style user_exterior_wall_window_frame fill:#4CAF50
+style user_exterior_wall_window_glass fill:#4CAF50
+style Bg_Aussenwandfenster fill:#4CAF50
+style A_Aussenwandfenster1 fill:#4CAF50
+style U_Aussenwandfenster0 fill:#4CAF50
+style U_Aussenwandfenster1 fill:#4CAF50
+style F_Aussenwandfenster fill:#4CAF50
+style Ht_Aussenwandfenster fill:#4CAF50

@@ -9,8 +9,12 @@ declare module "../" {
 
 export default {
   key: "heatLossSum",
-  // TODO: add remaining heat loss components (e.g. transmission heat loss)
-  resolve: (ctx) => ctx.get("ventilationHeatLoss"),
+  // TODO: add remaining surface heat loss components (OGD, exterior walls, UGD)
+  resolve: (ctx) =>
+    ctx.get("ventilationHeatLoss") +
+    ctx.get("roofHeatLoss") +
+    ctx.get("roofWindowsHeatLoss") +
+    ctx.get("exteriorWallWindowsHeatLoss"),
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,

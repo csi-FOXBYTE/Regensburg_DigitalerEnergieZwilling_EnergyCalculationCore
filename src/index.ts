@@ -15,7 +15,17 @@ export type { DETGeneralInput } from "./types/input/general.js";
 export type { DETHeatInput } from "./types/input/heat.js";
 export type { DETConfig } from "./types/config/index.js";
 export type { DETGeneralConfig } from "./types/config/general.js";
-export type { DETHeatConfig } from "./types/config/heat.js";
+export type { DETHeatConfig, PrimaryEnergyCarrierData } from "./types/config/heat.js";
+export type { DETRoofConfig } from "./types/config/roof.js";
+export type { DETWindowsConfig } from "./types/config/windows.js";
+export type { DETRoofInput } from "./types/input/roof.js";
+export type { DETRoofWindowsInput } from "./types/input/roofWindows.js";
+export type { DETExteriorWallWindowsInput } from "./types/input/exteriorWallWindows.js";
+export { HeatFlowDirection } from "./types/heat-flow-direction.js";
+export { DEFAULT_CONFIG } from "./types/config/default-config.js";
 
 export { resolveKeyedValue } from "./types/keyed-values.js";
 export { resolveRangeBand, resolveYearBand } from "./types/range-bands.js";
+
+export { calculate } from "./calculate.js";
+export type { CalculationResult } from "./calculate.js";
