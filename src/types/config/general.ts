@@ -1,14 +1,16 @@
 import type { BuildingType } from "../building-type";
 import type { KeyedValues } from "../keyed-values";
-import type { Ranges } from "../range-bands";
+import type { EnergyEfficiencyClass } from "../energy-efficiency-class";
+import type { RangeBands, Ranges } from "../range-bands";
 
 export type DETGeneralConfig = {
   generalYearBands: Ranges;
+  energyEfficiencyClasses: RangeBands<EnergyEfficiencyClass>;
 
   assumedFloorSlabThickness: number;
   assumedInteriorStoryHeight: number;
 
-  heatedAirVolumeCorrectionFactor: number;
+  heatedAirVolumeCorrectionFactor: RangeBands<number>;
   usableFloorAreaFactor: number;
 
   netFloorAreaFromUsableFloorAreaFactor: KeyedValues<

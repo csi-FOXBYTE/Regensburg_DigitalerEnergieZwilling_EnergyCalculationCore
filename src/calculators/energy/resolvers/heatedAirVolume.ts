@@ -11,7 +11,7 @@ export default {
   key: "heatedAirVolume",
   resolve: (ctx) =>
     ctx.get("grossHeatedVolume") *
-    ctx.input.config.general.heatedAirVolumeCorrectionFactor,
+    ctx.get("heatedAirVolumeCorrectionFactor"),
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,

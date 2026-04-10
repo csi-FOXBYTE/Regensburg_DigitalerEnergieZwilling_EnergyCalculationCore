@@ -3,17 +3,16 @@ import type { DETCalculatorRegistry, DETCalculatorContext } from "../";
 
 declare module "../" {
   interface DETCalculatorRegistry {
-    usableFloorArea: number;
+    preliminaryHeatingEnergyDemand: number;
   }
 }
 
 export default {
-  key: "usableFloorArea",
+  key: "preliminaryHeatingEnergyDemand",
   resolve: (ctx) =>
-    ctx.get("grossHeatedVolume") *
-    ctx.get("usableFloorAreaFactor"),
+    ctx.get("heatLossSum") * ctx.get("heatingDegreeDays") * 0.024,
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,
-  "usableFloorArea"
+  "preliminaryHeatingEnergyDemand"
 >;

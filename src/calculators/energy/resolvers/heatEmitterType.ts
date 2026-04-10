@@ -3,17 +3,19 @@ import type { DETCalculatorRegistry, DETCalculatorContext } from "../";
 
 declare module "../" {
   interface DETCalculatorRegistry {
-    usableFloorArea: number;
+    heatEmitterType: string;
   }
 }
 
 export default {
-  key: "usableFloorArea",
-  resolve: (ctx) =>
-    ctx.get("grossHeatedVolume") *
-    ctx.get("usableFloorAreaFactor"),
+  key: "heatEmitterType",
+  resolve: (ctx) => {
+    const override = ctx.input.input.heat.heatEmitterType;
+    if (override != null) return override;
+    return ctx.input.config.heat.defaultHeatEmitterType;
+  },
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,
-  "usableFloorArea"
+  "heatEmitterType"
 >;

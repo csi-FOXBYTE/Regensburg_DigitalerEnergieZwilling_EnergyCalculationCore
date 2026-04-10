@@ -3,17 +3,19 @@ import type { DETCalculatorRegistry, DETCalculatorContext } from "../";
 
 declare module "../" {
   interface DETCalculatorRegistry {
-    usableFloorArea: number;
+    heatingSurfaceType: string;
   }
 }
 
 export default {
-  key: "usableFloorArea",
-  resolve: (ctx) =>
-    ctx.get("grossHeatedVolume") *
-    ctx.get("usableFloorAreaFactor"),
+  key: "heatingSurfaceType",
+  resolve: (ctx) => {
+    const override = ctx.input.input.heat.heatingSurfaceType;
+    if (override != null) return override;
+    return ctx.input.config.heat.defaultHeatingSurfaceType;
+  },
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,
-  "usableFloorArea"
+  "heatingSurfaceType"
 >;

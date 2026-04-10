@@ -1,19 +1,18 @@
 import type { Resolver } from "../../../engine/index.js";
 import type { DETCalculatorRegistry, DETCalculatorContext } from "../";
+import type { RangeKey } from "../../../types/range-bands";
 
 declare module "../" {
   interface DETCalculatorRegistry {
-    usableFloorArea: number;
+    buildingYear: number | RangeKey;
   }
 }
 
 export default {
-  key: "usableFloorArea",
-  resolve: (ctx) =>
-    ctx.get("grossHeatedVolume") *
-    ctx.get("usableFloorAreaFactor"),
+  key: "buildingYear",
+  resolve: (ctx) => ctx.input.input.general.buildingYear,
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,
-  "usableFloorArea"
+  "buildingYear"
 >;
