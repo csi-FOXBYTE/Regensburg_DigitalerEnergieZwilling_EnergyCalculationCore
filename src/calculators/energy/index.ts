@@ -53,6 +53,21 @@ import exteriorWallWindowsHeatLossFactor from "./resolvers/exteriorWallWindows/e
 import exteriorWallWindowsType from "./resolvers/exteriorWallWindows/exteriorWallWindowsType";
 import exteriorWallWindowsUValue from "./resolvers/exteriorWallWindows/exteriorWallWindowsUValue";
 import exteriorWallWindowsYear from "./resolvers/exteriorWallWindows/exteriorWallWindowsYear";
+import isTopFloorHeated from "./resolvers/topFloor/isTopFloorHeated";
+import topFloorArea from "./resolvers/topFloor/topFloorArea";
+import topFloorHasInsulation from "./resolvers/topFloor/topFloorHasInsulation";
+import topFloorConstructionUValue from "./resolvers/topFloor/topFloorConstructionUValue";
+import topFloorConstructionResistance from "./resolvers/topFloor/topFloorConstructionResistance";
+import topFloorHeatLossFactor from "./resolvers/topFloor/topFloorHeatLossFactor";
+import topFloorHeatLoss from "./resolvers/topFloor/topFloorHeatLoss";
+import topFloorThermalResistance from "./resolvers/topFloor/topFloorThermalResistance";
+import topFloorUValue from "./resolvers/topFloor/topFloorUValue";
+import topFloorInsulationThickness from "./resolvers/topFloor/topFloorInsulationThickness";
+import topFloorInsulationResistance from "./resolvers/topFloor/topFloorInsulationResistance";
+import topFloorInnerSurfaceThermalResistance from "./resolvers/topFloor/topFloorInnerSurfaceThermalResistance";
+import topFloorOuterSurfaceThermalResistance from "./resolvers/topFloor/topFloorOuterSurfaceThermalResistance";
+import topFloorThermalConductivity from "./resolvers/topFloor/topFloorThermalConductivity";
+import topFloorType from "./resolvers/topFloor/topFloorType";
 import roofArea from "./resolvers/roof/roofArea";
 import roofHeatLoss from "./resolvers/roof/roofHeatLoss";
 import roofHeatLossFactor from "./resolvers/roof/roofHeatLossFactor";
@@ -136,6 +151,21 @@ export const DETEnergyCaluclator = createCalculator<
   exteriorWallWindowsType,
   exteriorWallWindowsUValue,
   exteriorWallWindowsYear,
+  isTopFloorHeated,
+  topFloorArea,
+  topFloorHasInsulation,
+  topFloorConstructionUValue,
+  topFloorConstructionResistance,
+  topFloorHeatLossFactor,
+  topFloorHeatLoss,
+  topFloorThermalResistance,
+  topFloorUValue,
+  topFloorInsulationThickness,
+  topFloorInsulationResistance,
+  topFloorInnerSurfaceThermalResistance,
+  topFloorOuterSurfaceThermalResistance,
+  topFloorThermalConductivity,
+  topFloorType,
   roofArea,
   roofConstructionType,
   roofHeatLoss,

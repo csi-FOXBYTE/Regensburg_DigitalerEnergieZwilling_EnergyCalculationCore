@@ -1,1 +1,17 @@
 # Added Resolvers
+
+- `isTopFloorHeated` (boolean, topFloor input, defaults to `true`)
+- `topFloorArea` (number, required input)
+- `topFloorType` (string, topFloor input, config year-band fallback via `buildingYear`)
+- `topFloorInnerSurfaceThermalResistance` (number, config heat keyed by `HeatFlowDirection.UPWARD`)
+- `topFloorOuterSurfaceThermalResistance` (number, config heat keyed by `HeatFlowDirection.UPWARD`)
+- `topFloorThermalConductivity` (number, config `topFloor.thermalConductivity`)
+- `topFloorInsulationThickness` (number, input override or config `assumedInsulationThickness`)
+- `topFloorInsulationResistance` (Rsi + d/λ + Rse)
+- `topFloorHasInsulation` (boolean, input override, defaults to `false`)
+- `topFloorConstructionUValue` (number, keyed by `topFloorType` + year-band via `buildingYear`)
+- `topFloorConstructionResistance` (1 / topFloorConstructionUValue)
+- `topFloorHeatLossFactor` (number, config `topFloor.heatLossFactor`)
+- `topFloorHeatLoss` (area * uValue * heatLossFactor)
+- `topFloorThermalResistance` (constructionResistance + insulationResistance if hasInsulation, else constructionResistance)
+- `topFloorUValue` (1 / topFloorThermalResistance)
