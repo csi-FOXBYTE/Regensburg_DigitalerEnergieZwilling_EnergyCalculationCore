@@ -14,7 +14,7 @@ export default {
   resolve: (ctx) => {
     const byEmitterType = resolveKeyedValue(
       ctx.input.config.heat.heatingPerformanceFactor,
-      ctx.get("heatEmitterType"),
+      ctx.get("heatingSystemType"),
     );
     const byYear = resolveRangeBand(byEmitterType, ctx.get("heatingSystemConstructionYear"));
     if (byYear == null) throw new Error("Failed to resolve heatingPerformanceFactor for given year");

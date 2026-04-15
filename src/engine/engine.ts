@@ -17,6 +17,15 @@ export function createCalculator<TContext, TRegistry>(
 
     const ctx: ResolverContext<TContext, TRegistry> = {
       input,
+      getAll(): Partial<TRegistry> {
+        const result: Partial<TRegistry> = {};
+        for (const [key, value] of cache) {
+          if (value !== RESOLVING) {
+            result[key] = value as TRegistry[typeof key];
+          }
+        }
+        return result;
+      },
       get<K extends keyof TRegistry>(key: K): TRegistry[K] {
         const cached = cache.get(key);
         if (cached === RESOLVING) {

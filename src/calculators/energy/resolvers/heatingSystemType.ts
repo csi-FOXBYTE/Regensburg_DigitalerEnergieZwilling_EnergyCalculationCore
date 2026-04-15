@@ -3,19 +3,19 @@ import type { DETCalculatorRegistry, DETCalculatorContext } from "../";
 
 declare module "../" {
   interface DETCalculatorRegistry {
-    heatEmitterType: string;
+    heatingSystemType: string;
   }
 }
 
 export default {
-  key: "heatEmitterType",
+  key: "heatingSystemType",
   resolve: (ctx) => {
-    const override = ctx.input.input.heat.heatEmitterType;
+    const override = ctx.input.input.heat.heatingSystemType;
     if (override != null) return override;
-    return ctx.input.config.heat.defaultHeatEmitterType;
+    return ctx.input.config.heat.defaultHeatingSystemType;
   },
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,
-  "heatEmitterType"
+  "heatingSystemType"
 >;

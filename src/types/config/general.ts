@@ -4,6 +4,7 @@ import type { EnergyEfficiencyClass } from "../energy-efficiency-class";
 import type { RangeBands, Ranges } from "../range-bands";
 
 export type DETGeneralConfig = {
+  supportedLocales: string[];
   generalYearBands: Ranges;
   energyEfficiencyClasses: RangeBands<EnergyEfficiencyClass>;
 

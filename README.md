@@ -14,12 +14,49 @@ Requires an `.npmrc` pointing to GitHub Packages:
 @csi-foxbyte:registry=https://npm.pkg.github.com
 ```
 
+## Usage
+
+```ts
+import { calculate, DEFAULT_CONFIG } from "@csi-foxbyte/regensburg_digitalerenergiezwilling_energycalculationcore";
+
+const result = calculate(DEFAULT_CONFIG, {
+  general: { /* ... */ },
+  heat: { isBasementHeated: false },
+  roof: { area: 120 },
+  topFloor: { area: 80 },
+  outerWall: { area: 200 },
+  baseSlab: { area: 80 },
+  roofWindows: { area: 4 },
+  exteriorWallWindows: { area: 24 },
+});
+
+// result: { energyConsumptionPerSquareMeter, energyEfficiencyClass, yearlyCost, co2Emissions }
+```
+
 ## Exports
 
-**Types:**
-- `DETConfig`, `DETGeneralConfig` — configuration schema
-- `DETInput`, `DETGeneralInput`, `DETHeatInput` — calculation input schema
-- `BuildingType` — enum for single/multi-family buildings
+**Calculation:**
+- `calculate(config, input)` — runs the energy calculation, returns `CalculationResult`
+- `DEFAULT_CONFIG` — ready-to-use default configuration
+
+**Config types:**
+- `DETConfig`, `DETGeneralConfig`, `DETHeatConfig` — top-level and heat configuration
+- `DETRoofConfig`, `DETTopFloorConfig`, `DETOuterWallConfig`, `DETBaseSlabConfig`, `DETWindowsConfig` — envelope component configuration
+- `PrimaryEnergyCarrierData` — energy carrier data shape
+
+**Input types:**
+- `DETInput`, `DETGeneralInput`, `DETHeatInput` — top-level and heat input
+- `DETRoofInput`, `DETTopFloorInput`, `DETOuterWallInput`, `DETBaseSlabInput` — envelope component input
+- `DETRoofWindowsInput`, `DETExteriorWallWindowsInput` — window input
+
+**Enums:**
+- `BuildingType` — single/multi-family
+- `EnergyEfficiencyClass` — A+ through H
+- `HeatFlowDirection` — upward/horizontal/downward
+- `RoofInsulationType` — between-rafter/above-rafter
+
+**Shared types:**
+- `Selection`, `SelectionFilter` — labelled options with localization and filtering
 - `KeyedValues`, `RangeBands`, `YearBands`, `Ranges`, `RangeKey` — generic data structures
 
 **Utility functions:**

@@ -9,11 +9,9 @@ declare module "../../" {
 
 export default {
   key: "topFloorThermalResistance",
-  resolve: (ctx) => {
-    const construction = ctx.get("topFloorConstructionResistance");
-    if (!ctx.get("topFloorHasInsulation")) return construction;
-    return construction + ctx.get("topFloorInsulationResistance");
-  },
+  resolve: (ctx) =>
+    ctx.get("topFloorConstructionResistance") +
+    ctx.get("topFloorInsulationResistance"),
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,

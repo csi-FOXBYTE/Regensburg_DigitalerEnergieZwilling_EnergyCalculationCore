@@ -9,11 +9,15 @@ declare module "../../" {
 
 export default {
   key: "topFloorInsulationResistance",
-  resolve: (ctx) =>
-    ctx.get("topFloorInnerSurfaceThermalResistance") +
-    ctx.get("topFloorInsulationThickness") /
-      ctx.get("topFloorThermalConductivity") +
-    ctx.get("topFloorOuterSurfaceThermalResistance"),
+  resolve: (ctx) => {
+    if (!ctx.get("topFloorHasInsulation")) return 0;
+    return (
+      ctx.get("topFloorInnerSurfaceThermalResistance") +
+      ctx.get("topFloorInsulationThickness") /
+        ctx.get("topFloorThermalConductivity") +
+      ctx.get("topFloorOuterSurfaceThermalResistance")
+    );
+  },
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,

@@ -1,24 +1,20 @@
 import type { Resolver } from "../../../../engine/index.js";
 import type { DETCalculatorRegistry, DETCalculatorContext } from "../../";
+import { RoofInsulationType } from "../../../../types/roof-insulation-type.js";
 
 declare module "../../" {
   interface DETCalculatorRegistry {
-    roofTotalThermalResistance: number | null;
+    roofTotalThermalResistance: number;
   }
 }
 
 export default {
   key: "roofTotalThermalResistance",
   resolve: (ctx) => {
-    const reductionFactor = ctx.get("roofInsulationReductionFactor");
-    if (reductionFactor == null) return null;
-    return (
-      (ctx.get("roofInnerSurfaceThermalResistance") +
-        ctx.get("roofInsulationThickness") /
-          ctx.get("roofThermalConductivity") +
-        ctx.get("roofOuterSurfaceThermalResistance")) *
-      reductionFactor
-    );
+    if (ctx.get("roofInsulationType") === RoofInsulationType.BETWEEN_RAFTER) {
+      return ctx.get("betweenRafterRoofResistance");
+    }
+    return ctx.get("roofConstructionResistance") + ctx.get("roofInsulationResistance");
   },
 } satisfies Resolver<
   DETCalculatorContext,

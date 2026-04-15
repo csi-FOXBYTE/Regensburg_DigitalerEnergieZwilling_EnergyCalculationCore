@@ -4,6 +4,6 @@ export type DETHeatInput = {
   isBasementHeated: boolean;
   heatingSystemConstructionYear?: number | RangeKey | null;
   primaryEnergyCarrier?: string | null;
-  heatEmitterType?: string | null;
+  heatingSystemType?: string | null;
   heatingSurfaceType?: string | null;
 };

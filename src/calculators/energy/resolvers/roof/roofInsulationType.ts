@@ -1,9 +1,10 @@
 import type { Resolver } from "../../../../engine/index.js";
 import type { DETCalculatorRegistry, DETCalculatorContext } from "../../";
+import type { RoofInsulationType } from "../../../../types/roof-insulation-type.js";
 
 declare module "../../" {
   interface DETCalculatorRegistry {
-    roofInsulationType: string;
+    roofInsulationType: RoofInsulationType;
   }
 }
 
