@@ -36,4 +36,4 @@ export { resolveKeyedValue } from "./types/keyed-values.js";
 export { resolveRangeBand, resolveYearBand } from "./types/range-bands.js";
 
 export { calculate } from "./calculate.js";
-export type { CalculationResult } from "./calculate.js";
+export type { CalculationResult, CalculateOptions } from "./calculate.js";

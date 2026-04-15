@@ -10,13 +10,23 @@ export type CalculationResult = {
   co2Emissions: number;
 };
 
-export function calculate(config: DETConfig, input: DETInput): CalculationResult {
+export type CalculateOptions = {
+  debug?: boolean;
+};
+
+export function calculate(config: DETConfig, input: DETInput, options?: CalculateOptions): CalculationResult {
   const ctx = DETEnergyCaluclator({ config, input });
 
-  return {
+  const result = {
     energyConsumptionPerSquareMeter: ctx.get("totalEnergyDemandPerSquareMeter"),
     energyEfficiencyClass: ctx.get("energyEfficiencyClass"),
     yearlyCost: ctx.get("energyCarrierCost"),
     co2Emissions: ctx.get("co2Emissions"),
   };
+
+  if (options?.debug) {
+    console.log("[DET] Resolved values:", ctx.getAll());
+  }
+
+  return result;
 }
