@@ -3,7 +3,7 @@ import type { DETHeatConfig } from "./heat"
 import type { DETRoofConfig } from "./roof"
 import type { DETTopFloorConfig } from "./topFloor"
 import type { DETOuterWallConfig } from "./outerWall"
-import type { DETBaseSlabConfig } from "./baseSlab"
+import type { DETBottomFloorConfig } from "./bottomFloor"
 import type { DETWindowsConfig } from "./windows"
 
 export type DETConfig = {
@@ -12,6 +12,6 @@ export type DETConfig = {
   roof: DETRoofConfig,
   topFloor: DETTopFloorConfig,
   outerWall: DETOuterWallConfig,
-  baseSlab: DETBaseSlabConfig,
+  bottomFloor: DETBottomFloorConfig,
   windows: DETWindowsConfig,
 }

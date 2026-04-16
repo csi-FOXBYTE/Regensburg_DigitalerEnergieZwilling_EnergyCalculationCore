@@ -8,9 +8,7 @@
     "test": "node --test --import tsx \"test/**/*.test.ts\"",
     "build": "pnpm run lint && pnpm run test && tsdown",
     "lint": "tsc --noEmit",
-    "docs:api": "typedoc --options typedoc.json",
-    "configurator:build": "tsx scripts/generate-configurator.ts",
-    "docs": "pnpm run docs:api && pnpm run configurator:build",
+    "gen:docs": "typedoc --options typedoc.json",
     "prepack": "pnpm run build"
   },
   "keywords": [],

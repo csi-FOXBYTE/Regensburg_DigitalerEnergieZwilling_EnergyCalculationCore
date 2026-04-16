@@ -1,93 +1,56 @@
-**@csi-foxbyte/Regensburg_DigitalerEnergieZwilling_EnergyCalculationCore**
+**@csi-foxbyte/regensburg_digitalerenergiezwilling_energycalculationcore**
 
 ***
 
-# @csi-foxbyte/Regensburg_DigitalerEnergieZwilling_EnergyCalculationCore
+# @csi-foxbyte/regensburg_digitalerenergiezwilling_energycalculationcore
 
-## Core
+## Enumerations
 
-- [calculateCore](functions/calculateCore.md)
-- [CoreInput](type-aliases/CoreInput.md)
-- [CoreConfig](type-aliases/CoreConfig.md)
-- [CoreResult](type-aliases/CoreResult.md)
+- [BuildingType](enumerations/BuildingType.md)
+- [EnergyEfficiencyClass](enumerations/EnergyEfficiencyClass.md)
+- [HeatFlowDirection](enumerations/HeatFlowDirection.md)
+- [RoofInsulationType](enumerations/RoofInsulationType.md)
 
-## Envelope
+## Functions
 
-- [calculateRoofWindow](functions/calculateRoofWindow.md)
-- [calculateWallWindow](functions/calculateWallWindow.md)
-- [calculateSingleSurface](functions/calculateSingleSurface.md)
-- [EnvelopeSurfaceKind](type-aliases/EnvelopeSurfaceKind.md)
-- [SurfaceDetails](type-aliases/SurfaceDetails.md)
-- [SurfaceInput](type-aliases/SurfaceInput.md)
-- [RoofWindowInput](type-aliases/RoofWindowInput.md)
-- [WallWindowInput](type-aliases/WallWindowInput.md)
-- [HtBlock](type-aliases/HtBlock.md)
-- [RecommendationAction](type-aliases/RecommendationAction.md)
-- [EnvelopeRecommendation](type-aliases/EnvelopeRecommendation.md)
-- [AgeRecommendationRule](type-aliases/AgeRecommendationRule.md)
-- [EnvelopeComponentDefaults](type-aliases/EnvelopeComponentDefaults.md)
-- [EnvelopeRecommendationConfig](type-aliases/EnvelopeRecommendationConfig.md)
-- [EnvelopeConfig](type-aliases/EnvelopeConfig.md)
-- [RoofWindowResult](type-aliases/RoofWindowResult.md)
-- [WallWindowResult](type-aliases/WallWindowResult.md)
-- [SingleSurfaceResult](type-aliases/SingleSurfaceResult.md)
-
-## Heating
-
-- [calculateHeating](functions/calculateHeating.md)
-- [HeatingMode](type-aliases/HeatingMode.md)
-- [EnergyCarrier](type-aliases/EnergyCarrier.md)
-- [LiteralUnion](type-aliases/LiteralUnion.md)
-- [HeatingTypeFromConfig](type-aliases/HeatingTypeFromConfig.md)
-- [HeatingTypeFromConfigs](type-aliases/HeatingTypeFromConfigs.md)
-- [HeatingInput](type-aliases/HeatingInput.md)
-- [HeatingRecommendationAction](type-aliases/HeatingRecommendationAction.md)
-- [HeatingRecommendation](type-aliases/HeatingRecommendation.md)
-- [HeatingDetails](type-aliases/HeatingDetails.md)
-- [HeatingRecommendationRule](type-aliases/HeatingRecommendationRule.md)
-- [HeatingConfig](type-aliases/HeatingConfig.md)
-- [HeatingResult](type-aliases/HeatingResult.md)
-
-## Catalogs
-
-- [YearBand](type-aliases/YearBand.md)
-- [YearBandRange](type-aliases/YearBandRange.md)
-- [UValueCatalog](type-aliases/UValueCatalog.md)
-- [UValueCatalogMap](type-aliases/UValueCatalogMap.md)
-- [CatalogName](type-aliases/CatalogName.md)
-- [ConstructionName](type-aliases/ConstructionName.md)
-- [UValueLookupSource](type-aliases/UValueLookupSource.md)
-- [UValueSource](type-aliases/UValueSource.md)
-- [resolveUValue](functions/resolveUValue.md)
-
-## Configuration
-
-- [JsonConstructionConfig](type-aliases/JsonConstructionConfig.md)
-- [JsonCatalogConfig](type-aliases/JsonCatalogConfig.md)
-- [JsonCatalogConfigMap](type-aliases/JsonCatalogConfigMap.md)
-- [NormalizedCatalogMap](type-aliases/NormalizedCatalogMap.md)
-- [CoreConfigJson](type-aliases/CoreConfigJson.md)
-- [coreConfigFromJson](functions/coreConfigFromJson.md)
-- [CoreConfigJsonSchemaSource](type-aliases/CoreConfigJsonSchemaSource.md)
-- [CoreInputSchemaSource](type-aliases/CoreInputSchemaSource.md)
-- [defaultCoreConfigJson](variables/defaultCoreConfigJson.md)
-- [defaultCoreConfig](variables/defaultCoreConfig.md)
-- [defaultCoreInputJson](variables/defaultCoreInputJson.md)
-
-## Shared
-
-- [RuleCondition](type-aliases/RuleCondition.md)
-
-## Energy
-
-- [calculateEnergy](functions/calculateEnergy.md)
-- [SolarGainInput](type-aliases/SolarGainInput.md)
-- [EnergyInput](type-aliases/EnergyInput.md)
-- [EnergyResult](type-aliases/EnergyResult.md)
-- [FuelCarrierProfile](type-aliases/FuelCarrierProfile.md)
-- [EnergyConfig](type-aliases/EnergyConfig.md)
-- [EnergyCalculationContext](type-aliases/EnergyCalculationContext.md)
+- [calculate](functions/calculate.md)
+- [resolveKeyedValue](functions/resolveKeyedValue.md)
+- [resolveRangeBand](functions/resolveRangeBand.md)
 
 ## Type Aliases
 
-- [RuleValue](type-aliases/RuleValue.md)
+- [CalculationResult](type-aliases/CalculationResult.md)
+- [CalculateOptions](type-aliases/CalculateOptions.md)
+- [DETBottomFloorConfig](type-aliases/DETBottomFloorConfig.md)
+- [DETGeneralConfig](type-aliases/DETGeneralConfig.md)
+- [PrimaryEnergyCarrierData](type-aliases/PrimaryEnergyCarrierData.md)
+- [DETHeatConfig](type-aliases/DETHeatConfig.md)
+- [DETConfig](type-aliases/DETConfig.md)
+- [DETOuterWallConfig](type-aliases/DETOuterWallConfig.md)
+- [DETRoofConfig](type-aliases/DETRoofConfig.md)
+- [DETTopFloorConfig](type-aliases/DETTopFloorConfig.md)
+- [DETWindowsConfig](type-aliases/DETWindowsConfig.md)
+- [DETBottomFloorInput](type-aliases/DETBottomFloorInput.md)
+- [DETExteriorWallWindowsInput](type-aliases/DETExteriorWallWindowsInput.md)
+- [DETGeneralInput](type-aliases/DETGeneralInput.md)
+- [DETHeatInput](type-aliases/DETHeatInput.md)
+- [DETInput](type-aliases/DETInput.md)
+- [DETOuterWallInput](type-aliases/DETOuterWallInput.md)
+- [DETRoofInput](type-aliases/DETRoofInput.md)
+- [DETRoofWindowsInput](type-aliases/DETRoofWindowsInput.md)
+- [DETTopFloorInput](type-aliases/DETTopFloorInput.md)
+- [KeyedValues](type-aliases/KeyedValues.md)
+- [RangeFirst](type-aliases/RangeFirst.md)
+- [RangeMiddle](type-aliases/RangeMiddle.md)
+- [RangeLast](type-aliases/RangeLast.md)
+- [Ranges](type-aliases/Ranges.md)
+- [RangeBands](type-aliases/RangeBands.md)
+- [YearBands](type-aliases/YearBands.md)
+- [RangeKey](type-aliases/RangeKey.md)
+- [Selection](type-aliases/Selection.md)
+- [SelectionFilter](type-aliases/SelectionFilter.md)
+
+## Variables
+
+- [DEFAULT\_CONFIG](variables/DEFAULT_CONFIG.md)
+- [resolveYearBand](variables/resolveYearBand.md)

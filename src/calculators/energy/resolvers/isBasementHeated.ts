@@ -9,7 +9,7 @@ declare module "../" {
 
 export default {
   key: "isBasementHeated",
-  resolve: (ctx) => ctx.input.input.heat.isBasementHeated,
+  resolve: (ctx) => ctx.input.input.bottomFloor.isBasementHeated ?? false,
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,

@@ -16,7 +16,7 @@ export default {
       ctx.input.config.topFloor.uValue,
       ctx.get("topFloorType"),
     );
-    const result = resolveYearBand(yearBands, ctx.get("buildingYear"));
+    const result = resolveYearBand(yearBands, ctx.get("topFloorYear"));
     if (result == null) throw new Error("Failed to resolve topFloorConstructionUValue");
     return result;
   },

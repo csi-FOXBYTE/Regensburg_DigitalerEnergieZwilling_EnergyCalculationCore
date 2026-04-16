@@ -15,7 +15,7 @@ export default {
     if (override != null) return override;
     const result = resolveYearBand(
       ctx.input.config.topFloor.defaultTopFloorType,
-      ctx.get("buildingYear"),
+      ctx.get("topFloorYear"),
     );
     if (result == null) throw new Error("Failed to resolve topFloorType");
     return result;

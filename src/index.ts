@@ -19,14 +19,14 @@ export type { DETHeatConfig, PrimaryEnergyCarrierData } from "./types/config/hea
 export type { DETRoofConfig } from "./types/config/roof.js";
 export type { DETTopFloorConfig } from "./types/config/topFloor.js";
 export type { DETOuterWallConfig } from "./types/config/outerWall.js";
-export type { DETBaseSlabConfig } from "./types/config/baseSlab.js";
+export type { DETBottomFloorConfig } from "./types/config/bottomFloor.js";
 export type { DETWindowsConfig } from "./types/config/windows.js";
 export type { DETRoofInput } from "./types/input/roof.js";
 export type { DETRoofWindowsInput } from "./types/input/roofWindows.js";
 export type { DETExteriorWallWindowsInput } from "./types/input/exteriorWallWindows.js";
 export type { DETTopFloorInput } from "./types/input/topFloor.js";
 export type { DETOuterWallInput } from "./types/input/outerWall.js";
-export type { DETBaseSlabInput } from "./types/input/baseSlab.js";
+export type { DETBottomFloorInput } from "./types/input/bottomFloor.js";
 export { HeatFlowDirection } from "./types/heat-flow-direction.js";
 export { RoofInsulationType } from "./types/roof-insulation-type.js";
 export type { Selection, SelectionFilter } from "./types/selection.js";

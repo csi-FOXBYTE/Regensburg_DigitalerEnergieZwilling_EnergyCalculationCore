@@ -37,6 +37,7 @@ import netFloorArea from "./resolvers/netFloorArea";
 import netFloorAreaFromLivingAreaFactor from "./resolvers/netFloorAreaFromLivingAreaFactor";
 import netFloorAreaFromUsableFloorAreaFactor from "./resolvers/netFloorAreaFromUsableFloorAreaFactor";
 import numberOfStories from "./resolvers/numberOfStories";
+import numberOfHeatedStories from "./resolvers/numberOfHeatedStories";
 import preliminaryHeatingEnergyDemand from "./resolvers/preliminaryHeatingEnergyDemand";
 import totalStoryHeight from "./resolvers/totalStoryHeight";
 import usableFloorArea from "./resolvers/usableFloorArea";
@@ -52,7 +53,9 @@ import exteriorWallWindowsHeatLossFactor from "./resolvers/exteriorWallWindows/e
 import exteriorWallWindowsType from "./resolvers/exteriorWallWindows/exteriorWallWindowsType";
 import exteriorWallWindowsUValue from "./resolvers/exteriorWallWindows/exteriorWallWindowsUValue";
 import exteriorWallWindowsYear from "./resolvers/exteriorWallWindows/exteriorWallWindowsYear";
-import isTopFloorHeated from "./resolvers/topFloor/isTopFloorHeated";
+import isAtticHeated from "./resolvers/topFloor/isAtticHeated";
+import hasAttic from "./resolvers/topFloor/hasAttic";
+import topFloorYear from "./resolvers/topFloor/topFloorYear";
 import topFloorArea from "./resolvers/topFloor/topFloorArea";
 import topFloorHasInsulation from "./resolvers/topFloor/topFloorHasInsulation";
 import topFloorConstructionUValue from "./resolvers/topFloor/topFloorConstructionUValue";
@@ -85,6 +88,8 @@ import roofThermalConductivity from "./resolvers/roof/roofThermalConductivity";
 import roofTotalThermalResistance from "./resolvers/roof/roofTotalThermalResistance";
 import roofUValue from "./resolvers/roof/roofUValue";
 import roofYear from "./resolvers/roof/roofYear";
+import isSpaceBelowRoofHeated from "./resolvers/roof/isSpaceBelowRoofHeated";
+import outerWallYear from "./resolvers/outerWall/outerWallYear";
 import outerWallHasInsulation from "./resolvers/outerWall/outerWallHasInsulation";
 import outerWallConstructionType from "./resolvers/outerWall/outerWallConstructionType";
 import outerWallConstructionUValue from "./resolvers/outerWall/outerWallConstructionUValue";
@@ -99,21 +104,24 @@ import outerWallOuterSurfaceThermalResistance from "./resolvers/outerWall/outerW
 import outerWallThermalConductivity from "./resolvers/outerWall/outerWallThermalConductivity";
 import outerWallInsulationThickness from "./resolvers/outerWall/outerWallInsulationThickness";
 import outerWallInsulationResistance from "./resolvers/outerWall/outerWallInsulationResistance";
-import baseSlabIsHeated from "./resolvers/baseSlab/baseSlabIsHeated";
-import baseSlabArea from "./resolvers/baseSlab/baseSlabArea";
-import baseSlabConstructionType from "./resolvers/baseSlab/baseSlabConstructionType";
-import baseSlabConstructionUValue from "./resolvers/baseSlab/baseSlabConstructionUValue";
-import baseSlabConstructionResistance from "./resolvers/baseSlab/baseSlabConstructionResistance";
-import baseSlabHasInsulation from "./resolvers/baseSlab/baseSlabHasInsulation";
-import baseSlabInsulationThickness from "./resolvers/baseSlab/baseSlabInsulationThickness";
-import baseSlabInnerSurfaceThermalResistance from "./resolvers/baseSlab/baseSlabInnerSurfaceThermalResistance";
-import baseSlabOuterSurfaceThermalResistance from "./resolvers/baseSlab/baseSlabOuterSurfaceThermalResistance";
-import baseSlabThermalConductivity from "./resolvers/baseSlab/baseSlabThermalConductivity";
-import baseSlabInsulationResistance from "./resolvers/baseSlab/baseSlabInsulationResistance";
-import baseSlabThermalResistance from "./resolvers/baseSlab/baseSlabThermalResistance";
-import baseSlabUValue from "./resolvers/baseSlab/baseSlabUValue";
-import baseSlabHeatLossFactor from "./resolvers/baseSlab/baseSlabHeatLossFactor";
-import baseSlabHeatLoss from "./resolvers/baseSlab/baseSlabHeatLoss";
+import bottomFloorIsHeated from "./resolvers/bottomFloor/bottomFloorIsHeated";
+import bottomFloorYear from "./resolvers/bottomFloor/bottomFloorYear";
+import hasBasement from "./resolvers/bottomFloor/hasBasement";
+import isSpaceAboveBaseSlabHeated from "./resolvers/bottomFloor/isSpaceAboveBaseSlabHeated";
+import bottomFloorArea from "./resolvers/bottomFloor/bottomFloorArea";
+import bottomFloorConstructionType from "./resolvers/bottomFloor/bottomFloorConstructionType";
+import bottomFloorConstructionUValue from "./resolvers/bottomFloor/bottomFloorConstructionUValue";
+import bottomFloorConstructionResistance from "./resolvers/bottomFloor/bottomFloorConstructionResistance";
+import bottomFloorHasInsulation from "./resolvers/bottomFloor/bottomFloorHasInsulation";
+import bottomFloorInsulationThickness from "./resolvers/bottomFloor/bottomFloorInsulationThickness";
+import bottomFloorInnerSurfaceThermalResistance from "./resolvers/bottomFloor/bottomFloorInnerSurfaceThermalResistance";
+import bottomFloorOuterSurfaceThermalResistance from "./resolvers/bottomFloor/bottomFloorOuterSurfaceThermalResistance";
+import bottomFloorThermalConductivity from "./resolvers/bottomFloor/bottomFloorThermalConductivity";
+import bottomFloorInsulationResistance from "./resolvers/bottomFloor/bottomFloorInsulationResistance";
+import bottomFloorThermalResistance from "./resolvers/bottomFloor/bottomFloorThermalResistance";
+import bottomFloorUValue from "./resolvers/bottomFloor/bottomFloorUValue";
+import bottomFloorHeatLossFactor from "./resolvers/bottomFloor/bottomFloorHeatLossFactor";
+import bottomFloorHeatLoss from "./resolvers/bottomFloor/bottomFloorHeatLoss";
 import roofWindowsArea from "./resolvers/roofWindows/roofWindowsArea";
 import roofWindowsHeatLoss from "./resolvers/roofWindows/roofWindowsHeatLoss";
 import roofWindowsHeatLossFactor from "./resolvers/roofWindows/roofWindowsHeatLossFactor";
@@ -168,6 +176,7 @@ export const DETEnergyCaluclator = createCalculator<
   netFloorAreaFromLivingAreaFactor,
   netFloorAreaFromUsableFloorAreaFactor,
   numberOfStories,
+  numberOfHeatedStories,
   preliminaryHeatingEnergyDemand,
   totalStoryHeight,
   usableFloorArea,
@@ -183,7 +192,10 @@ export const DETEnergyCaluclator = createCalculator<
   exteriorWallWindowsType,
   exteriorWallWindowsUValue,
   exteriorWallWindowsYear,
-  isTopFloorHeated,
+  isAtticHeated,
+  hasAttic,
+  topFloorYear,
+  isSpaceBelowRoofHeated,
   topFloorArea,
   topFloorHasInsulation,
   topFloorConstructionUValue,
@@ -216,6 +228,7 @@ export const DETEnergyCaluclator = createCalculator<
   roofTotalThermalResistance,
   roofUValue,
   roofYear,
+  outerWallYear,
   outerWallHasInsulation,
   outerWallConstructionType,
   outerWallConstructionUValue,
@@ -230,21 +243,24 @@ export const DETEnergyCaluclator = createCalculator<
   outerWallThermalConductivity,
   outerWallInsulationThickness,
   outerWallInsulationResistance,
-  baseSlabIsHeated,
-  baseSlabArea,
-  baseSlabConstructionType,
-  baseSlabConstructionUValue,
-  baseSlabConstructionResistance,
-  baseSlabHasInsulation,
-  baseSlabInsulationThickness,
-  baseSlabInnerSurfaceThermalResistance,
-  baseSlabOuterSurfaceThermalResistance,
-  baseSlabThermalConductivity,
-  baseSlabInsulationResistance,
-  baseSlabThermalResistance,
-  baseSlabUValue,
-  baseSlabHeatLossFactor,
-  baseSlabHeatLoss,
+  bottomFloorIsHeated,
+  bottomFloorYear,
+  hasBasement,
+  isSpaceAboveBaseSlabHeated,
+  bottomFloorArea,
+  bottomFloorConstructionType,
+  bottomFloorConstructionUValue,
+  bottomFloorConstructionResistance,
+  bottomFloorHasInsulation,
+  bottomFloorInsulationThickness,
+  bottomFloorInnerSurfaceThermalResistance,
+  bottomFloorOuterSurfaceThermalResistance,
+  bottomFloorThermalConductivity,
+  bottomFloorInsulationResistance,
+  bottomFloorThermalResistance,
+  bottomFloorUValue,
+  bottomFloorHeatLossFactor,
+  bottomFloorHeatLoss,
   roofWindowsArea,
   roofWindowsHeatLoss,
   roofWindowsHeatLossFactor,

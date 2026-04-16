@@ -7,6 +7,5 @@ export type DETGeneralInput = {
   buildingHeight: number;
   buildingBaseArea: number;
   livingArea?: number | null;
-
   type: BuildingType;
 };

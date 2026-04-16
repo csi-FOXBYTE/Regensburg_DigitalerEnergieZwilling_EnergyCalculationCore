@@ -16,7 +16,7 @@ export default {
       ctx.input.config.outerWall.uValue,
       ctx.get("outerWallConstructionType"),
     );
-    const result = resolveYearBand(yearBands, ctx.get("buildingYear"));
+    const result = resolveYearBand(yearBands, ctx.get("outerWallYear"));
     if (result == null) throw new Error("Failed to resolve outerWallConstructionUValue");
     return result;
   },

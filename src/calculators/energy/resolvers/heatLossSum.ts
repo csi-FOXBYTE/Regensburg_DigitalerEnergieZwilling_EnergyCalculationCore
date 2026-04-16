@@ -11,12 +11,11 @@ export default {
   key: "heatLossSum",
   resolve: (ctx) =>
     ctx.get("ventilationHeatLoss") +
-    ctx.get("roofHeatLoss") +
+    (ctx.get("isSpaceBelowRoofHeated") ? ctx.get("roofHeatLoss") : ctx.get("topFloorHeatLoss")) +
     ctx.get("roofWindowsHeatLoss") +
     ctx.get("exteriorWallWindowsHeatLoss") +
-    ctx.get("topFloorHeatLoss") +
     ctx.get("outerWallHeatLoss") +
-    ctx.get("baseSlabHeatLoss"),
+    ctx.get("bottomFloorHeatLoss"),
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,

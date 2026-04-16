@@ -15,7 +15,7 @@ export default {
     if (override != null) return override;
     const result = resolveYearBand(
       ctx.input.config.outerWall.defaultConstructionType,
-      ctx.get("buildingYear"),
+      ctx.get("outerWallYear"),
     );
     if (result == null) throw new Error("Failed to resolve outerWallConstructionType");
     return result;

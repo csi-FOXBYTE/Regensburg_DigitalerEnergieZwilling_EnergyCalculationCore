@@ -948,7 +948,7 @@ export const DEFAULT_CONFIG: DETConfig = {
       },
     ],
   },
-  baseSlab: {
+  bottomFloor: {
     constructionTypes: [
       {
         value: "reinforced_concrete_on_ground",
@@ -985,8 +985,17 @@ export const DEFAULT_CONFIG: DETConfig = {
     ],
 
     defaultConstructionType: [
-      { to: 1968, value: "timber_joist_ceiling" },
-      { from: 1969, value: "reinforced_concrete_ceiling" },
+      {
+        key: true,
+        value: [{ value: "reinforced_concrete_on_ground" }],
+      },
+      {
+        key: false,
+        value: [
+          { to: 1968, value: "timber_joist_ceiling" },
+          { from: 1969, value: "reinforced_concrete_ceiling" },
+        ],
+      },
     ],
     thermalConductivity: 0.03,
     assumedInsulationThickness: 0.3,

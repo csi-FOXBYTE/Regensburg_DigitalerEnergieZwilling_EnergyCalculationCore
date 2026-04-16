@@ -10,7 +10,7 @@ declare module "../" {
 export default {
   key: "totalStoryHeight",
   resolve: (ctx) => {
-    const n = ctx.get("numberOfStories");
+    const n = ctx.get("numberOfHeatedStories");
     return (
       n * ctx.get("interiorStoryHeight") +
       (n - 1) * ctx.get("floorSlabThickness")
