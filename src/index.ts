@@ -35,7 +35,5 @@ export { DEFAULT_CONFIG } from "./types/config/default-config.js";
 export { resolveKeyedValue } from "./types/keyed-values.js";
 export { resolveRangeBand, resolveYearBand } from "./types/range-bands.js";
 
-export type { DETCalculatorRegistry } from "./calculators/energy/index.js";
-
 export { calculate } from "./calculate.js";
 export type { CalculationResult, CalculateOptions } from "./calculate.js";

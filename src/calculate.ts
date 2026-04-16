@@ -1,34 +1,23 @@
 import type { DETConfig } from "./types/config/index.js";
 import type { DETInput } from "./types/input/index.js";
 import type { EnergyEfficiencyClass } from "./types/energy-efficiency-class.js";
-import type { DETCalculatorRegistry } from "./calculators/energy/index.js";
 import { DETEnergyCaluclator } from "./calculators/energy/index.js";
 
-type BaseCalculationResult = {
+export type CalculationResult = {
   energyConsumptionPerSquareMeter: number;
   energyEfficiencyClass: EnergyEfficiencyClass;
   yearlyCost: number;
   co2Emissions: number;
 };
 
-export type CalculationResult<K extends keyof DETCalculatorRegistry = never> =
-  [K] extends [never]
-    ? BaseCalculationResult
-    : BaseCalculationResult & { extra: Pick<DETCalculatorRegistry, K> };
-
-export type CalculateOptions<K extends keyof DETCalculatorRegistry = never> = {
+export type CalculateOptions = {
   debug?: boolean;
-  extra?: ReadonlyArray<K>;
 };
 
-export function calculate<K extends keyof DETCalculatorRegistry = never>(
-  config: DETConfig,
-  input: DETInput,
-  options?: CalculateOptions<K>,
-): CalculationResult<K> {
+export function calculate(config: DETConfig, input: DETInput, options?: CalculateOptions): CalculationResult {
   const ctx = DETEnergyCaluclator({ config, input });
 
-  const result: BaseCalculationResult = {
+  const result = {
     energyConsumptionPerSquareMeter: ctx.get("totalEnergyDemandPerSquareMeter"),
     energyEfficiencyClass: ctx.get("energyEfficiencyClass"),
     yearlyCost: ctx.get("energyCarrierCost"),
@@ -39,13 +28,5 @@ export function calculate<K extends keyof DETCalculatorRegistry = never>(
     console.log("[DET] Resolved values:", ctx.getAll());
   }
 
-  if (!options?.extra?.length) {
-    return result as CalculationResult<K>;
-  }
-
-  const extra = {} as Pick<DETCalculatorRegistry, K>;
-  for (const key of options.extra) {
-    (extra as Partial<DETCalculatorRegistry>)[key] = ctx.get(key);
-  }
-  return { ...result, extra } as CalculationResult<K>;
+  return result;
 }
