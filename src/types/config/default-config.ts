@@ -308,7 +308,17 @@ export const DEFAULT_CONFIG: DETConfig = {
     ],
 
     defaultPrimaryEnergyCarrier: "heating_oil_heavy",
-    defaultHeatingSystemType: "standard_boiler_70_55",
+    defaultHeatingSystemType: [
+      { key: "heating_oil_light", value: "standard_boiler_70_55" },
+      { key: "heating_oil_heavy", value: "standard_boiler_70_55" },
+      { key: "natural_gas", value: "standard_boiler_70_55" },
+      { key: "bio_gas", value: "standard_boiler_70_55" },
+      { key: "wood_biomass", value: "standard_boiler_70_55" },
+      { key: "wood_pellets", value: "standard_boiler_70_55" },
+      { key: "electricity", value: "air_source_heat_pump_55_45" },
+      { key: "renewable_electricity", value: "air_source_heat_pump_55_45" },
+      { key: "district_heating", value: "district_heating_all_temperatures" },
+    ],
     defaultHeatingSurfaceType: "radiant_surface_heating",
 
     // HDD

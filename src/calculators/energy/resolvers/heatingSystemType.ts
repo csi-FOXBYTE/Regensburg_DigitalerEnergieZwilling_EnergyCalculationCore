@@ -1,5 +1,6 @@
 import type { Resolver } from "../../../engine/index.js";
 import type { DETCalculatorRegistry, DETCalculatorContext } from "../";
+import { resolveKeyedValue } from "../../../types/keyed-values.js";
 
 declare module "../" {
   interface DETCalculatorRegistry {
@@ -12,7 +13,10 @@ export default {
   resolve: (ctx) => {
     const override = ctx.input.input.heat.heatingSystemType;
     if (override != null) return override;
-    return ctx.input.config.heat.defaultHeatingSystemType;
+    return resolveKeyedValue(
+      ctx.input.config.heat.defaultHeatingSystemType,
+      ctx.get("primaryEnergyCarrier"),
+    );
   },
 } satisfies Resolver<
   DETCalculatorContext,

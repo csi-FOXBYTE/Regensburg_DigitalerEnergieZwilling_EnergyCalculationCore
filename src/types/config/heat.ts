@@ -20,7 +20,7 @@ export type DETHeatConfig = {
   ventilationHeatLossCorrectionFactor: number;
   heatingDegreeDays: number;
   defaultPrimaryEnergyCarrier: string;
-  defaultHeatingSystemType: string;
+  defaultHeatingSystemType: KeyedValues<string, string>;
   defaultHeatingSurfaceType: string;
   heatingPerformanceFactor: KeyedValues<string, YearBands<RangeBands<number>>>;
   temperatureControlPerformanceFactor: KeyedValues<string, YearBands<KeyedValues<string, number>>>;
