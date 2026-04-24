@@ -5,6 +5,7 @@ export type InputPatch = {
 };
 
 export interface Renovation {
+  id: string;
   label: string;
   patch: InputPatch;
 }

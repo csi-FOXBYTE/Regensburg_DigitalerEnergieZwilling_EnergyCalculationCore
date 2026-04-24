@@ -21,6 +21,7 @@ export function generateHeatingRenovations(
   ] as RangeLast;
   if (systemRenewalLabel != null) {
     renovations.push({
+      id: "heat_renew",
       label: systemRenewalLabel,
       patch: { heat: { heatingSystemConstructionYear: lastYearBand } },
     });
@@ -38,6 +39,7 @@ export function generateHeatingRenovations(
       );
     }
     renovations.push({
+      id: `heat_${hRenConf.targetCarrier}_${hRenConf.targetSystem}`,
       label,
       patch: {
         heat: {
@@ -88,7 +90,7 @@ export function generateInsulationRenovations(
   for (const key of insulationKeys) {
     const patch = makeInsulationPatch(key, config);
     const label = translate(key);
-    renovations.push({ patch, label });
+    renovations.push({ id: `envelope_${key}`, patch, label });
   }
   return renovations;
 }
@@ -106,6 +108,7 @@ export function generateHeatingSurfaceRenovations(
       );
     }
     renovations.push({
+      id: `surface_${hRenConf.targetSurfaceType}`,
       label,
       patch: {
         heat: {
