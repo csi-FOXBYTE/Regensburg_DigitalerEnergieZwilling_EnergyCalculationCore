@@ -9,4 +9,5 @@ export type DETBottomFloorInput = {
   insulationThickness?: number | null;
   hasBasement?: boolean | null;
   isBasementHeated?: boolean | null;
+  uValue?: number | null;
 };

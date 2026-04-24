@@ -5,4 +5,7 @@ export type DETHeatInput = {
   primaryEnergyCarrier?: string | null;
   heatingSystemType?: string | null;
   heatingSurfaceType?: string | null;
+  hasGasSupply?: boolean | null;
+  hasBioGas?: boolean | null;
+  hasStorage?: boolean | null;
 };

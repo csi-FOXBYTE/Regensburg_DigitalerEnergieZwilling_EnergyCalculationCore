@@ -33,6 +33,10 @@ import heatLossSum from "./resolvers/heatLossSum";
 import interiorStoryHeight from "./resolvers/interiorStoryHeight";
 import livingArea from "./resolvers/livingArea";
 import isBasementHeated from "./resolvers/isBasementHeated";
+import hasRenewableEnergy from "./resolvers/hasRenewableEnergy";
+import hasGasSupply from "./resolvers/hasGasSupply";
+import hasBioGas from "./resolvers/hasBioGas";
+import hasStorage from "./resolvers/hasStorage";
 import netFloorArea from "./resolvers/netFloorArea";
 import netFloorAreaFromLivingAreaFactor from "./resolvers/netFloorAreaFromLivingAreaFactor";
 import netFloorAreaFromUsableFloorAreaFactor from "./resolvers/netFloorAreaFromUsableFloorAreaFactor";
@@ -171,6 +175,10 @@ export const DETEnergyCaluclator = createCalculator<
   hotWaterEnergyDemandFromAreaFactor,
   interiorStoryHeight,
   isBasementHeated,
+  hasRenewableEnergy,
+  hasGasSupply,
+  hasBioGas,
+  hasStorage,
   livingArea,
   netFloorArea,
   netFloorAreaFromLivingAreaFactor,

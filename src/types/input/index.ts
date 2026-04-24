@@ -1,3 +1,4 @@
+import type { DETElectricityInput } from "./electricity";
 import type { DETExteriorWallWindowsInput } from "./exteriorWallWindows";
 import type { DETGeneralInput } from "./general";
 import type { DETHeatInput } from "./heat";
@@ -10,6 +11,7 @@ import type { DETBottomFloorInput } from "./bottomFloor";
 export type DETInput = {
   general: DETGeneralInput;
   heat: DETHeatInput;
+  electricity: DETElectricityInput;
   roof: DETRoofInput;
   roofWindows: DETRoofWindowsInput;
   exteriorWallWindows: DETExteriorWallWindowsInput;

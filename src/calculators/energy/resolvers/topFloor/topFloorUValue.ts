@@ -9,7 +9,11 @@ declare module "../../" {
 
 export default {
   key: "topFloorUValue",
-  resolve: (ctx) => 1 / ctx.get("topFloorThermalResistance"),
+  resolve: (ctx) => {
+    const override = ctx.input.input.topFloor.uValue;
+    if (override != null) return override;
+    return 1 / ctx.get("topFloorThermalResistance");
+  },
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,

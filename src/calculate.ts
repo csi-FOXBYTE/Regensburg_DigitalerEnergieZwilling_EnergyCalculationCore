@@ -37,6 +37,12 @@ export function calculate(config: DETConfig, input: DETInput, options?: Calculat
         primaryEnergyCarrier: ctx.get("primaryEnergyCarrier"),
         heatingSystemType: ctx.get("heatingSystemType"),
         heatingSurfaceType: ctx.get("heatingSurfaceType"),
+        hasGasSupply: ctx.get("hasGasSupply"),
+        hasBioGas: ctx.get("hasBioGas"),
+        hasStorage: ctx.get("hasStorage"),
+      },
+      electricity: {
+        hasRenewableEnergy: ctx.get("hasRenewableEnergy"),
       },
       roof: {
         area: ctx.get("roofArea"),

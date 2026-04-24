@@ -76,6 +76,7 @@ export const DEFAULT_CONFIG: DETConfig = {
           de: "Heizöl, schwer",
           en: "Heavy fuel oil",
         },
+        requirements: { storage: true },
       },
       {
         value: "heating_oil_light",
@@ -83,6 +84,7 @@ export const DEFAULT_CONFIG: DETConfig = {
           de: "Heizöl, extra leicht",
           en: "Extra light heating oil",
         },
+        requirements: { storage: true },
       },
       {
         value: "renewable_electricity",
@@ -90,6 +92,7 @@ export const DEFAULT_CONFIG: DETConfig = {
           de: "Strom Erneuerbar",
           en: "Renewable electricity",
         },
+        requirements: { renewableElectricity: true },
       },
       {
         value: "electricity",
@@ -97,6 +100,7 @@ export const DEFAULT_CONFIG: DETConfig = {
           de: "Strom",
           en: "Electricity",
         },
+        requirements: { renewableElectricity: false },
       },
       {
         value: "natural_gas",
@@ -104,6 +108,7 @@ export const DEFAULT_CONFIG: DETConfig = {
           de: "Erdgas",
           en: "Natural gas",
         },
+        requirements: { gas: true, bioGas: false },
       },
       {
         value: "bio_gas",
@@ -111,6 +116,7 @@ export const DEFAULT_CONFIG: DETConfig = {
           de: "Biogas",
           en: "Biogas",
         },
+        requirements: { gas: true, bioGas: true },
       },
       {
         value: "wood_biomass",
@@ -118,6 +124,7 @@ export const DEFAULT_CONFIG: DETConfig = {
           de: "Biomasse Holz",
           en: "Wood biomass",
         },
+        requirements: { storage: true },
       },
       {
         value: "wood_pellets",
@@ -125,6 +132,7 @@ export const DEFAULT_CONFIG: DETConfig = {
           de: "Holz Pellets",
           en: "Wood pellets",
         },
+        requirements: { storage: true },
       },
       {
         value: "district_heating",
@@ -1123,5 +1131,69 @@ export const DEFAULT_CONFIG: DETConfig = {
     ],
     roofWindowsHeatLossFactor: 0.93,
     exteriorWallWindowsHeatLossFactor: 1,
+  },
+  renovation: {
+    heatingRenovations: [
+      {
+        localization: { de: "Wechsel zu Gas", en: "Switch to gas" },
+        targetCarrier: "natural_gas",
+        targetSystem: "improved_condensing_boiler_55_45",
+      },
+      {
+        localization: { de: "Wechsel zu Biogas", en: "Switch to biogas" },
+        targetCarrier: "bio_gas",
+        targetSystem: "improved_condensing_boiler_55_45",
+      },
+      {
+        localization: { de: "Wechsel zur Luftwärmepumpe", en: "Switch to air source heat pump" },
+        targetCarrier: "electricity",
+        targetSystem: "air_source_heat_pump_lt_40",
+      },
+      {
+        localization: { de: "Wechsel zur Erdwärmepumpe", en: "Switch to ground source heat pump" },
+        targetCarrier: "electricity",
+        targetSystem: "ground_source_heat_pump_lt_40",
+      },
+      {
+        localization: { de: "Wechsel zur Luftwärmepumpe", en: "Switch to air source heat pump" },
+        targetCarrier: "renewable_electricity",
+        targetSystem: "air_source_heat_pump_lt_40",
+      },
+      {
+        localization: { de: "Wechsel zur Erdwärmepumpe", en: "Switch to ground source heat pump" },
+        targetCarrier: "renewable_electricity",
+        targetSystem: "ground_source_heat_pump_lt_40",
+      },
+      {
+        localization: { de: "Wechsel zu Holzpellets", en: "Switch to wood pellets" },
+        targetCarrier: "wood_pellets",
+        targetSystem: "standard_boiler_70_55",
+      },
+      {
+        localization: { de: "Wechsel zu Fernwärme", en: "Switch to district heating" },
+        targetCarrier: "district_heating",
+        targetSystem: "district_heating_all_temperatures",
+      },
+    ],
+    heatingSurfaceRenovations: [
+      {
+        localization: { de: "Wechsel zu Flächenheizung", en: "Switch to radiant surface heating" },
+        targetSurfaceType: "radiant_surface_heating",
+      },
+    ],
+    insulationRenovations: {
+      bottomFloor: { uValue: 0.25 },
+      roof: { uValue: 0.14 },
+      topFloor: { uValue: 0.14 },
+      outerWalls: { uValue: 0.2 },
+      outerWindows: { uValue: 0.95 },
+      roofWindows: { uValue: 1 },
+    },
+    primaryEnergyCarrierTargets: [
+      "heating_oil_heavy",
+      "heating_oil_light",
+      "natural_gas",
+      "bio_gas",
+    ],
   },
 };

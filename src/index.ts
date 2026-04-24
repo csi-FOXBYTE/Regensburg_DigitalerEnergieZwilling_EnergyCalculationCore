@@ -13,14 +13,17 @@ export { EnergyEfficiencyClass } from "./types/energy-efficiency-class.js";
 export type { DETInput } from "./types/input/index.js";
 export type { DETGeneralInput } from "./types/input/general.js";
 export type { DETHeatInput } from "./types/input/heat.js";
+export type { DETElectricityInput } from "./types/input/electricity.js";
 export type { DETConfig } from "./types/config/index.js";
 export type { DETGeneralConfig } from "./types/config/general.js";
-export type { DETHeatConfig, PrimaryEnergyCarrierData } from "./types/config/heat.js";
+export type { DETHeatConfig, PrimaryEnergyCarrierData, CarrierSelection, CarrierRequirements } from "./types/config/heat.js";
+export { isCarrierCompatible } from "./types/config/heat.js";
 export type { DETRoofConfig } from "./types/config/roof.js";
 export type { DETTopFloorConfig } from "./types/config/topFloor.js";
 export type { DETOuterWallConfig } from "./types/config/outerWall.js";
 export type { DETBottomFloorConfig } from "./types/config/bottomFloor.js";
 export type { DETWindowsConfig } from "./types/config/windows.js";
+export type { DETRenovationConfig } from "./types/config/renovation.js";
 export type { DETRoofInput } from "./types/input/roof.js";
 export type { DETRoofWindowsInput } from "./types/input/roofWindows.js";
 export type { DETExteriorWallWindowsInput } from "./types/input/exteriorWallWindows.js";
@@ -37,3 +40,6 @@ export { resolveRangeBand, resolveYearBand } from "./types/range-bands.js";
 
 export { calculate } from "./calculate.js";
 export type { CalculationResult, CalculateOptions } from "./calculate.js";
+
+export type { InputPatch, Renovation } from "./types/renovation/renovation.js";
+export { applyRenovation } from "./types/renovation/applyRenovation.js";

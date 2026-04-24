@@ -5,6 +5,7 @@ import type { DETTopFloorConfig } from "./topFloor"
 import type { DETOuterWallConfig } from "./outerWall"
 import type { DETBottomFloorConfig } from "./bottomFloor"
 import type { DETWindowsConfig } from "./windows"
+import type { DETRenovationConfig } from "./renovation"
 
 export type DETConfig = {
   general: DETGeneralConfig,
@@ -14,4 +15,5 @@ export type DETConfig = {
   outerWall: DETOuterWallConfig,
   bottomFloor: DETBottomFloorConfig,
   windows: DETWindowsConfig,
+  renovation: DETRenovationConfig,
 }

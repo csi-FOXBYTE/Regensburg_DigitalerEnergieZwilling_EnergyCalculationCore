@@ -8,4 +8,5 @@ export type DETRoofInput = {
   insulationType?: RoofInsulationType | null;
   constructionType?: string | null;
   insulationThickness?: number | null;
+  uValue?: number | null;
 };

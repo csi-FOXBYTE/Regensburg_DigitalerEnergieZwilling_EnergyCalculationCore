@@ -8,4 +8,5 @@ export type DETTopFloorInput = {
   hasInsulation?: boolean | null;
   insulationThickness?: number | null;
   hasAttic?: boolean | null;
+  uValue?: number | null;
 };

@@ -6,4 +6,5 @@ export type DETOuterWallInput = {
   hasInsulation?: boolean | null;
   constructionType?: string | null;
   insulationThickness?: number | null;
+  uValue?: number | null;
 };
