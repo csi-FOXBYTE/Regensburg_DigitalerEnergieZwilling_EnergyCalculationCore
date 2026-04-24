@@ -41,5 +41,19 @@ export { resolveRangeBand, resolveYearBand } from "./types/range-bands.js";
 export { calculate } from "./calculate.js";
 export type { CalculationResult, CalculateOptions } from "./calculate.js";
 
-export type { InputPatch, Renovation } from "./types/renovation/renovation.js";
+export type {
+  InputPatch,
+  Renovation,
+  HeatingRenovationConfig,
+  HeatingSurfaceRenovationConfig,
+  InsulationRenovationKeys,
+  InsulationRenovationConfig,
+  InsulationRenovationConfigs,
+} from "./types/renovation/renovation.js";
+export { insulationKeys } from "./types/renovation/renovation.js";
 export { applyRenovation } from "./types/renovation/applyRenovation.js";
+export {
+  generateHeatingRenovations,
+  generateInsulationRenovations,
+  generateHeatingSurfaceRenovations,
+} from "./types/renovation/generate.js";
