@@ -43,7 +43,14 @@ export function createCalculator<TContext, TRegistry>(
         }
 
         cache.set(key, RESOLVING);
-        const value = resolver.resolve(ctx) as TRegistry[K];
+        let value: TRegistry[K];
+        try {
+          value = resolver.resolve(ctx) as TRegistry[K];
+        } catch (error) {
+          cache.delete(key);
+          const message = error instanceof Error ? error.message : String(error);
+          throw new Error(`Resolver "${String(key)}" failed: ${message}`, { cause: error });
+        }
         cache.set(key, value);
         return value;
       },

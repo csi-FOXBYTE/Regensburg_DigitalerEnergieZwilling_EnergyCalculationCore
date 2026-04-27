@@ -1,10 +1,9 @@
 # Release Notes
 
-## v0.6.1
+## v0.6.2
 
-### Renovation identifiers
+### Bug fixes & error handling improvements
 
-- Added `id: string` to the `Renovation` type
-- `generateHeatingRenovations` now sets `id` to `heat_renew` for the optional system-renewal entry, and `heat_{carrier}_{system}` for carrier-switching renovations (e.g. `heat_natural_gas_improved_condensing_boiler_55_45`)
-- `generateInsulationRenovations` now sets `id` to `envelope_{key}` (e.g. `envelope_roof`, `envelope_outerWalls`)
-- `generateHeatingSurfaceRenovations` now sets `id` to `surface_{targetSurfaceType}` (e.g. `surface_radiant_surface_heating`)
+- Fixed `renewable_electricity` primary energy carrier being keyed as `electricity_renewable` in `primaryEnergyCarrierEfficiencyFactor`, `co2Factor`, and `primaryEnergyCarrierData` — lookups for this carrier were silently failing
+- Engine now wraps each resolver call in a try/catch and rethrows with the resolver name included in the error message (e.g. `Resolver "primaryEnergyDemand" failed: …`)
+- `resolveKeyedValue` now throws a descriptive error when a key is not found, listing the available keys instead of crashing with `Cannot read properties of undefined`

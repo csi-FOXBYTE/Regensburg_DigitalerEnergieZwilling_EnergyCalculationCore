@@ -1,5 +1,10 @@
 export type KeyedValues<K, T> = { key: K; value: T }[];
 
 export function resolveKeyedValue<K, T>(values: KeyedValues<K, T>, key: K): T {
-  return values.find((entry) => entry.key === key)!.value;
+  const entry = values.find((entry) => entry.key === key);
+  if (!entry) {
+    const available = values.map((e) => String(e.key)).join(", ");
+    throw new Error(`No keyed value found for key "${String(key)}". Available keys: ${available}`);
+  }
+  return entry.value;
 }

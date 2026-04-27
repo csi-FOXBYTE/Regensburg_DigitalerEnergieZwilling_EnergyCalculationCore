@@ -340,7 +340,7 @@ export const DEFAULT_CONFIG: DETConfig = {
     primaryEnergyCarrierEfficiencyFactor: [
       { key: "heating_oil_heavy", value: 1.1 },
       { key: "heating_oil_light", value: 1.1 },
-      { key: "electricity_renewable", value: 1.8 },
+      { key: "renewable_electricity", value: 1.8 },
       { key: "electricity", value: 1.8 },
       { key: "natural_gas", value: 1.1 },
       { key: "bio_gas", value: 1.1 },
@@ -352,7 +352,7 @@ export const DEFAULT_CONFIG: DETConfig = {
     co2Factor: [
       { key: "heating_oil_heavy", value: 288 },
       { key: "heating_oil_light", value: 288 },
-      { key: "electricity_renewable", value: 0 },
+      { key: "renewable_electricity", value: 0 },
       { key: "electricity", value: 366 },
       { key: "natural_gas", value: 201 },
       { key: "bio_gas", value: 152 },
@@ -371,7 +371,7 @@ export const DEFAULT_CONFIG: DETConfig = {
         value: { energyPerUnit: 10.08, unitRate: 0.597, baseRate: 0 },
       },
       {
-        key: "electricity_renewable",
+        key: "renewable_electricity",
         value: { energyPerUnit: 1, unitRate: 0.192, baseRate: 50 },
       },
       {
