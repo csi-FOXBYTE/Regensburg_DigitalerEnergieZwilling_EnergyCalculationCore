@@ -329,35 +329,35 @@ export const DEFAULT_CONFIG: DETConfig = {
     primaryEnergyCarrierData: [
       {
         key: "heating_oil_heavy",
-        value: { energyPerUnit: 10.08, unitRate: 0.597, baseRate: 0, co2Factor: 288, primaryEnergyFactor: 1.1 },
+        value: { energyPerUnit: 10.08, unit: "L", unitRate: 0.597, baseRate: 0, co2Factor: 288, primaryEnergyFactor: 1.1 },
       },
       {
         key: "heating_oil_light",
-        value: { energyPerUnit: 10.08, unitRate: 0.597, baseRate: 0, co2Factor: 288, primaryEnergyFactor: 1.1 },
+        value: { energyPerUnit: 10.08, unit: "L", unitRate: 0.597, baseRate: 0, co2Factor: 288, primaryEnergyFactor: 1.1 },
       },
       {
         key: "none",
-        value: { energyPerUnit: 1, unitRate: 0, baseRate: 0, co2Factor: 0, primaryEnergyFactor: 0 },
+        value: { energyPerUnit: 1, unit: "kWh", unitRate: 0, baseRate: 0, co2Factor: 0, primaryEnergyFactor: 0 },
       },
       {
         key: "natural_gas",
-        value: { energyPerUnit: 10.42, unitRate: 0.652, baseRate: 181.83, co2Factor: 201, primaryEnergyFactor: 1.1 },
+        value: { energyPerUnit: 10.42, unit: "m³", unitRate: 0.652, baseRate: 181.83, co2Factor: 201, primaryEnergyFactor: 1.1 },
       },
       {
         key: "bio_gas",
-        value: { energyPerUnit: 10.42, unitRate: 0.652, baseRate: 181.83, co2Factor: 152, primaryEnergyFactor: 1.1 },
+        value: { energyPerUnit: 10.42, unit: "m³", unitRate: 0.652, baseRate: 181.83, co2Factor: 152, primaryEnergyFactor: 1.1 },
       },
       {
         key: "wood_biomass",
-        value: { energyPerUnit: 1900, unitRate: 57, baseRate: 0, co2Factor: 30, primaryEnergyFactor: 0.2 },
+        value: { energyPerUnit: 1900, unit: "rm", unitRate: 57, baseRate: 0, co2Factor: 30, primaryEnergyFactor: 0.2 },
       },
       {
         key: "wood_pellets",
-        value: { energyPerUnit: 4.9, unitRate: 0.206, baseRate: 0, co2Factor: 36, primaryEnergyFactor: 0.2 },
+        value: { energyPerUnit: 4.9, unit: "kg", unitRate: 0.206, baseRate: 0, co2Factor: 36, primaryEnergyFactor: 0.2 },
       },
       {
         key: "district_heating",
-        value: { energyPerUnit: 1, unitRate: 0.192, baseRate: 50, co2Factor: 280, primaryEnergyFactor: 1 },
+        value: { energyPerUnit: 1, unit: "kWh", unitRate: 0.192, baseRate: 50, co2Factor: 280, primaryEnergyFactor: 1 },
       },
     ],
 

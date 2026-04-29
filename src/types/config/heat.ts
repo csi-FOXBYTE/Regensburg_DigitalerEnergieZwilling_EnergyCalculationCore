@@ -6,6 +6,7 @@ import type { Selection, SelectionFilter } from "../selection";
 
 export type PrimaryEnergyCarrierData = {
   energyPerUnit: number;
+  unit: string;
   unitRate: number;
   baseRate: number;
   co2Factor: number;
