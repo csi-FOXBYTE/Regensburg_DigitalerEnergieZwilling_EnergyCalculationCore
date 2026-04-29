@@ -18,7 +18,11 @@ export type CalculateOptions = {
   debug?: boolean;
 };
 
-export function calculate(config: DETConfig, input: DETInput, options?: CalculateOptions): CalculationResult {
+export function calculate(
+  config: DETConfig,
+  input: DETInput,
+  options?: CalculateOptions,
+): CalculationResult {
   const ctx = DETEnergyCaluclator({ config, input });
 
   const result: CalculationResult = {
@@ -28,7 +32,7 @@ export function calculate(config: DETConfig, input: DETInput, options?: Calculat
     co2Emissions: ctx.get("totalCo2Emissions"),
     hadInternalGains: ctx.get("hasInternalGains"),
     preRenovationValues: input.preRenovationValues ?? {
-      totalEnergyDemand: ctx.get("totalEnergyDemand"),
+      totalEnergyDemand: ctx.get("calculatedTotalEnergyDemand"),
       primaryEnergyCarrier: ctx.get("primaryEnergyCarrier"),
       heatingSystemType: ctx.get("heatingSystemType"),
       electricityOffset: ctx.get("electricityOffset"),
