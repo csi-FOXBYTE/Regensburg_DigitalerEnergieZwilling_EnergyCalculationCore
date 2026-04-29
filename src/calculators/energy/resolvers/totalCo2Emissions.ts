@@ -3,19 +3,16 @@ import type { DETCalculatorRegistry, DETCalculatorContext } from "../";
 
 declare module "../" {
   interface DETCalculatorRegistry {
-    electricityType: string;
+    totalCo2Emissions: number;
   }
 }
 
 export default {
-  key: "electricityType",
-  resolve: (ctx) => {
-    const override = ctx.input.input.electricity.electricityType;
-    if (override != null) return override;
-    return ctx.input.config.heat.defaultElectricityType;
-  },
+  key: "totalCo2Emissions",
+  resolve: (ctx) =>
+    ctx.get("thermalCo2Emissions") + ctx.get("electricityCo2Emissions"),
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,
-  "electricityType"
+  "totalCo2Emissions"
 >;

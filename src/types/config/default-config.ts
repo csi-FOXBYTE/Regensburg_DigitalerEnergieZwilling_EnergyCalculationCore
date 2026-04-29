@@ -1,7 +1,7 @@
-import { BuildingType } from "../building-type";
 import { EnergyEfficiencyClass } from "../energy-efficiency-class";
 import { HeatFlowDirection } from "../heat-flow-direction";
 import { RoofInsulationType } from "../roof-insulation-type";
+import { BuildingType } from "../building-type";
 import type { DETConfig } from ".";
 
 export const DEFAULT_CONFIG: DETConfig = {
@@ -87,20 +87,11 @@ export const DEFAULT_CONFIG: DETConfig = {
         requirements: { storage: true },
       },
       {
-        value: "renewable_electricity",
-        localization: {
-          de: "Strom Erneuerbar",
-          en: "Renewable electricity",
-        },
-        requirements: { renewableElectricity: true },
-      },
-      {
-        value: "electricity",
+        value: "none",
         localization: {
           de: "Strom",
           en: "Electricity",
         },
-        requirements: { renewableElectricity: false },
       },
       {
         value: "natural_gas",
@@ -225,6 +216,13 @@ export const DEFAULT_CONFIG: DETConfig = {
           en: "Electric direct heater",
         },
       },
+      {
+        value: "gas_heat_pump_hybrid",
+        localization: {
+          de: "Gas-Wärmepumpen-Hybridheizung",
+          en: "Gas heat pump hybrid",
+        },
+      },
     ],
     heatingSurfaceTypes: [
       {
@@ -269,6 +267,7 @@ export const DEFAULT_CONFIG: DETConfig = {
           "condensing_boiler_70_55",
           "improved_condensing_boiler_55_45",
           "gas_space_heater",
+          "gas_heat_pump_hybrid",
         ],
       },
       {
@@ -279,6 +278,7 @@ export const DEFAULT_CONFIG: DETConfig = {
           "condensing_boiler_70_55",
           "improved_condensing_boiler_55_45",
           "gas_space_heater",
+          "gas_heat_pump_hybrid",
         ],
       },
       {
@@ -290,17 +290,7 @@ export const DEFAULT_CONFIG: DETConfig = {
         allowedValues: ["standard_boiler_70_55"],
       },
       {
-        key: "electricity",
-        allowedValues: [
-          "air_source_heat_pump_55_45",
-          "air_source_heat_pump_lt_40",
-          "ground_source_heat_pump_55_45",
-          "ground_source_heat_pump_lt_40",
-          "electric_direct_heater",
-        ],
-      },
-      {
-        key: "renewable_electricity",
+        key: "none",
         allowedValues: [
           "air_source_heat_pump_55_45",
           "air_source_heat_pump_lt_40",
@@ -323,8 +313,7 @@ export const DEFAULT_CONFIG: DETConfig = {
       { key: "bio_gas", value: "standard_boiler_70_55" },
       { key: "wood_biomass", value: "standard_boiler_70_55" },
       { key: "wood_pellets", value: "standard_boiler_70_55" },
-      { key: "electricity", value: "air_source_heat_pump_55_45" },
-      { key: "renewable_electricity", value: "air_source_heat_pump_55_45" },
+      { key: "none", value: "air_source_heat_pump_55_45" },
       { key: "district_heating", value: "district_heating_all_temperatures" },
     ],
     defaultHeatingSurfaceType: "radiant_surface_heating",
@@ -336,68 +325,65 @@ export const DEFAULT_CONFIG: DETConfig = {
     // kQwb
     hotWaterEnergyDemandFromAreaFactor: 9.84,
 
-    // fp
-    primaryEnergyCarrierEfficiencyFactor: [
-      { key: "heating_oil_heavy", value: 1.1 },
-      { key: "heating_oil_light", value: 1.1 },
-      { key: "renewable_electricity", value: 1.8 },
-      { key: "electricity", value: 1.8 },
-      { key: "natural_gas", value: 1.1 },
-      { key: "bio_gas", value: 1.1 },
-      { key: "wood_biomass", value: 0.2 },
-      { key: "wood_pellets", value: 0.2 },
-      { key: "district_heating", value: 1 },
-    ],
-    // xco2
-    co2Factor: [
-      { key: "heating_oil_heavy", value: 288 },
-      { key: "heating_oil_light", value: 288 },
-      { key: "renewable_electricity", value: 0 },
-      { key: "electricity", value: 366 },
-      { key: "natural_gas", value: 201 },
-      { key: "bio_gas", value: 152 },
-      { key: "wood_biomass", value: 30 },
-      { key: "wood_pellets", value: 36 },
-      { key: "district_heating", value: 280 },
-    ],
-    // bheiz, barb, bgrund
+    // bheiz, barb, bgrund, xco2, fp
     primaryEnergyCarrierData: [
       {
         key: "heating_oil_heavy",
-        value: { energyPerUnit: 10.08, unitRate: 0.597, baseRate: 0 },
+        value: { energyPerUnit: 10.08, unitRate: 0.597, baseRate: 0, co2Factor: 288, primaryEnergyFactor: 1.1 },
       },
       {
         key: "heating_oil_light",
-        value: { energyPerUnit: 10.08, unitRate: 0.597, baseRate: 0 },
+        value: { energyPerUnit: 10.08, unitRate: 0.597, baseRate: 0, co2Factor: 288, primaryEnergyFactor: 1.1 },
       },
       {
-        key: "renewable_electricity",
-        value: { energyPerUnit: 1, unitRate: 0.192, baseRate: 50 },
-      },
-      {
-        key: "electricity",
-        value: { energyPerUnit: 1, unitRate: 0.192, baseRate: 50 },
+        key: "none",
+        value: { energyPerUnit: 1, unitRate: 0, baseRate: 0, co2Factor: 0, primaryEnergyFactor: 0 },
       },
       {
         key: "natural_gas",
-        value: { energyPerUnit: 10.42, unitRate: 0.652, baseRate: 181.83 },
+        value: { energyPerUnit: 10.42, unitRate: 0.652, baseRate: 181.83, co2Factor: 201, primaryEnergyFactor: 1.1 },
       },
       {
         key: "bio_gas",
-        value: { energyPerUnit: 10.42, unitRate: 0.652, baseRate: 181.83 },
+        value: { energyPerUnit: 10.42, unitRate: 0.652, baseRate: 181.83, co2Factor: 152, primaryEnergyFactor: 1.1 },
       },
       {
         key: "wood_biomass",
-        value: { energyPerUnit: 1900, unitRate: 57, baseRate: 0 },
+        value: { energyPerUnit: 1900, unitRate: 57, baseRate: 0, co2Factor: 30, primaryEnergyFactor: 0.2 },
       },
       {
         key: "wood_pellets",
-        value: { energyPerUnit: 4.9, unitRate: 0.206, baseRate: 0 },
+        value: { energyPerUnit: 4.9, unitRate: 0.206, baseRate: 0, co2Factor: 36, primaryEnergyFactor: 0.2 },
       },
       {
         key: "district_heating",
-        value: { energyPerUnit: 1, unitRate: 0.192, baseRate: 50 },
+        value: { energyPerUnit: 1, unitRate: 0.192, baseRate: 50, co2Factor: 280, primaryEnergyFactor: 1 },
       },
+    ],
+
+    electricityTypes: [
+      { value: "grid", localization: { de: "Netz", en: "Grid" } },
+      { value: "renewable", localization: { de: "Erneuerbar", en: "Renewable" } },
+    ],
+    defaultElectricityType: "grid",
+    electricityTypeData: [
+      { key: "grid", value: { co2Factor: 366, unitRate: 0.192, baseRate: 50, primaryEnergyFactor: 1.8 } },
+      { key: "renewable", value: { co2Factor: 0, unitRate: 0.192, baseRate: 50, primaryEnergyFactor: 0 } },
+    ],
+    electricalRatio: [
+      { key: "standard_boiler_70_55", value: 0 },
+      { key: "low_temperature_boiler_oil_gas_70_55", value: 0 },
+      { key: "condensing_boiler_70_55", value: 0 },
+      { key: "improved_condensing_boiler_55_45", value: 0 },
+      { key: "district_heating_all_temperatures", value: 0 },
+      { key: "air_source_heat_pump_55_45", value: 1 },
+      { key: "air_source_heat_pump_lt_40", value: 1 },
+      { key: "ground_source_heat_pump_55_45", value: 1 },
+      { key: "ground_source_heat_pump_lt_40", value: 1 },
+      { key: "oil_fired_single_stove", value: 0 },
+      { key: "gas_space_heater", value: 0 },
+      { key: "electric_direct_heater", value: 1 },
+      { key: "gas_heat_pump_hybrid", value: 0.65 },
     ],
 
     heatingPerformanceFactor: [
@@ -584,6 +570,14 @@ export const DEFAULT_CONFIG: DETConfig = {
         value: [
           {
             value: [{ value: 1.02 }],
+          },
+        ],
+      },
+      {
+        key: "gas_heat_pump_hybrid",
+        value: [
+          {
+            value: [{ value: 0.62 }],
           },
         ],
       },
@@ -797,6 +791,17 @@ export const DEFAULT_CONFIG: DETConfig = {
             value: [
               { key: "radiant_surface_heating", value: 0 },
               { key: "free_heat_emitter", value: 0 },
+            ],
+          },
+        ],
+      },
+      {
+        key: "gas_heat_pump_hybrid",
+        value: [
+          {
+            value: [
+              { key: "radiant_surface_heating", value: 1.055 },
+              { key: "free_heat_emitter", value: 1.051 },
             ],
           },
         ],
@@ -1146,22 +1151,12 @@ export const DEFAULT_CONFIG: DETConfig = {
       },
       {
         localization: { de: "Wechsel zur Luftwärmepumpe", en: "Switch to air source heat pump" },
-        targetCarrier: "electricity",
+        targetCarrier: "none",
         targetSystem: "air_source_heat_pump_lt_40",
       },
       {
         localization: { de: "Wechsel zur Erdwärmepumpe", en: "Switch to ground source heat pump" },
-        targetCarrier: "electricity",
-        targetSystem: "ground_source_heat_pump_lt_40",
-      },
-      {
-        localization: { de: "Wechsel zur Luftwärmepumpe", en: "Switch to air source heat pump" },
-        targetCarrier: "renewable_electricity",
-        targetSystem: "air_source_heat_pump_lt_40",
-      },
-      {
-        localization: { de: "Wechsel zur Erdwärmepumpe", en: "Switch to ground source heat pump" },
-        targetCarrier: "renewable_electricity",
+        targetCarrier: "none",
         targetSystem: "ground_source_heat_pump_lt_40",
       },
       {

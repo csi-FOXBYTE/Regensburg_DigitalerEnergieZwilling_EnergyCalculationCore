@@ -3,19 +3,17 @@ import type { DETCalculatorRegistry, DETCalculatorContext } from "../";
 
 declare module "../" {
   interface DETCalculatorRegistry {
-    electricityType: string;
+    userTotalEnergyDemand: number;
   }
 }
 
 export default {
-  key: "electricityType",
-  resolve: (ctx) => {
-    const override = ctx.input.input.electricity.electricityType;
-    if (override != null) return override;
-    return ctx.input.config.heat.defaultElectricityType;
-  },
+  key: "userTotalEnergyDemand",
+  resolve: (ctx) =>
+    ctx.get("userThermalEnergyDemand") /
+    (1 - ctx.get("preRenovationElectricalRatio")),
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,
-  "electricityType"
+  "userTotalEnergyDemand"
 >;

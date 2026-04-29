@@ -1,6 +1,5 @@
 import type { Resolver } from "../../../engine/index.js";
 import type { DETCalculatorRegistry, DETCalculatorContext } from "../";
-import { resolveKeyedValue } from "../../../types/keyed-values.js";
 
 declare module "../" {
   interface DETCalculatorRegistry {
@@ -10,11 +9,7 @@ declare module "../" {
 
 export default {
   key: "co2Factor",
-  resolve: (ctx) =>
-    resolveKeyedValue(
-      ctx.input.config.heat.co2Factor,
-      ctx.get("primaryEnergyCarrier"),
-    ),
+  resolve: (ctx) => ctx.get("primaryEnergyCarrierData").co2Factor,
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,

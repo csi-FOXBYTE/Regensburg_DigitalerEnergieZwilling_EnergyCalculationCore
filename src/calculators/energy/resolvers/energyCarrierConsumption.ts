@@ -3,17 +3,17 @@ import type { DETCalculatorRegistry, DETCalculatorContext } from "../";
 
 declare module "../" {
   interface DETCalculatorRegistry {
-    energyCarrierConsumption: number;
+    thermalCarrierConsumption: number;
   }
 }
 
 export default {
-  key: "energyCarrierConsumption",
+  key: "thermalCarrierConsumption",
   resolve: (ctx) =>
-    ctx.get("totalEnergyDemand") /
+    ctx.get("thermalEnergyDemand") /
     ctx.get("primaryEnergyCarrierData").energyPerUnit,
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,
-  "energyCarrierConsumption"
+  "thermalCarrierConsumption"
 >;

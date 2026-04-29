@@ -16,7 +16,7 @@ export type { DETHeatInput } from "./types/input/heat.js";
 export type { DETElectricityInput } from "./types/input/electricity.js";
 export type { DETConfig } from "./types/config/index.js";
 export type { DETGeneralConfig } from "./types/config/general.js";
-export type { DETHeatConfig, PrimaryEnergyCarrierData, CarrierSelection, CarrierRequirements } from "./types/config/heat.js";
+export type { DETHeatConfig, PrimaryEnergyCarrierData, ElectricityTypeData, CarrierSelection, CarrierRequirements } from "./types/config/heat.js";
 export { isCarrierCompatible } from "./types/config/heat.js";
 export type { DETRoofConfig } from "./types/config/roof.js";
 export type { DETTopFloorConfig } from "./types/config/topFloor.js";

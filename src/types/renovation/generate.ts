@@ -56,27 +56,28 @@ export function generateHeatingRenovations(
 function makeInsulationPatch(
   key: InsulationRenovationKeys,
   config: DETConfig,
+  lastYearBand: RangeLast,
 ): InputPatch {
   const uValue = config.renovation.insulationRenovations[key].uValue;
   let patch: InputPatch;
   switch (key) {
     case "roof":
-      patch = { roof: { uValue } };
+      patch = { roof: { uValue, year: lastYearBand } };
       break;
     case "topFloor":
-      patch = { topFloor: { uValue } };
+      patch = { topFloor: { uValue, year: lastYearBand } };
       break;
     case "bottomFloor":
-      patch = { bottomFloor: { uValue } };
+      patch = { bottomFloor: { uValue, year: lastYearBand } };
       break;
     case "outerWalls":
-      patch = { outerWall: { uValue } };
+      patch = { outerWall: { uValue, year: lastYearBand } };
       break;
     case "outerWindows":
-      patch = { exteriorWallWindows: { uValue } };
+      patch = { exteriorWallWindows: { uValue, year: lastYearBand } };
       break;
     case "roofWindows":
-      patch = { roofWindows: { uValue } };
+      patch = { roofWindows: { uValue, year: lastYearBand } };
       break;
   }
   return patch;
@@ -87,8 +88,11 @@ export function generateInsulationRenovations(
   translate: (key: InsulationRenovationKeys) => string,
 ): Renovation[] {
   const renovations: Renovation[] = [];
+  const lastYearBand = config.general.generalYearBands[
+    config.general.generalYearBands.length - 1
+  ] as RangeLast;
   for (const key of insulationKeys) {
-    const patch = makeInsulationPatch(key, config);
+    const patch = makeInsulationPatch(key, config, lastYearBand);
     const label = translate(key);
     renovations.push({ id: `envelope_${key}`, patch, label });
   }
@@ -97,10 +101,12 @@ export function generateInsulationRenovations(
 
 export function generateHeatingSurfaceRenovations(
   config: DETConfig,
+  input: DETInput,
   locale: string,
 ): Renovation[] {
   const renovations: Renovation[] = [];
   for (const hRenConf of config.renovation.heatingSurfaceRenovations) {
+    if (hRenConf.targetSurfaceType === input.heat.heatingSurfaceType) continue;
     const label = hRenConf.localization[locale];
     if (label == null) {
       throw new Error(

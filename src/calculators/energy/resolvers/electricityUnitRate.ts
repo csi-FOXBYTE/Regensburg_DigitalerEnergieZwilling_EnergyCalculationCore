@@ -3,19 +3,19 @@ import type { DETCalculatorRegistry, DETCalculatorContext } from "../";
 
 declare module "../" {
   interface DETCalculatorRegistry {
-    electricityType: string;
+    electricityUnitRate: number;
   }
 }
 
 export default {
-  key: "electricityType",
+  key: "electricityUnitRate",
   resolve: (ctx) => {
-    const override = ctx.input.input.electricity.electricityType;
+    const override = ctx.input.input.electricity.electricityUnitRate;
     if (override != null) return override;
-    return ctx.input.config.heat.defaultElectricityType;
+    return ctx.get("electricityTypeData").unitRate;
   },
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,
-  "electricityType"
+  "electricityUnitRate"
 >;

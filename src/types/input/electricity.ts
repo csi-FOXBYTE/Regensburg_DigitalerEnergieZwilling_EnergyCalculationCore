@@ -1,3 +1,6 @@
 export type DETElectricityInput = {
-  hasRenewableEnergy?: boolean | null;
+  electricityType?: string | null;
+  electricityUnitRate?: number | null;
+  userElectricityConsumption?: number | null;
+  preRenovationElectricityOffset?: number | null;
 };

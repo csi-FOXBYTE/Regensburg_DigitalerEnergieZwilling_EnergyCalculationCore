@@ -8,4 +8,9 @@ export type DETHeatInput = {
   hasGasSupply?: boolean | null;
   hasBioGas?: boolean | null;
   hasStorage?: boolean | null;
+  userThermalUnitRate?: number | null;
+  userThermalConsumption?: number | null;
+  preRenovationTotalEnergyDemand?: number | null;
+  preRenovationPrimaryEnergyCarrier?: string | null;
+  preRenovationHeatingSystemType?: string | null;
 };

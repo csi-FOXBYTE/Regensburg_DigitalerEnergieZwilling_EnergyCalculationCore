@@ -21,8 +21,8 @@ export function calculate(config: DETConfig, input: DETInput, options?: Calculat
   const result: CalculationResult = {
     energyConsumptionPerSquareMeter: ctx.get("totalEnergyDemandPerSquareMeter"),
     energyEfficiencyClass: ctx.get("energyEfficiencyClass"),
-    yearlyCost: ctx.get("energyCarrierCost"),
-    co2Emissions: ctx.get("co2Emissions"),
+    yearlyCost: ctx.get("totalCost"),
+    co2Emissions: ctx.get("totalCo2Emissions"),
     resolvedInput: {
       general: {
         buildingYear: ctx.get("buildingYear"),
@@ -42,7 +42,7 @@ export function calculate(config: DETConfig, input: DETInput, options?: Calculat
         hasStorage: ctx.get("hasStorage"),
       },
       electricity: {
-        hasRenewableEnergy: ctx.get("hasRenewableEnergy"),
+        electricityType: ctx.get("electricityType"),
       },
       roof: {
         area: ctx.get("roofArea"),

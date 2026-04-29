@@ -3,18 +3,16 @@ import type { DETCalculatorRegistry, DETCalculatorContext } from "../../";
 
 declare module "../../" {
   interface DETCalculatorRegistry {
-    roofHeatLoss: number;
+    roofWindowsHeatingDemand: number;
   }
 }
 
 export default {
-  key: "roofHeatLoss",
+  key: "roofWindowsHeatingDemand",
   resolve: (ctx) =>
-    ctx.get("isSpaceBelowRoofHeated")
-      ? ctx.get("roofHeatLossFactor") * ctx.get("roofUValue") * ctx.get("roofArea")
-      : 0,
+    ctx.get("roofWindowsHeatLoss") * ctx.get("heatingDegreeDays") * 0.024,
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,
-  "roofHeatLoss"
+  "roofWindowsHeatingDemand"
 >;

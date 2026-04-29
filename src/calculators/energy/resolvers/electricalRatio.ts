@@ -1,21 +1,22 @@
 import type { Resolver } from "../../../engine/index.js";
 import type { DETCalculatorRegistry, DETCalculatorContext } from "../";
+import { resolveKeyedValue } from "../../../types/keyed-values.js";
 
 declare module "../" {
   interface DETCalculatorRegistry {
-    electricityType: string;
+    electricalRatio: number;
   }
 }
 
 export default {
-  key: "electricityType",
-  resolve: (ctx) => {
-    const override = ctx.input.input.electricity.electricityType;
-    if (override != null) return override;
-    return ctx.input.config.heat.defaultElectricityType;
-  },
+  key: "electricalRatio",
+  resolve: (ctx) =>
+    resolveKeyedValue(
+      ctx.input.config.heat.electricalRatio,
+      ctx.get("heatingSystemType"),
+    ),
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,
-  "electricityType"
+  "electricalRatio"
 >;

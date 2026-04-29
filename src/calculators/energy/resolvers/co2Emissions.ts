@@ -3,16 +3,18 @@ import type { DETCalculatorRegistry, DETCalculatorContext } from "../";
 
 declare module "../" {
   interface DETCalculatorRegistry {
-    co2Emissions: number;
+    thermalCo2Emissions: number;
   }
 }
 
 export default {
-  key: "co2Emissions",
+  key: "thermalCo2Emissions",
   resolve: (ctx) =>
-    ctx.get("totalEnergyDemand") * ctx.get("co2Factor") * 0.000001,
+    ctx.get("thermalEnergyDemand") *
+    ctx.get("primaryEnergyCarrierData").co2Factor *
+    0.000001,
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,
-  "co2Emissions"
+  "thermalCo2Emissions"
 >;

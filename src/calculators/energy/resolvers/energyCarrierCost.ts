@@ -3,18 +3,18 @@ import type { DETCalculatorRegistry, DETCalculatorContext } from "../";
 
 declare module "../" {
   interface DETCalculatorRegistry {
-    energyCarrierCost: number;
+    thermalCarrierCost: number;
   }
 }
 
 export default {
-  key: "energyCarrierCost",
+  key: "thermalCarrierCost",
   resolve: (ctx) => {
     const data = ctx.get("primaryEnergyCarrierData");
-    return ctx.get("energyCarrierConsumption") * data.unitRate + data.baseRate;
+    return ctx.get("thermalCarrierConsumption") * ctx.get("thermalUnitRate") + data.baseRate;
   },
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,
-  "energyCarrierCost"
+  "thermalCarrierCost"
 >;

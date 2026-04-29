@@ -3,7 +3,6 @@ import type { DETConfig } from "../../types/config";
 import type { DETInput } from "../../types/input";
 import airDensitySpecificHeatCapacityProduct from "./resolvers/airDensitySpecificHeatCapacityProduct";
 import buildingBaseArea from "./resolvers/buildingBaseArea";
-import co2Emissions from "./resolvers/co2Emissions";
 import co2Factor from "./resolvers/co2Factor";
 import combinedHeatingPerformanceFactor from "./resolvers/combinedHeatingPerformanceFactor";
 import primaryEnergyCarrier from "./resolvers/primaryEnergyCarrier";
@@ -12,8 +11,6 @@ import primaryEnergyCarrierEfficiencyFactor from "./resolvers/primaryEnergyCarri
 import primaryEnergyDemand from "./resolvers/primaryEnergyDemand";
 import primaryEnergyDemandPerSquareMeter from "./resolvers/primaryEnergyDemandPerSquareMeter";
 import energyEfficiencyClass from "./resolvers/energyEfficiencyClass";
-import energyCarrierConsumption from "./resolvers/energyCarrierConsumption";
-import energyCarrierCost from "./resolvers/energyCarrierCost";
 import buildingYear from "./resolvers/buildingYear";
 import buildingHeight from "./resolvers/buildingHeight.js";
 import buildingType from "./resolvers/buildingType.js";
@@ -26,17 +23,16 @@ import heatingSystemConstructionYear from "./resolvers/heatingSystemConstruction
 import heatedAirVolume from "./resolvers/heatedAirVolume";
 import heatedAirVolumeCorrectionFactor from "./resolvers/heatedAirVolumeCorrectionFactor";
 import heatingDegreeDays from "./resolvers/heatingDegreeDays";
-import hotWaterEnergyDemand from "./resolvers/hotWaterEnergyDemand";
-import hotWaterEnergyDemandFromAreaFactor from "./resolvers/hotWaterEnergyDemandFromAreaFactor";
 import heatingEnergyDemand from "./resolvers/heatingEnergyDemand";
 import heatLossSum from "./resolvers/heatLossSum";
+import hotWaterEnergyDemand from "./resolvers/hotWaterEnergyDemand";
+import hotWaterEnergyDemandFromAreaFactor from "./resolvers/hotWaterEnergyDemandFromAreaFactor";
 import interiorStoryHeight from "./resolvers/interiorStoryHeight";
-import livingArea from "./resolvers/livingArea";
 import isBasementHeated from "./resolvers/isBasementHeated";
-import hasRenewableEnergy from "./resolvers/hasRenewableEnergy";
 import hasGasSupply from "./resolvers/hasGasSupply";
 import hasBioGas from "./resolvers/hasBioGas";
 import hasStorage from "./resolvers/hasStorage";
+import livingArea from "./resolvers/livingArea";
 import netFloorArea from "./resolvers/netFloorArea";
 import netFloorAreaFromLivingAreaFactor from "./resolvers/netFloorAreaFromLivingAreaFactor";
 import netFloorAreaFromUsableFloorAreaFactor from "./resolvers/netFloorAreaFromUsableFloorAreaFactor";
@@ -132,6 +128,47 @@ import roofWindowsHeatLossFactor from "./resolvers/roofWindows/roofWindowsHeatLo
 import roofWindowsType from "./resolvers/roofWindows/roofWindowsType";
 import roofWindowsUValue from "./resolvers/roofWindows/roofWindowsUValue";
 import roofWindowsYear from "./resolvers/roofWindows/roofWindowsYear";
+// Step 1 — component heating demands
+import outerWallHeatingDemand from "./resolvers/outerWall/outerWallHeatingDemand";
+import bottomFloorHeatingDemand from "./resolvers/bottomFloor/bottomFloorHeatingDemand";
+import topFloorHeatingDemand from "./resolvers/topFloor/topFloorHeatingDemand";
+import roofHeatingDemand from "./resolvers/roof/roofHeatingDemand";
+import exteriorWallWindowsHeatingDemand from "./resolvers/exteriorWallWindows/exteriorWallWindowsHeatingDemand";
+import roofWindowsHeatingDemand from "./resolvers/roofWindows/roofWindowsHeatingDemand";
+import ventilationHeatingDemand from "./resolvers/ventilationHeatingDemand";
+// Step 2 — electricity type
+import electricityType from "./resolvers/hasRenewableEnergy";
+import electricityTypeData from "./resolvers/electricityTypeData";
+import electricityCo2Factor from "./resolvers/electricityCo2Factor";
+import electricityUnitRate from "./resolvers/electricityUnitRate";
+// Step 3 — demand split
+import calculatedTotalEnergyDemand from "./resolvers/calculatedTotalEnergyDemand";
+import electricalRatio from "./resolvers/electricalRatio";
+import thermalEnergyDemand from "./resolvers/thermalEnergyDemand";
+import calculatedElectricalEnergyDemand from "./resolvers/calculatedElectricalEnergyDemand";
+import electricalEnergyDemand from "./resolvers/electricalEnergyDemand";
+import thermalHeatingDemand from "./resolvers/thermalHeatingDemand";
+import electricalHeatingDemand from "./resolvers/electricalHeatingDemand";
+// Step 4 — thermal/electrical downstream
+import thermalCo2Emissions from "./resolvers/co2Emissions";
+import thermalCarrierConsumption from "./resolvers/energyCarrierConsumption";
+import thermalCarrierCost from "./resolvers/energyCarrierCost";
+import thermalUnitRate from "./resolvers/thermalUnitRate";
+import thermalPrimaryEnergyDemand from "./resolvers/thermalPrimaryEnergyDemand";
+import electricityConsumption from "./resolvers/electricityConsumption";
+import electricityCost from "./resolvers/electricityCost";
+import electricityCo2Emissions from "./resolvers/electricityCo2Emissions";
+import electricalPrimaryEnergyDemand from "./resolvers/electricalPrimaryEnergyDemand";
+import totalCost from "./resolvers/totalCost";
+import totalCo2Emissions from "./resolvers/totalCo2Emissions";
+// Step 5 — pre-renovation
+import preRenovationCarrierData from "./resolvers/preRenovationCarrierData";
+import preRenovationElectricalRatio from "./resolvers/preRenovationElectricalRatio";
+import userThermalEnergyDemand from "./resolvers/userThermalEnergyDemand";
+import userTotalEnergyDemand from "./resolvers/userTotalEnergyDemand";
+import renovationFactor from "./resolvers/renovationFactor";
+// Step 6 — electricity offset
+import electricityOffset from "./resolvers/electricityOffset";
 
 export interface DETCalculatorRegistry {}
 
@@ -146,11 +183,8 @@ export const DETEnergyCaluclator = createCalculator<
 >([
   airDensitySpecificHeatCapacityProduct,
   buildingBaseArea,
-  co2Emissions,
   co2Factor,
   energyEfficiencyClass,
-  energyCarrierConsumption,
-  energyCarrierCost,
   combinedHeatingPerformanceFactor,
   primaryEnergyCarrier,
   primaryEnergyCarrierData,
@@ -175,7 +209,6 @@ export const DETEnergyCaluclator = createCalculator<
   hotWaterEnergyDemandFromAreaFactor,
   interiorStoryHeight,
   isBasementHeated,
-  hasRenewableEnergy,
   hasGasSupply,
   hasBioGas,
   hasStorage,
@@ -275,4 +308,45 @@ export const DETEnergyCaluclator = createCalculator<
   roofWindowsType,
   roofWindowsUValue,
   roofWindowsYear,
+  // Step 1
+  outerWallHeatingDemand,
+  bottomFloorHeatingDemand,
+  topFloorHeatingDemand,
+  roofHeatingDemand,
+  exteriorWallWindowsHeatingDemand,
+  roofWindowsHeatingDemand,
+  ventilationHeatingDemand,
+  // Step 2
+  electricityType,
+  electricityTypeData,
+  electricityCo2Factor,
+  electricityUnitRate,
+  // Step 3
+  calculatedTotalEnergyDemand,
+  electricalRatio,
+  thermalEnergyDemand,
+  calculatedElectricalEnergyDemand,
+  electricalEnergyDemand,
+  thermalHeatingDemand,
+  electricalHeatingDemand,
+  // Step 4
+  thermalCo2Emissions,
+  thermalCarrierConsumption,
+  thermalCarrierCost,
+  thermalUnitRate,
+  thermalPrimaryEnergyDemand,
+  electricityConsumption,
+  electricityCost,
+  electricityCo2Emissions,
+  electricalPrimaryEnergyDemand,
+  totalCost,
+  totalCo2Emissions,
+  // Step 5
+  preRenovationCarrierData,
+  preRenovationElectricalRatio,
+  userThermalEnergyDemand,
+  userTotalEnergyDemand,
+  renovationFactor,
+  // Step 6
+  electricityOffset,
 ]);

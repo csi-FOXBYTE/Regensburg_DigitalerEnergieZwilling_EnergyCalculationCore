@@ -9,10 +9,12 @@ declare module "../" {
 
 export default {
   key: "totalEnergyDemand",
-  resolve: (ctx) =>
-    ctx.get("heatingEnergyDemand") *
-      ctx.get("combinedHeatingPerformanceFactor") +
-    ctx.get("hotWaterEnergyDemand"),
+  resolve: (ctx) => {
+    if (ctx.input.input.heat.userThermalConsumption != null) {
+      return ctx.get("userTotalEnergyDemand") * ctx.get("renovationFactor");
+    }
+    return ctx.get("calculatedTotalEnergyDemand");
+  },
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,
