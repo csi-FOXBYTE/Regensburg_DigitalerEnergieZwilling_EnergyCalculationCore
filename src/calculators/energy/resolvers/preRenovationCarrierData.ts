@@ -13,7 +13,7 @@ export default {
   key: "preRenovationCarrierData",
   resolve: (ctx) => {
     const carrier =
-      ctx.input.input.heat.preRenovationPrimaryEnergyCarrier ??
+      ctx.input.input.preRenovationValues?.primaryEnergyCarrier ??
       ctx.get("primaryEnergyCarrier");
     return resolveKeyedValue(ctx.input.config.heat.primaryEnergyCarrierData, carrier);
   },

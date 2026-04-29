@@ -48,6 +48,8 @@ export type DETHeatConfig = {
   defaultElectricityType: string;
   electricityTypeData: KeyedValues<string, ElectricityTypeData>;
   electricalRatio: KeyedValues<string, number>;
+  hasInternalGains: KeyedValues<string, boolean>;
+  internalGainsFactorByBuildingType: KeyedValues<string, number>;
 
   hotWaterEnergyDemandFromAreaFactor: number;
   ventilationHeatLossCorrectionFactor: number;

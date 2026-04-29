@@ -9,7 +9,7 @@ import primaryEnergyCarrier from "./resolvers/primaryEnergyCarrier";
 import primaryEnergyCarrierData from "./resolvers/primaryEnergyCarrierData";
 import primaryEnergyCarrierEfficiencyFactor from "./resolvers/primaryEnergyCarrierEfficiencyFactor";
 import primaryEnergyDemand from "./resolvers/primaryEnergyDemand";
-import primaryEnergyDemandPerSquareMeter from "./resolvers/primaryEnergyDemandPerSquareMeter";
+import totalEnergyConsumption from "./resolvers/totalEnergyConsumption";
 import energyEfficiencyClass from "./resolvers/energyEfficiencyClass";
 import buildingYear from "./resolvers/buildingYear";
 import buildingHeight from "./resolvers/buildingHeight.js";
@@ -144,6 +144,9 @@ import electricityUnitRate from "./resolvers/electricityUnitRate";
 // Step 3 — demand split
 import calculatedTotalEnergyDemand from "./resolvers/calculatedTotalEnergyDemand";
 import electricalRatio from "./resolvers/electricalRatio";
+import hasInternalGains from "./resolvers/hasInternalGains";
+import internalGainsFactor from "./resolvers/internalGainsFactor";
+import effectiveHeatingDemand from "./resolvers/effectiveHeatingDemand";
 import thermalEnergyDemand from "./resolvers/thermalEnergyDemand";
 import calculatedElectricalEnergyDemand from "./resolvers/calculatedElectricalEnergyDemand";
 import electricalEnergyDemand from "./resolvers/electricalEnergyDemand";
@@ -164,6 +167,8 @@ import totalCo2Emissions from "./resolvers/totalCo2Emissions";
 // Step 5 — pre-renovation
 import preRenovationCarrierData from "./resolvers/preRenovationCarrierData";
 import preRenovationElectricalRatio from "./resolvers/preRenovationElectricalRatio";
+import preRenovationHasInternalGains from "./resolvers/preRenovationHasInternalGains";
+import preRenovationInternalGainsFactor from "./resolvers/preRenovationInternalGainsFactor";
 import userThermalEnergyDemand from "./resolvers/userThermalEnergyDemand";
 import userTotalEnergyDemand from "./resolvers/userTotalEnergyDemand";
 import renovationFactor from "./resolvers/renovationFactor";
@@ -190,7 +195,7 @@ export const DETEnergyCaluclator = createCalculator<
   primaryEnergyCarrierData,
   primaryEnergyCarrierEfficiencyFactor,
   primaryEnergyDemand,
-  primaryEnergyDemandPerSquareMeter,
+  totalEnergyConsumption,
   buildingYear,
   buildingHeight,
   buildingType,
@@ -324,6 +329,9 @@ export const DETEnergyCaluclator = createCalculator<
   // Step 3
   calculatedTotalEnergyDemand,
   electricalRatio,
+  hasInternalGains,
+  internalGainsFactor,
+  effectiveHeatingDemand,
   thermalEnergyDemand,
   calculatedElectricalEnergyDemand,
   electricalEnergyDemand,
@@ -344,6 +352,8 @@ export const DETEnergyCaluclator = createCalculator<
   // Step 5
   preRenovationCarrierData,
   preRenovationElectricalRatio,
+  preRenovationHasInternalGains,
+  preRenovationInternalGainsFactor,
   userThermalEnergyDemand,
   userTotalEnergyDemand,
   renovationFactor,

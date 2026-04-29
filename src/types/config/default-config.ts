@@ -385,6 +385,25 @@ export const DEFAULT_CONFIG: DETConfig = {
       { key: "electric_direct_heater", value: 1 },
       { key: "gas_heat_pump_hybrid", value: 0.65 },
     ],
+    hasInternalGains: [
+      { key: "standard_boiler_70_55", value: false },
+      { key: "low_temperature_boiler_oil_gas_70_55", value: false },
+      { key: "condensing_boiler_70_55", value: false },
+      { key: "improved_condensing_boiler_55_45", value: false },
+      { key: "district_heating_all_temperatures", value: false },
+      { key: "air_source_heat_pump_55_45", value: true },
+      { key: "air_source_heat_pump_lt_40", value: true },
+      { key: "ground_source_heat_pump_55_45", value: true },
+      { key: "ground_source_heat_pump_lt_40", value: true },
+      { key: "oil_fired_single_stove", value: false },
+      { key: "gas_space_heater", value: false },
+      { key: "electric_direct_heater", value: false },
+      { key: "gas_heat_pump_hybrid", value: true },
+    ],
+    internalGainsFactorByBuildingType: [
+      { key: BuildingType.SINGLE_FAMILY, value: 0.65 },
+      { key: BuildingType.MULTI_FAMILY, value: 0.5 },
+    ],
 
     heatingPerformanceFactor: [
       {

@@ -11,6 +11,7 @@ export type {
 export { BuildingType } from "./types/building-type.js";
 export { EnergyEfficiencyClass } from "./types/energy-efficiency-class.js";
 export type { DETInput } from "./types/input/index.js";
+export type { PreRenovationValues } from "./types/input/preRenovation.js";
 export type { DETGeneralInput } from "./types/input/general.js";
 export type { DETHeatInput } from "./types/input/heat.js";
 export type { DETElectricityInput } from "./types/input/electricity.js";

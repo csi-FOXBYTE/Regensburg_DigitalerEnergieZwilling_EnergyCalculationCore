@@ -10,7 +10,7 @@ declare module "../" {
 export default {
   key: "renovationFactor",
   resolve: (ctx) => {
-    const preRenovationTotal = ctx.input.input.heat.preRenovationTotalEnergyDemand;
+    const preRenovationTotal = ctx.input.input.preRenovationValues?.totalEnergyDemand;
     if (preRenovationTotal == null || preRenovationTotal === 0) return 1;
     return ctx.get("calculatedTotalEnergyDemand") / preRenovationTotal;
   },

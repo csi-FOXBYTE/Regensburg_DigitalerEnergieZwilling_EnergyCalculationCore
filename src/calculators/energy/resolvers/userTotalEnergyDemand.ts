@@ -11,7 +11,8 @@ export default {
   key: "userTotalEnergyDemand",
   resolve: (ctx) =>
     ctx.get("userThermalEnergyDemand") /
-    (1 - ctx.get("preRenovationElectricalRatio")),
+    ((1 - ctx.get("preRenovationElectricalRatio")) *
+      ctx.get("preRenovationInternalGainsFactor")),
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,

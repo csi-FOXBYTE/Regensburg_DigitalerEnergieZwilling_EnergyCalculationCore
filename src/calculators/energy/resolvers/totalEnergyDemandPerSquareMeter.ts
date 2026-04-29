@@ -10,7 +10,7 @@ declare module "../" {
 export default {
   key: "totalEnergyDemandPerSquareMeter",
   resolve: (ctx) =>
-    ctx.get("totalEnergyDemand") / ctx.get("usableFloorArea"),
+    ctx.get("totalEnergyConsumption") / ctx.get("usableFloorArea"),
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,

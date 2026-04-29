@@ -10,7 +10,7 @@ declare module "../" {
 export default {
   key: "electricalEnergyDemand",
   resolve: (ctx) =>
-    ctx.get("totalEnergyDemand") * ctx.get("electricalRatio") +
+    ctx.get("effectiveHeatingDemand") * ctx.get("electricalRatio") +
     ctx.get("electricityOffset"),
 } satisfies Resolver<
   DETCalculatorContext,

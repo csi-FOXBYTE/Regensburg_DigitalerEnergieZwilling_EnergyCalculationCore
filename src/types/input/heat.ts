@@ -10,7 +10,4 @@ export type DETHeatInput = {
   hasStorage?: boolean | null;
   userThermalUnitRate?: number | null;
   userThermalConsumption?: number | null;
-  preRenovationTotalEnergyDemand?: number | null;
-  preRenovationPrimaryEnergyCarrier?: string | null;
-  preRenovationHeatingSystemType?: string | null;
 };

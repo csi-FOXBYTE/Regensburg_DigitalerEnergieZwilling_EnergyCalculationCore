@@ -12,9 +12,9 @@ export default {
   resolve: (ctx) => {
     const override = ctx.input.input.heat.userThermalUnitRate;
     if (override != null) {
-      const bundlePresent = ctx.input.input.heat.preRenovationTotalEnergyDemand != null;
+      const bundlePresent = ctx.input.input.preRenovationValues != null;
       if (!bundlePresent) return override;
-      const preRenovCarrier = ctx.input.input.heat.preRenovationPrimaryEnergyCarrier;
+      const preRenovCarrier = ctx.input.input.preRenovationValues?.primaryEnergyCarrier;
       if (preRenovCarrier == null || preRenovCarrier === ctx.get("primaryEnergyCarrier")) {
         return override;
       }

@@ -2,6 +2,7 @@ import type { DETElectricityInput } from "./electricity";
 import type { DETExteriorWallWindowsInput } from "./exteriorWallWindows";
 import type { DETGeneralInput } from "./general";
 import type { DETHeatInput } from "./heat";
+import type { PreRenovationValues } from "./preRenovation";
 import type { DETRoofInput } from "./roof";
 import type { DETRoofWindowsInput } from "./roofWindows";
 import type { DETTopFloorInput } from "./topFloor";
@@ -18,4 +19,5 @@ export type DETInput = {
   topFloor: DETTopFloorInput;
   outerWall: DETOuterWallInput;
   bottomFloor: DETBottomFloorInput;
+  preRenovationValues?: PreRenovationValues | null;
 };

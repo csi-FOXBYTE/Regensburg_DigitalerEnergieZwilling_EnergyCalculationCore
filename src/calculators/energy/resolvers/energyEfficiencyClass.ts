@@ -14,7 +14,7 @@ export default {
   resolve: (ctx) => {
     const result = resolveRangeBand(
       ctx.input.config.general.energyEfficiencyClasses,
-      ctx.get("primaryEnergyDemandPerSquareMeter"),
+      ctx.get("totalEnergyDemandPerSquareMeter"),
     );
     if (result == null)
       throw new Error("Failed to resolve energyEfficiencyClass");

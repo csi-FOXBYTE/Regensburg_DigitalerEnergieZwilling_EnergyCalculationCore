@@ -1,5 +1,37 @@
 # Release Notes
 
+## v0.7.2
+
+### Internal gains (interne Gewinne)
+
+- Added `hasInternalGains` flag to config, keyed by heating system type — true for all heat pump variants and `gas_heat_pump_hybrid`
+- Added `internalGainsFactorByBuildingType` to heat config: `0.65` for single-family, `0.5` for multi-family
+- New resolver `internalGainsFactor` resolves to the building-type factor when `hasInternalGains` is true, otherwise `1`
+- New resolver `effectiveHeatingDemand` = `totalEnergyDemand × internalGainsFactor` — the energy the system actually needs to deliver
+- Thermal/electrical split now operates on `effectiveHeatingDemand` instead of `totalEnergyDemand`
+- Back-calculation (`userTotalEnergyDemand`) now also divides by `preRenovationInternalGainsFactor` to correctly invert the gains reduction
+- `CalculationResult` gains `hadInternalGains: boolean`
+
+### Energy efficiency class basis
+
+- `totalEnergyConsumption` added as an explicit resolver: `thermalEnergyDemand + electricalEnergyDemand` (includes electricity offset)
+- `totalEnergyDemandPerSquareMeter` now based on `totalEnergyConsumption` instead of raw `totalEnergyDemand`
+- `energyEfficiencyClass` now derived from `totalEnergyDemandPerSquareMeter` instead of `primaryEnergyDemandPerSquareMeter`
+- `primaryEnergyDemandPerSquareMeter` removed from the calculator
+
+### Pre-renovation values
+
+- All pre-renovation fields removed from `DETHeatInput` and `DETElectricityInput` and consolidated into a single `PreRenovationValues` type
+- `DETInput` gains `preRenovationValues?: PreRenovationValues | null` — replaces the scattered `preRenovation*` fields
+- `PreRenovationValues` contains `totalEnergyDemand`, `primaryEnergyCarrier`, `heatingSystemType`, `electricityOffset`, and `hadInternalGains`
+- `CalculationResult` now returns `preRenovationValues: PreRenovationValues` — populated from current resolved state on the first run, passed through unchanged on subsequent renovation runs
+- Supports multi-step renovation chains: the original baseline is preserved across any number of steps
+
+### Renovation
+
+- `generateHeatingSurfaceRenovations` now accepts `input` and filters out surface types already present — can return an empty array
+- Insulation renovation patches now include `year: lastYearBand` for each component
+
 ## v0.7.0
 
 ### Thermal / electrical demand split

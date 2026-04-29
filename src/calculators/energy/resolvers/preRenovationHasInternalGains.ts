@@ -4,20 +4,20 @@ import { resolveKeyedValue } from "../../../types/keyed-values.js";
 
 declare module "../" {
   interface DETCalculatorRegistry {
-    preRenovationElectricalRatio: number;
+    preRenovationHasInternalGains: boolean;
   }
 }
 
 export default {
-  key: "preRenovationElectricalRatio",
+  key: "preRenovationHasInternalGains",
   resolve: (ctx) => {
     const sysType =
       ctx.input.input.preRenovationValues?.heatingSystemType ??
       ctx.get("heatingSystemType");
-    return resolveKeyedValue(ctx.input.config.heat.electricalRatio, sysType);
+    return resolveKeyedValue(ctx.input.config.heat.hasInternalGains, sysType);
   },
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,
-  "preRenovationElectricalRatio"
+  "preRenovationHasInternalGains"
 >;

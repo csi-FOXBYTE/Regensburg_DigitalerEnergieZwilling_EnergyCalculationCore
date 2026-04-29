@@ -10,9 +10,9 @@ declare module "../" {
 export default {
   key: "electricityOffset",
   resolve: (ctx) => {
-    const bundlePresent = ctx.input.input.heat.preRenovationTotalEnergyDemand != null;
-    if (bundlePresent) {
-      return ctx.input.input.electricity.preRenovationElectricityOffset ?? 0;
+    const preRenovationValues = ctx.input.input.preRenovationValues;
+    if (preRenovationValues != null) {
+      return preRenovationValues.electricityOffset;
     }
     const userElectricityConsumption = ctx.input.input.electricity.userElectricityConsumption;
     if (userElectricityConsumption != null) {

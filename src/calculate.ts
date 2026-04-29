@@ -1,5 +1,6 @@
 import type { DETConfig } from "./types/config/index.js";
 import type { DETInput } from "./types/input/index.js";
+import type { PreRenovationValues } from "./types/input/preRenovation.js";
 import type { EnergyEfficiencyClass } from "./types/energy-efficiency-class.js";
 import { DETEnergyCaluclator } from "./calculators/energy/index.js";
 
@@ -8,6 +9,8 @@ export type CalculationResult = {
   energyEfficiencyClass: EnergyEfficiencyClass;
   yearlyCost: number;
   co2Emissions: number;
+  hadInternalGains: boolean;
+  preRenovationValues: PreRenovationValues;
   resolvedInput: DETInput;
 };
 
@@ -23,6 +26,14 @@ export function calculate(config: DETConfig, input: DETInput, options?: Calculat
     energyEfficiencyClass: ctx.get("energyEfficiencyClass"),
     yearlyCost: ctx.get("totalCost"),
     co2Emissions: ctx.get("totalCo2Emissions"),
+    hadInternalGains: ctx.get("hasInternalGains"),
+    preRenovationValues: input.preRenovationValues ?? {
+      totalEnergyDemand: ctx.get("totalEnergyDemand"),
+      primaryEnergyCarrier: ctx.get("primaryEnergyCarrier"),
+      heatingSystemType: ctx.get("heatingSystemType"),
+      electricityOffset: ctx.get("electricityOffset"),
+      hadInternalGains: ctx.get("hasInternalGains"),
+    },
     resolvedInput: {
       general: {
         buildingYear: ctx.get("buildingYear"),
