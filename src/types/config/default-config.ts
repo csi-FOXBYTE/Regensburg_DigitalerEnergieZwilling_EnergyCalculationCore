@@ -1159,34 +1159,40 @@ export const DEFAULT_CONFIG: DETConfig = {
   renovation: {
     heatingRenovations: [
       {
-        localization: { de: "Wechsel zu Gas", en: "Switch to gas" },
-        targetCarrier: "natural_gas",
-        targetSystem: "improved_condensing_boiler_55_45",
-      },
-      {
-        localization: { de: "Wechsel zu Biogas", en: "Switch to biogas" },
-        targetCarrier: "bio_gas",
-        targetSystem: "improved_condensing_boiler_55_45",
-      },
-      {
         localization: { de: "Wechsel zur Luftwärmepumpe", en: "Switch to air source heat pump" },
         targetCarrier: "none",
         targetSystem: "air_source_heat_pump_lt_40",
+        priority: 1,
       },
       {
         localization: { de: "Wechsel zur Erdwärmepumpe", en: "Switch to ground source heat pump" },
         targetCarrier: "none",
         targetSystem: "ground_source_heat_pump_lt_40",
+        priority: 1,
       },
       {
         localization: { de: "Wechsel zu Holzpellets", en: "Switch to wood pellets" },
         targetCarrier: "wood_pellets",
         targetSystem: "standard_boiler_70_55",
+        priority: 2,
+      },
+      {
+        localization: { de: "Wechsel zu Gas", en: "Switch to gas" },
+        targetCarrier: "natural_gas",
+        targetSystem: "improved_condensing_boiler_55_45",
+        priority: 3,
+      },
+      {
+        localization: { de: "Wechsel zu Biogas", en: "Switch to biogas" },
+        targetCarrier: "bio_gas",
+        targetSystem: "improved_condensing_boiler_55_45",
+        priority: 3,
       },
       {
         localization: { de: "Wechsel zu Fernwärme", en: "Switch to district heating" },
         targetCarrier: "district_heating",
         targetSystem: "district_heating_all_temperatures",
+        priority: 3,
       },
     ],
     heatingSurfaceRenovations: [
@@ -1196,12 +1202,12 @@ export const DEFAULT_CONFIG: DETConfig = {
       },
     ],
     insulationRenovations: {
-      bottomFloor: { uValue: 0.25 },
-      roof: { uValue: 0.14 },
-      topFloor: { uValue: 0.14 },
-      outerWalls: { uValue: 0.2 },
-      outerWindows: { uValue: 0.95 },
-      roofWindows: { uValue: 1 },
+      bottomFloor: { uValue: 0.25, recommendYearRange: { to: 1986 } },
+      roof: { uValue: 0.14, recommendYearRange: { to: 2006 } },
+      topFloor: { uValue: 0.14, recommendYearRange: { to: 1986 } },
+      outerWalls: { uValue: 0.2, recommendYearRange: { to: 1978 } },
+      outerWindows: { uValue: 0.95, recommendYearRange: { to: 1994 } },
+      roofWindows: { uValue: 1, recommendYearRange: { to: 1994 } },
     },
     primaryEnergyCarrierTargets: [
       "heating_oil_heavy",

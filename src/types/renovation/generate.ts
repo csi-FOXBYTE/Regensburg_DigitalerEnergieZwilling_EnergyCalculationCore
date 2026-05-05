@@ -1,13 +1,50 @@
 import type { DETConfig } from "../config";
 import { isCarrierCompatible } from "../config/heat";
 import type { DETInput } from "../input";
-import type { RangeLast } from "../range-bands";
+import type { RangeKey, RangeLast } from "../range-bands";
 import { insulationKeys } from "./renovation";
 import type {
   InputPatch,
   InsulationRenovationKeys,
   Renovation,
 } from "./renovation";
+
+function isYearInRange(
+  year: number | RangeKey | null | undefined,
+  range: RangeKey,
+): boolean {
+  if (year == null) return false;
+  const rangeFrom = range.from ?? -Infinity;
+  const rangeTo = range.to ?? Infinity;
+  if (typeof year === "number") {
+    return year >= rangeFrom && year <= rangeTo;
+  }
+  const yearFrom = year.from ?? -Infinity;
+  const yearTo = year.to ?? Infinity;
+  return yearFrom <= rangeTo && yearTo >= rangeFrom;
+}
+
+function isInsulationRecommended(
+  key: InsulationRenovationKeys,
+  config: DETConfig,
+  input: DETInput,
+): boolean {
+  const { recommendYearRange } = config.renovation.insulationRenovations[key];
+  switch (key) {
+    case "roof":
+      return isYearInRange(input.roof.year, recommendYearRange) || input.roof.hasInsulation === false;
+    case "topFloor":
+      return isYearInRange(input.topFloor.year, recommendYearRange) || input.topFloor.hasInsulation === false;
+    case "bottomFloor":
+      return isYearInRange(input.bottomFloor.year, recommendYearRange) || input.bottomFloor.hasInsulation === false;
+    case "outerWalls":
+      return isYearInRange(input.outerWall.year, recommendYearRange) || input.outerWall.hasInsulation === false;
+    case "outerWindows":
+      return isYearInRange(input.exteriorWallWindows.year, recommendYearRange);
+    case "roofWindows":
+      return isYearInRange(input.roofWindows.year, recommendYearRange);
+  }
+}
 
 export function generateHeatingRenovations(
   config: DETConfig,
@@ -24,14 +61,26 @@ export function generateHeatingRenovations(
       id: "heat_renew",
       label: systemRenewalLabel,
       patch: { heat: { heatingSystemConstructionYear: lastYearBand } },
+      recommended: false,
     });
   }
 
-  for (const hRenConf of config.renovation.heatingRenovations) {
+  const currentCarrierIsTarget = config.renovation.primaryEnergyCarrierTargets.includes(
+    input.heat.primaryEnergyCarrier ?? "",
+  );
+
+  const compatible = config.renovation.heatingRenovations.filter((hRenConf) => {
     const carrier = config.heat.primaryEnergyCarriers.find(
       (c) => c.value === hRenConf.targetCarrier,
     );
-    if (carrier == null || !isCarrierCompatible(carrier, input)) continue;
+    return carrier != null && isCarrierCompatible(carrier, input);
+  });
+
+  const highestPriority = currentCarrierIsTarget
+    ? Math.min(...compatible.map((r) => r.priority))
+    : Infinity;
+
+  for (const hRenConf of compatible) {
     const label = hRenConf.localization[locale];
     if (label == null) {
       throw new Error(
@@ -48,6 +97,7 @@ export function generateHeatingRenovations(
           heatingSystemConstructionYear: lastYearBand,
         },
       },
+      recommended: hRenConf.priority === highestPriority,
     });
   }
   return renovations;
@@ -85,6 +135,7 @@ function makeInsulationPatch(
 
 export function generateInsulationRenovations(
   config: DETConfig,
+  input: DETInput,
   translate: (key: InsulationRenovationKeys) => string,
 ): Renovation[] {
   const renovations: Renovation[] = [];
@@ -94,7 +145,8 @@ export function generateInsulationRenovations(
   for (const key of insulationKeys) {
     const patch = makeInsulationPatch(key, config, lastYearBand);
     const label = translate(key);
-    renovations.push({ id: `envelope_${key}`, patch, label });
+    const recommended = isInsulationRecommended(key, config, input);
+    renovations.push({ id: `envelope_${key}`, patch, label, recommended });
   }
   return renovations;
 }
@@ -121,6 +173,7 @@ export function generateHeatingSurfaceRenovations(
           heatingSurfaceType: hRenConf.targetSurfaceType,
         },
       },
+      recommended: false,
     });
   }
   return renovations;
