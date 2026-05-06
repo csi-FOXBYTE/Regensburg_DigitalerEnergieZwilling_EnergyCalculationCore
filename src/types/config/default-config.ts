@@ -329,46 +329,121 @@ export const DEFAULT_CONFIG: DETConfig = {
     primaryEnergyCarrierData: [
       {
         key: "heating_oil_heavy",
-        value: { energyPerUnit: 10.08, unit: "L", unitRate: 0.597, baseRate: 0, co2Factor: 288, primaryEnergyFactor: 1.1 },
+        value: {
+          energyPerUnit: 10.08,
+          unit: "L",
+          unitRate: 0.597,
+          baseRate: 0,
+          co2Factor: 288,
+          primaryEnergyFactor: 1.1,
+        },
       },
       {
         key: "heating_oil_light",
-        value: { energyPerUnit: 10.08, unit: "L", unitRate: 0.597, baseRate: 0, co2Factor: 288, primaryEnergyFactor: 1.1 },
+        value: {
+          energyPerUnit: 10.08,
+          unit: "L",
+          unitRate: 0.597,
+          baseRate: 0,
+          co2Factor: 288,
+          primaryEnergyFactor: 1.1,
+        },
       },
       {
         key: "none",
-        value: { energyPerUnit: 1, unit: "kWh", unitRate: 0, baseRate: 0, co2Factor: 0, primaryEnergyFactor: 0 },
+        value: {
+          energyPerUnit: 1,
+          unit: "kWh",
+          unitRate: 0,
+          baseRate: 0,
+          co2Factor: 0,
+          primaryEnergyFactor: 0,
+        },
       },
       {
         key: "natural_gas",
-        value: { energyPerUnit: 10.42, unit: "m³", unitRate: 0.652, baseRate: 181.83, co2Factor: 201, primaryEnergyFactor: 1.1 },
+        value: {
+          energyPerUnit: 10.42,
+          unit: "m³",
+          unitRate: 0.652,
+          baseRate: 181.83,
+          co2Factor: 201,
+          primaryEnergyFactor: 1.1,
+        },
       },
       {
         key: "bio_gas",
-        value: { energyPerUnit: 10.42, unit: "m³", unitRate: 0.652, baseRate: 181.83, co2Factor: 152, primaryEnergyFactor: 1.1 },
+        value: {
+          energyPerUnit: 10.42,
+          unit: "m³",
+          unitRate: 0.652,
+          baseRate: 181.83,
+          co2Factor: 152,
+          primaryEnergyFactor: 1.1,
+        },
       },
       {
         key: "wood_biomass",
-        value: { energyPerUnit: 1900, unit: "rm", unitRate: 57, baseRate: 0, co2Factor: 30, primaryEnergyFactor: 0.2 },
+        value: {
+          energyPerUnit: 1900,
+          unit: "rm",
+          unitRate: 57,
+          baseRate: 0,
+          co2Factor: 30,
+          primaryEnergyFactor: 0.2,
+        },
       },
       {
         key: "wood_pellets",
-        value: { energyPerUnit: 4.9, unit: "kg", unitRate: 0.206, baseRate: 0, co2Factor: 36, primaryEnergyFactor: 0.2 },
+        value: {
+          energyPerUnit: 4.9,
+          unit: "kg",
+          unitRate: 0.206,
+          baseRate: 0,
+          co2Factor: 36,
+          primaryEnergyFactor: 0.2,
+        },
       },
       {
         key: "district_heating",
-        value: { energyPerUnit: 1, unit: "kWh", unitRate: 0.192, baseRate: 50, co2Factor: 280, primaryEnergyFactor: 1 },
+        value: {
+          energyPerUnit: 1,
+          unit: "kWh",
+          unitRate: 0.192,
+          baseRate: 50,
+          co2Factor: 280,
+          primaryEnergyFactor: 1,
+        },
       },
     ],
 
     electricityTypes: [
       { value: "grid", localization: { de: "Netz", en: "Grid" } },
-      { value: "renewable", localization: { de: "Erneuerbar", en: "Renewable" } },
+      {
+        value: "renewable",
+        localization: { de: "Erneuerbar", en: "Renewable" },
+      },
     ],
     defaultElectricityType: "grid",
     electricityTypeData: [
-      { key: "grid", value: { co2Factor: 366, unitRate: 0.192, baseRate: 50, primaryEnergyFactor: 1.8 } },
-      { key: "renewable", value: { co2Factor: 0, unitRate: 0.192, baseRate: 50, primaryEnergyFactor: 0 } },
+      {
+        key: "grid",
+        value: {
+          co2Factor: 366,
+          unitRate: 0.192,
+          baseRate: 50,
+          primaryEnergyFactor: 1.8,
+        },
+      },
+      {
+        key: "renewable",
+        value: {
+          co2Factor: 0,
+          unitRate: 0.192,
+          baseRate: 50,
+          primaryEnergyFactor: 0,
+        },
+      },
     ],
     electricalRatio: [
       { key: "standard_boiler_70_55", value: 0 },
@@ -1155,23 +1230,34 @@ export const DEFAULT_CONFIG: DETConfig = {
     ],
     roofWindowsHeatLossFactor: 0.93,
     exteriorWallWindowsHeatLossFactor: 1,
+    exteriorWallAreaFactor: 0.2,
+    roofAreaFactor: 0.1,
   },
   renovation: {
     heatingRenovations: [
       {
-        localization: { de: "Wechsel zur Luftwärmepumpe", en: "Switch to air source heat pump" },
+        localization: {
+          de: "Wechsel zur Luftwärmepumpe",
+          en: "Switch to air source heat pump",
+        },
         targetCarrier: "none",
         targetSystem: "air_source_heat_pump_lt_40",
         priority: 1,
       },
       {
-        localization: { de: "Wechsel zur Erdwärmepumpe", en: "Switch to ground source heat pump" },
+        localization: {
+          de: "Wechsel zur Erdwärmepumpe",
+          en: "Switch to ground source heat pump",
+        },
         targetCarrier: "none",
         targetSystem: "ground_source_heat_pump_lt_40",
         priority: 1,
       },
       {
-        localization: { de: "Wechsel zu Holzpellets", en: "Switch to wood pellets" },
+        localization: {
+          de: "Wechsel zu Holzpellets",
+          en: "Switch to wood pellets",
+        },
         targetCarrier: "wood_pellets",
         targetSystem: "standard_boiler_70_55",
         priority: 2,
@@ -1189,7 +1275,10 @@ export const DEFAULT_CONFIG: DETConfig = {
         priority: 3,
       },
       {
-        localization: { de: "Wechsel zu Fernwärme", en: "Switch to district heating" },
+        localization: {
+          de: "Wechsel zu Fernwärme",
+          en: "Switch to district heating",
+        },
         targetCarrier: "district_heating",
         targetSystem: "district_heating_all_temperatures",
         priority: 3,
@@ -1197,7 +1286,10 @@ export const DEFAULT_CONFIG: DETConfig = {
     ],
     heatingSurfaceRenovations: [
       {
-        localization: { de: "Wechsel zu Flächenheizung", en: "Switch to radiant surface heating" },
+        localization: {
+          de: "Wechsel zu Flächenheizung",
+          en: "Switch to radiant surface heating",
+        },
         targetSurfaceType: "radiant_surface_heating",
       },
     ],
