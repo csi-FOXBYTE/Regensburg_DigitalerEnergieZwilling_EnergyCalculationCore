@@ -9,7 +9,9 @@ declare module "../../" {
 
 export default {
   key: "exteriorWallWindowsArea",
-  resolve: (ctx) => ctx.input.input.exteriorWallWindows.area,
+  resolve: (ctx) =>
+    ctx.input.input.exteriorWallWindows.area ??
+    ctx.get("outerWallArea") * ctx.input.config.windows.exteriorWallAreaFactor,
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,

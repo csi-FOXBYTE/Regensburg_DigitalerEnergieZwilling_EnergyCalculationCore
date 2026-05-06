@@ -1,5 +1,16 @@
 # Release Notes
 
+## v0.8.0
+
+### Renovation recommendations
+
+- `Renovation` gains a `recommended: boolean` field indicating whether the renovation is the best available option for the current building state
+- `InsulationRenovationConfig` gains `recommendYearRange: RangeKey` — insulation renovations are recommended when the component year falls within that range or (for opaque components) `hasInsulation` is explicitly `false`
+- Default year thresholds: roof `{ to: 2006 }`, top/bottom floor `{ to: 1986 }`, outer walls `{ to: 1978 }`, windows `{ to: 1994 }`
+- `HeatingRenovationConfig` gains `priority: number` — lower number means higher priority (1 = heat pumps, 2 = wood pellets, 3 = gas / district heating)
+- `generateInsulationRenovations` now accepts `input` as a second argument (before `translate`) to evaluate year and insulation state per component
+- Heating recommendations only apply when the current carrier is listed in `primaryEnergyCarrierTargets`; among compatible renovations the highest-priority group (lowest priority number) is marked recommended, with ties all recommended together
+
 ## v0.7.2
 
 ### Internal gains (interne Gewinne)

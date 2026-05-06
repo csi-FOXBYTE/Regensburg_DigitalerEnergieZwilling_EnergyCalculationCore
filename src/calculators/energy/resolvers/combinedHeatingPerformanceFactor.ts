@@ -10,7 +10,7 @@ declare module "../" {
 export default {
   key: "combinedHeatingPerformanceFactor",
   resolve: (ctx) =>
-    ctx.get("heatingPerformanceFactor") +
+    ctx.get("heatingPerformanceFactor") *
     ctx.get("temperatureControlPerformanceFactor"),
 } satisfies Resolver<
   DETCalculatorContext,

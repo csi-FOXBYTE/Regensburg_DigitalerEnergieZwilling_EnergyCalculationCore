@@ -10,9 +10,11 @@ declare module "../../" {
 export default {
   key: "roofWindowsHeatLoss",
   resolve: (ctx) =>
-    ctx.get("roofWindowsHeatLossFactor") *
-    ctx.get("roofWindowsUValue") *
-    ctx.get("roofWindowsArea"),
+    ctx.get("isSpaceBelowRoofHeated")
+      ? ctx.get("roofWindowsHeatLossFactor") *
+        ctx.get("roofWindowsUValue") *
+        ctx.get("roofWindowsArea")
+      : 0,
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,

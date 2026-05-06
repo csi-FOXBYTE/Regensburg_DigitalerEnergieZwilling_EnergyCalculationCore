@@ -9,7 +9,9 @@ declare module "../../" {
 
 export default {
   key: "roofWindowsArea",
-  resolve: (ctx) => ctx.input.input.roofWindows.area,
+  resolve: (ctx) =>
+    ctx.input.input.roofWindows.area ??
+    ctx.get("roofArea") * ctx.input.config.windows.roofAreaFactor,
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,

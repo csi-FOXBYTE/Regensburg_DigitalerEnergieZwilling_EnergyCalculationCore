@@ -10,7 +10,7 @@ declare module "../../" {
 export default {
   key: "outerWallHeatLoss",
   resolve: (ctx) =>
-    ctx.get("outerWallArea") *
+    (ctx.get("outerWallArea") - ctx.get("exteriorWallWindowsArea")) *
     ctx.get("outerWallUValue") *
     ctx.get("outerWallHeatLossFactor"),
 } satisfies Resolver<

@@ -8,4 +8,6 @@ export type DETWindowsConfig = {
   uValue: KeyedValues<string, YearBands<number>>;
   roofWindowsHeatLossFactor: number;
   exteriorWallWindowsHeatLossFactor: number;
+  roofAreaFactor: number;
+  exteriorWallAreaFactor: number;
 };
