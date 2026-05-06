@@ -1,5 +1,24 @@
 # Release Notes
 
+## v0.8.1
+
+### Subsidies
+
+- New `Subsidy` and `SubsidyBenefit` types exported from the package root
+- `Subsidy` carries `title`, `content`, `href`, and a `benefits` descriptor
+- `SubsidyBenefit` supports three benefit shapes: `range` (from/to), `upTo`, and `exactly` — each with a `unit` and optional `for` label
+
+### Window area fallback
+
+- `exteriorWallWindowsArea` and `roofWindowsArea` inputs are now optional — when omitted the area is derived from the parent surface area multiplied by a config factor (`windows.exteriorWallAreaFactor` / `windows.roofAreaFactor`)
+- `DETWindowsConfig` gains two new required fields: `roofAreaFactor` and `exteriorWallAreaFactor`
+
+### Calculation fixes
+
+- `outerWallHeatLoss` now subtracts `exteriorWallWindowsArea` from `outerWallArea` before applying the U-value, avoiding double-counting the window area in wall heat loss
+- `roofWindowsHeatLoss` returns `0` when `isSpaceBelowRoofHeated` is `false` — roof windows do not contribute to heat loss for unheated attic spaces
+- `combinedHeatingPerformanceFactor` was incorrectly summing `heatingPerformanceFactor` and `temperatureControlPerformanceFactor`; now correctly multiplies them
+
 ## v0.8.0
 
 ### Renovation recommendations
