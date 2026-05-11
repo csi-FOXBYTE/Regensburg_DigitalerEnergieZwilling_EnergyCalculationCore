@@ -44,7 +44,7 @@ export function calculate(
         numberOfStories: ctx.get("numberOfStories"),
         buildingHeight: ctx.get("buildingHeight"),
         buildingBaseArea: ctx.get("buildingBaseArea"),
-        livingArea: ctx.get("livingArea"),
+        livingArea: ctx.get("livingArea") ?? ctx.get("netFloorArea") / ctx.get("netFloorAreaFromLivingAreaFactor"),
         type: ctx.get("buildingType"),
       },
       heat: {
