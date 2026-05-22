@@ -7,6 +7,7 @@ export type DETGeneralConfig = {
   supportedLocales: string[];
   generalYearBands: Ranges;
   energyEfficiencyClasses: RangeBands<EnergyEfficiencyClass>;
+  energyEfficiencyClassColors: KeyedValues<EnergyEfficiencyClass, string>;
 
   assumedFloorSlabThickness: number;
   assumedInteriorStoryHeight: number;

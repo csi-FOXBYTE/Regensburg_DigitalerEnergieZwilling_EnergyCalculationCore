@@ -43,6 +43,17 @@ export const DEFAULT_CONFIG: DETConfig = {
       { from: 200, to: 250, value: EnergyEfficiencyClass.G },
       { from: 250, value: EnergyEfficiencyClass.H },
     ],
+    energyEfficiencyClassColors: [
+      { key: EnergyEfficiencyClass.A_PLUS, value: "#008542" },
+      { key: EnergyEfficiencyClass.A, value: "#3aaa35" },
+      { key: EnergyEfficiencyClass.B, value: "#94c11c" },
+      { key: EnergyEfficiencyClass.C, value: "#c7d21f" },
+      { key: EnergyEfficiencyClass.D, value: "#f9e000" },
+      { key: EnergyEfficiencyClass.E, value: "#f6a800" },
+      { key: EnergyEfficiencyClass.F, value: "#f07d00" },
+      { key: EnergyEfficiencyClass.G, value: "#e94e0f" },
+      { key: EnergyEfficiencyClass.H, value: "#e2001a" },
+    ],
     assumedFloorSlabThickness: 0.2,
     assumedInteriorStoryHeight: 2.75,
     heatedAirVolumeCorrectionFactor: [
@@ -71,18 +82,10 @@ export const DEFAULT_CONFIG: DETConfig = {
   heat: {
     primaryEnergyCarriers: [
       {
-        value: "heating_oil_heavy",
+        value: "heating_oil",
         localization: {
-          de: "Heizöl, schwer",
-          en: "Heavy fuel oil",
-        },
-        requirements: { storage: true },
-      },
-      {
-        value: "heating_oil_light",
-        localization: {
-          de: "Heizöl, extra leicht",
-          en: "Extra light heating oil",
+          de: "Heizöl",
+          en: "Heating oil",
         },
         requirements: { storage: true },
       },
@@ -240,17 +243,7 @@ export const DEFAULT_CONFIG: DETConfig = {
 
     allowedHeatingSystemTypesByCarrier: [
       {
-        key: "heating_oil_light",
-        allowedValues: [
-          "standard_boiler_70_55",
-          "low_temperature_boiler_oil_gas_70_55",
-          "condensing_boiler_70_55",
-          "improved_condensing_boiler_55_45",
-          "oil_fired_single_stove",
-        ],
-      },
-      {
-        key: "heating_oil_heavy",
+        key: "heating_oil",
         allowedValues: [
           "standard_boiler_70_55",
           "low_temperature_boiler_oil_gas_70_55",
@@ -305,10 +298,9 @@ export const DEFAULT_CONFIG: DETConfig = {
       },
     ],
 
-    defaultPrimaryEnergyCarrier: "heating_oil_heavy",
+    defaultPrimaryEnergyCarrier: "heating_oil",
     defaultHeatingSystemType: [
-      { key: "heating_oil_light", value: "standard_boiler_70_55" },
-      { key: "heating_oil_heavy", value: "standard_boiler_70_55" },
+      { key: "heating_oil", value: "standard_boiler_70_55" },
       { key: "natural_gas", value: "standard_boiler_70_55" },
       { key: "bio_gas", value: "standard_boiler_70_55" },
       { key: "wood_biomass", value: "standard_boiler_70_55" },
@@ -328,18 +320,7 @@ export const DEFAULT_CONFIG: DETConfig = {
     // bheiz, barb, bgrund, xco2, fp
     primaryEnergyCarrierData: [
       {
-        key: "heating_oil_heavy",
-        value: {
-          energyPerUnit: 10.08,
-          unit: "L",
-          unitRate: 0.597,
-          baseRate: 0,
-          co2Factor: 288,
-          primaryEnergyFactor: 1.1,
-        },
-      },
-      {
-        key: "heating_oil_light",
+        key: "heating_oil",
         value: {
           energyPerUnit: 10.08,
           unit: "L",
@@ -1301,11 +1282,6 @@ export const DEFAULT_CONFIG: DETConfig = {
       outerWindows: { uValue: 0.95, recommendYearRange: { to: 1994 } },
       roofWindows: { uValue: 1, recommendYearRange: { to: 1994 } },
     },
-    primaryEnergyCarrierTargets: [
-      "heating_oil_heavy",
-      "heating_oil_light",
-      "natural_gas",
-      "bio_gas",
-    ],
+    primaryEnergyCarrierTargets: ["heating_oil", "natural_gas", "bio_gas"],
   },
 };
