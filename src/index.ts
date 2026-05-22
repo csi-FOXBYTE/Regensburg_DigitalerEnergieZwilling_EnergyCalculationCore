@@ -9,7 +9,7 @@ export type {
   YearBands,
 } from "./types/range-bands.js";
 export { BuildingType } from "./types/building-type.js";
-export { EnergyEfficiencyClass } from "./types/energy-efficiency-class.js";
+export type { EnergyEfficiencyClass } from "./types/energy-efficiency-class.js";
 export type { DETInput } from "./types/input/index.js";
 export type { PreRenovationValues } from "./types/input/preRenovation.js";
 export type { DETGeneralInput } from "./types/input/general.js";
