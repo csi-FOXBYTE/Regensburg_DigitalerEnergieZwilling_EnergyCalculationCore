@@ -308,7 +308,7 @@ export const DEFAULT_CONFIG: DETConfig = {
       { key: "none", value: "air_source_heat_pump_55_45" },
       { key: "district_heating", value: "district_heating_all_temperatures" },
     ],
-    defaultHeatingSurfaceType: "radiant_surface_heating",
+    defaultHeatingSurfaceType: "free_heat_emitter",
 
     // HDD
     heatingDegreeDays: 3279,
@@ -399,10 +399,10 @@ export const DEFAULT_CONFIG: DETConfig = {
     ],
 
     electricityTypes: [
-      { value: "grid", localization: { de: "Netz", en: "Grid" } },
+      { value: "grid", localization: { de: "Mixstrom", en: "Grid" } },
       {
         value: "renewable",
-        localization: { de: "Erneuerbar", en: "Renewable" },
+        localization: { de: "Ökostrom", en: "Renewable" },
       },
     ],
     defaultElectricityType: "grid",
