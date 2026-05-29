@@ -90,6 +90,7 @@ export function calculate(
       },
       outerWall: {
         area: ctx.get("outerWallArea"),
+        adjacentWallArea: ctx.get("adjacentWallArea"),
         year: ctx.get("outerWallYear"),
         hasInsulation: ctx.get("outerWallHasInsulation"),
         constructionType: ctx.get("outerWallConstructionType"),

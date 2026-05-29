@@ -94,6 +94,8 @@ import outerWallHasInsulation from "./resolvers/outerWall/outerWallHasInsulation
 import outerWallConstructionType from "./resolvers/outerWall/outerWallConstructionType";
 import outerWallConstructionUValue from "./resolvers/outerWall/outerWallConstructionUValue";
 import outerWallArea from "./resolvers/outerWall/outerWallArea";
+import adjacentWallArea from "./resolvers/outerWall/adjacentWallArea";
+import adjacentWallUValue from "./resolvers/outerWall/adjacentWallUValue";
 import outerWallConstructionResistance from "./resolvers/outerWall/outerWallConstructionResistance";
 import outerWallThermalResistance from "./resolvers/outerWall/outerWallThermalResistance";
 import outerWallUValue from "./resolvers/outerWall/outerWallUValue";
@@ -279,6 +281,8 @@ export const DETEnergyCaluclator = createCalculator<
   outerWallConstructionType,
   outerWallConstructionUValue,
   outerWallArea,
+  adjacentWallArea,
+  adjacentWallUValue,
   outerWallConstructionResistance,
   outerWallThermalResistance,
   outerWallUValue,
