@@ -1,12 +1,15 @@
-import type { KeyedValues } from "../keyed-values";
-import type { YearBands } from "../range-bands";
-import type { Selection } from "../selection";
+import { z } from "zod";
+import { keyedValues } from "../keyed-values.js";
+import { yearBands } from "../range-bands.js";
+import { SelectionSchema } from "../selection.js";
 
-export type DETOuterWallConfig = {
-  constructionTypes: Selection[];
-  defaultConstructionType: YearBands<string>;
-  uValue: KeyedValues<string, YearBands<number>>;
-  thermalConductivity: number;
-  assumedInsulationThickness: number;
-  heatLossFactor: number;
-};
+export const DETOuterWallConfigSchema = z.object({
+  constructionTypes: z.array(SelectionSchema),
+  defaultConstructionType: yearBands(z.string()),
+  uValue: keyedValues(z.string(), yearBands(z.number())),
+  thermalConductivity: z.number(),
+  assumedInsulationThickness: z.number(),
+  heatLossFactor: z.number(),
+});
+
+export type DETOuterWallConfig = z.infer<typeof DETOuterWallConfigSchema>;

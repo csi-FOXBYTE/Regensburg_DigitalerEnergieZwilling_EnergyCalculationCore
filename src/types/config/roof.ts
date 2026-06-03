@@ -1,15 +1,18 @@
-import type { KeyedValues } from "../keyed-values";
-import type { YearBands } from "../range-bands";
-import type { RoofInsulationType } from "../roof-insulation-type";
-import type { Selection } from "../selection";
+import { z } from "zod";
+import { keyedValues } from "../keyed-values.js";
+import { yearBands } from "../range-bands.js";
+import { RoofInsulationTypeSchema } from "../roof-insulation-type.js";
+import { SelectionSchema } from "../selection.js";
 
-export type DETRoofConfig = {
-  heatLossFactor: number;
-  defaultInsulationType: RoofInsulationType;
-  constructionTypes: Selection[];
-  defaultConstructionType: string;
-  assumedInsulationThickness: number;
-  thermalConductivity: number;
-  insulationReductionFactor: number;
-  uValue: KeyedValues<string, YearBands<number>>;
-};
+export const DETRoofConfigSchema = z.object({
+  heatLossFactor: z.number(),
+  defaultInsulationType: RoofInsulationTypeSchema,
+  constructionTypes: z.array(SelectionSchema),
+  defaultConstructionType: z.string(),
+  assumedInsulationThickness: z.number(),
+  thermalConductivity: z.number(),
+  insulationReductionFactor: z.number(),
+  uValue: keyedValues(z.string(), yearBands(z.number())),
+});
+
+export type DETRoofConfig = z.infer<typeof DETRoofConfigSchema>;

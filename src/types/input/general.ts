@@ -1,11 +1,14 @@
-import type { BuildingType } from "../building-type";
-import type { RangeKey } from "../range-bands";
+import { z } from "zod";
+import { BuildingTypeSchema } from "../building-type.js";
+import { RangeKeySchema } from "../range-bands.js";
 
-export type DETGeneralInput = {
-  buildingYear: number | RangeKey;
-  numberOfStories?: number | null;
-  buildingHeight: number;
-  buildingBaseArea: number;
-  livingArea?: number | null;
-  type: BuildingType;
-};
+export const DETGeneralInputSchema = z.object({
+  buildingYear: z.union([z.number(), RangeKeySchema]),
+  numberOfStories: z.number().nullable().optional(),
+  buildingHeight: z.number(),
+  buildingBaseArea: z.number(),
+  livingArea: z.number().nullable().optional(),
+  type: BuildingTypeSchema,
+});
+
+export type DETGeneralInput = z.infer<typeof DETGeneralInputSchema>;

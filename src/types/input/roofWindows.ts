@@ -1,8 +1,11 @@
-import type { RangeKey } from "../range-bands";
+import { z } from "zod";
+import { RangeKeySchema } from "../range-bands.js";
 
-export type DETRoofWindowsInput = {
-  area?: number;
-  year?: number | RangeKey | null;
-  windowType?: string | null;
-  uValue?: number | null;
-};
+export const DETRoofWindowsInputSchema = z.object({
+  area: z.number().optional(),
+  year: z.union([z.number(), RangeKeySchema]).nullable().optional(),
+  windowType: z.string().nullable().optional(),
+  uValue: z.number().nullable().optional(),
+});
+
+export type DETRoofWindowsInput = z.infer<typeof DETRoofWindowsInputSchema>;

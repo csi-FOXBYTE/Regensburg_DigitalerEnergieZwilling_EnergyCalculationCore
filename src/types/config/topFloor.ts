@@ -1,12 +1,15 @@
-import type { KeyedValues } from "../keyed-values";
-import type { YearBands } from "../range-bands";
-import type { Selection } from "../selection";
+import { z } from "zod";
+import { keyedValues } from "../keyed-values.js";
+import { yearBands } from "../range-bands.js";
+import { SelectionSchema } from "../selection.js";
 
-export type DETTopFloorConfig = {
-  topFloorTypes: Selection[];
-  defaultTopFloorType: YearBands<string>;
-  thermalConductivity: number;
-  assumedInsulationThickness: number;
-  uValue: KeyedValues<string, YearBands<number>>;
-  heatLossFactor: number;
-};
+export const DETTopFloorConfigSchema = z.object({
+  topFloorTypes: z.array(SelectionSchema),
+  defaultTopFloorType: yearBands(z.string()),
+  thermalConductivity: z.number(),
+  assumedInsulationThickness: z.number(),
+  uValue: keyedValues(z.string(), yearBands(z.number())),
+  heatLossFactor: z.number(),
+});
+
+export type DETTopFloorConfig = z.infer<typeof DETTopFloorConfigSchema>;

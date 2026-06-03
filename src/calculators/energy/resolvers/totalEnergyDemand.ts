@@ -10,7 +10,7 @@ declare module "../" {
 export default {
   key: "totalEnergyDemand",
   resolve: (ctx) => {
-    if (ctx.input.input.heat.userThermalConsumption != null) {
+    if (ctx.get("userThermalConsumption") != null) {
       return ctx.get("userTotalEnergyDemand") * ctx.get("renovationFactor");
     }
     return ctx.get("calculatedTotalEnergyDemand");

@@ -49,6 +49,11 @@ export { resolveRangeBand, resolveYearBand } from "./types/range-bands.js";
 export { calculate } from "./calculate.js";
 export type { CalculationResult, CalculateOptions } from "./calculate.js";
 
+export { validateConfig, validateInput } from "./validators/index.js";
+export type { ValidationResult, ValidationIssue } from "./validators/index.js";
+export { DETConfigSchema } from "./types/config/index.js";
+export { DETInputSchema } from "./types/input/index.js";
+
 export type {
   InputPatch,
   Renovation,

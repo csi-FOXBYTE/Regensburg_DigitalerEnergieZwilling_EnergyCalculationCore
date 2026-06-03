@@ -159,9 +159,12 @@ import thermalCo2Emissions from "./resolvers/co2Emissions";
 import thermalCarrierConsumption from "./resolvers/energyCarrierConsumption";
 import thermalCarrierCost from "./resolvers/energyCarrierCost";
 import thermalUnitRate from "./resolvers/thermalUnitRate";
+import thermalBaseRate from "./resolvers/thermalBaseRate";
+import userThermalConsumption from "./resolvers/userThermalConsumption";
 import thermalPrimaryEnergyDemand from "./resolvers/thermalPrimaryEnergyDemand";
 import electricityConsumption from "./resolvers/electricityConsumption";
 import electricityCost from "./resolvers/electricityCost";
+import electricityBaseRate from "./resolvers/electricityBaseRate";
 import electricityCo2Emissions from "./resolvers/electricityCo2Emissions";
 import electricalPrimaryEnergyDemand from "./resolvers/electricalPrimaryEnergyDemand";
 import totalCost from "./resolvers/totalCost";
@@ -344,10 +347,12 @@ export const DETEnergyCaluclator = createCalculator<
   // Step 4
   thermalCo2Emissions,
   thermalCarrierConsumption,
+  thermalBaseRate,
   thermalCarrierCost,
   thermalUnitRate,
   thermalPrimaryEnergyDemand,
   electricityConsumption,
+  electricityBaseRate,
   electricityCost,
   electricityCo2Emissions,
   electricalPrimaryEnergyDemand,
@@ -358,6 +363,7 @@ export const DETEnergyCaluclator = createCalculator<
   preRenovationElectricalRatio,
   preRenovationHasInternalGains,
   preRenovationInternalGainsFactor,
+  userThermalConsumption,
   userThermalEnergyDemand,
   userTotalEnergyDemand,
   renovationFactor,

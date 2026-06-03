@@ -1,6 +1,6 @@
 {
   "name": "@csi-foxbyte/regensburg_digitalerenergiezwilling_energycalculationcore",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "description": "Domain-based TypeScript energy calculation core with JSON-configurable catalogs and rules for building envelope and heating evaluation.",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -22,7 +22,11 @@
     "registry": "https://npm.pkg.github.com"
   },
   "packageManager": "pnpm@10.7.1",
+  "peerDependencies": {
+    "zod": "^3.24.0"
+  },
   "devDependencies": {
+    "zod": "^3.24.0",
     "@types/node": "^25.3.5",
     "esbuild": "^0.27.3",
     "prettier": "^3.8.1",

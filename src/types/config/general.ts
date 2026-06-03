@@ -1,23 +1,26 @@
-import type { BuildingType } from "../building-type";
-import type { KeyedValues } from "../keyed-values";
-import type { EnergyEfficiencyClass } from "../energy-efficiency-class";
-import type { RangeBands, Ranges } from "../range-bands";
+import { z } from "zod";
+import { BuildingTypeSchema } from "../building-type.js";
+import { keyedValues } from "../keyed-values.js";
+import { EnergyEfficiencyClassSchema } from "../energy-efficiency-class.js";
+import { rangeBands, RangesSchema } from "../range-bands.js";
 
-export type DETGeneralConfig = {
-  supportedLocales: string[];
-  generalYearBands: Ranges;
-  energyEfficiencyClasses: RangeBands<EnergyEfficiencyClass>;
-  energyEfficiencyClassColors: KeyedValues<EnergyEfficiencyClass, string>;
+export const DETGeneralConfigSchema = z.object({
+  supportedLocales: z.array(z.string()),
+  generalYearBands: RangesSchema,
+  energyEfficiencyClasses: rangeBands(EnergyEfficiencyClassSchema),
+  energyEfficiencyClassColors: keyedValues(EnergyEfficiencyClassSchema, z.string()),
 
-  assumedFloorSlabThickness: number;
-  assumedInteriorStoryHeight: number;
+  assumedFloorSlabThickness: z.number(),
+  assumedInteriorStoryHeight: z.number(),
 
-  heatedAirVolumeCorrectionFactor: RangeBands<number>;
-  usableFloorAreaFactor: number;
+  heatedAirVolumeCorrectionFactor: rangeBands(z.number()),
+  usableFloorAreaFactor: z.number(),
 
-  netFloorAreaFromUsableFloorAreaFactor: KeyedValues<
-    BuildingType,
-    KeyedValues<boolean, number>
-  >;
-  netFloorAreaFromLivingAreaFactor: number;
-};
+  netFloorAreaFromUsableFloorAreaFactor: keyedValues(
+    BuildingTypeSchema,
+    keyedValues(z.boolean(), z.number()),
+  ),
+  netFloorAreaFromLivingAreaFactor: z.number(),
+});
+
+export type DETGeneralConfig = z.infer<typeof DETGeneralConfigSchema>;

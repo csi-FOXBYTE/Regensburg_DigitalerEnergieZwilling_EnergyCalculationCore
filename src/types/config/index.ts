@@ -1,19 +1,22 @@
-import type { DETGeneralConfig } from "./general"
-import type { DETHeatConfig } from "./heat"
-import type { DETRoofConfig } from "./roof"
-import type { DETTopFloorConfig } from "./topFloor"
-import type { DETOuterWallConfig } from "./outerWall"
-import type { DETBottomFloorConfig } from "./bottomFloor"
-import type { DETWindowsConfig } from "./windows"
-import type { DETRenovationConfig } from "./renovation"
+import { z } from "zod";
+import { DETGeneralConfigSchema } from "./general.js";
+import { DETHeatConfigSchema } from "./heat.js";
+import { DETRoofConfigSchema } from "./roof.js";
+import { DETTopFloorConfigSchema } from "./topFloor.js";
+import { DETOuterWallConfigSchema } from "./outerWall.js";
+import { DETBottomFloorConfigSchema } from "./bottomFloor.js";
+import { DETWindowsConfigSchema } from "./windows.js";
+import { DETRenovationConfigSchema } from "../renovation/renovation.js";
 
-export type DETConfig = {
-  general: DETGeneralConfig,
-  heat: DETHeatConfig,
-  roof: DETRoofConfig,
-  topFloor: DETTopFloorConfig,
-  outerWall: DETOuterWallConfig,
-  bottomFloor: DETBottomFloorConfig,
-  windows: DETWindowsConfig,
-  renovation: DETRenovationConfig,
-}
+export const DETConfigSchema = z.object({
+  general: DETGeneralConfigSchema,
+  heat: DETHeatConfigSchema,
+  roof: DETRoofConfigSchema,
+  topFloor: DETTopFloorConfigSchema,
+  outerWall: DETOuterWallConfigSchema,
+  bottomFloor: DETBottomFloorConfigSchema,
+  windows: DETWindowsConfigSchema,
+  renovation: DETRenovationConfigSchema,
+});
+
+export type DETConfig = z.infer<typeof DETConfigSchema>;

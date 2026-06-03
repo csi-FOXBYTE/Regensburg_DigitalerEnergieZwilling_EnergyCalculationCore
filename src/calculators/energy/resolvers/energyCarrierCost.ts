@@ -9,10 +9,8 @@ declare module "../" {
 
 export default {
   key: "thermalCarrierCost",
-  resolve: (ctx) => {
-    const data = ctx.get("primaryEnergyCarrierData");
-    return ctx.get("thermalCarrierConsumption") * ctx.get("thermalUnitRate") + data.baseRate;
-  },
+  resolve: (ctx) =>
+    ctx.get("thermalCarrierConsumption") * ctx.get("thermalUnitRate") + ctx.get("thermalBaseRate"),
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,

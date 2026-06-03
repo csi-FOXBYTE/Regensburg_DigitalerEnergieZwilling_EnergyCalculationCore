@@ -1,13 +1,16 @@
-import type { KeyedValues } from "../keyed-values";
-import type { YearBands } from "../range-bands";
-import type { Selection } from "../selection";
+import { z } from "zod";
+import { keyedValues } from "../keyed-values.js";
+import { yearBands } from "../range-bands.js";
+import { SelectionSchema } from "../selection.js";
 
-export type DETWindowsConfig = {
-  windowTypes: Selection[];
-  defaultWindowType: YearBands<string>;
-  uValue: KeyedValues<string, YearBands<number>>;
-  roofWindowsHeatLossFactor: number;
-  exteriorWallWindowsHeatLossFactor: number;
-  roofAreaFactor: number;
-  exteriorWallAreaFactor: number;
-};
+export const DETWindowsConfigSchema = z.object({
+  windowTypes: z.array(SelectionSchema),
+  defaultWindowType: yearBands(z.string()),
+  uValue: keyedValues(z.string(), yearBands(z.number())),
+  roofWindowsHeatLossFactor: z.number(),
+  exteriorWallWindowsHeatLossFactor: z.number(),
+  roofAreaFactor: z.number(),
+  exteriorWallAreaFactor: z.number(),
+});
+
+export type DETWindowsConfig = z.infer<typeof DETWindowsConfigSchema>;

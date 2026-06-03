@@ -1,51 +1,120 @@
-# Validation
+# Validation — Handoff
 
-## Motivation
+## What is done
 
-The calculator currently trusts its input entirely. Adding a validation layer catches bad input early, gives callers actionable errors, and avoids silent wrong results from undefined catalogue values.
+Zod added as `peerDependency` (`^3.24.0`), also in `devDependencies` for local use.
 
-## Two-layer approach
+All type files replaced with Zod schema-first equivalents. Every type is still exported
+under its original name — no import changes required anywhere in the codebase.
 
-### Layer 1 — Static shape validation (TypeBox)
+### Base schemas (`src/types/`)
 
-Replace all hand-written type declarations in `src/types/` with TypeBox schema definitions. TypeScript types are inferred via `Static<typeof Schema>` — single source of truth.
+| File | Exports |
+|---|---|
+| `building-type.ts` | `BuildingType` const, `BuildingTypeSchema`, `type BuildingType` |
+| `heat-flow-direction.ts` | `HeatFlowDirection` const, `HeatFlowDirectionSchema`, `type HeatFlowDirection` |
+| `roof-insulation-type.ts` | `RoofInsulationType` const, `RoofInsulationTypeSchema`, `type RoofInsulationType` |
+| `energy-efficiency-class.ts` | `EnergyEfficiencyClassSchema`, `type EnergyEfficiencyClass` |
+| `selection.ts` | `SelectionSchema`, `selectionFilter` factory, `type Selection`, `type SelectionFilter<K,V>` |
+| `keyed-values.ts` | `keyedValues` factory, `type KeyedValues<K,T>`, `resolveKeyedValue` |
+| `range-bands.ts` | `rangeBands`/`yearBands` factories, `RangesSchema`, `RangeKeySchema`, all original types and runtime helpers |
 
-- Type checking and required field enforcement via `Value.Check(schema, input)`
-- Unknown field stripping via `Value.Clean(schema, input)` (non-destructive — operates on a clone)
-- Detailed error paths via `Value.Errors(schema, input)`
+**Key design decisions:**
+- Enums converted from TypeScript `enum` to `const` object + `z.nativeEnum()`. Values unchanged — `BuildingType.SINGLE_FAMILY` etc. all still work.
+- `RangeKey` derives from `RangeKeySchema` (required for `exactOptionalPropertyTypes: true` compat — Zod's `.optional()` infers `T | undefined`, the hand-written type would have been incompatible).
+- `rangeBands` uses option B: `superRefine` for positional validation + `.transform(data => data as RangeBands<T>)` to preserve the precise tuple type in inference.
+- `SelectionFilter<K,V>` kept as a hand-written generic type alongside the `selectionFilter` factory (generic defaults can't be expressed in the factory signature cleanly).
 
-### Layer 2 — Config-aware validation
+### Config schemas (`src/types/config/`)
 
-A separate pass that validates runtime catalogue membership — things TypeBox cannot check statically because the valid values come from the config instance.
+All config section schemas follow the same structure: `DET*ConfigSchema` + `type DET*Config = z.infer<...>`.
 
-Examples:
-- `input.heat.primaryEnergyCarrier` must exist in `config.heat.primaryEnergyCarriers`
-- `input.heat.heatingSystemType` must exist in `config.heat.heatingSystemTypes`
-- `input.heat.heatingSurfaceType` must exist in `config.heat.heatingSurfaceTypes`
+- `general.ts` — `DETGeneralConfigSchema`
+- `heat.ts` — `DETHeatConfigSchema`, `PrimaryEnergyCarrierDataSchema`, `ElectricityTypeDataSchema`, `CarrierSelectionSchema`, `CarrierRequirementsSchema`. `isCarrierCompatible` function preserved.
+- `roof.ts`, `topFloor.ts`, `outerWall.ts`, `bottomFloor.ts`, `windows.ts` — straightforward.
+- `index.ts` — `DETConfigSchema`, `type DETConfig`
+- `src/types/renovation/renovation.ts` — `DETRenovationConfigSchema` + all sub-schemas. `InputPatch` and `Renovation` kept as hand-written types (internal renovation system, not part of the validation API).
 
-Signature: `validateInputAgainstConfig(input: DETInput, config: DETConfig): ValidationError[]`
+### Input schemas (`src/types/input/`)
 
-### Composition
+All follow the same structure: `DET*InputSchema` + `type DET*Input = z.infer<...>`.
 
-```
-validate(input, config): ValidationError[]
-  → run Layer 1 (shape)
-  → if valid, run Layer 2 (config-aware)
-  → return combined error list
-```
+- `general.ts`, `heat.ts`, `electricity.ts`, `preRenovation.ts`
+- `roof.ts`, `topFloor.ts`, `outerWall.ts`, `bottomFloor.ts`, `exteriorWallWindows.ts`, `roofWindows.ts`
+- `index.ts` — `DETInputSchema`, `type DETInput`
 
-Layer 2 only runs if Layer 1 passes — no point checking catalogue membership on a malformed input.
+---
 
-## ValidationError shape
+## What is left — the validators
+
+Two exported functions to implement, plus their supporting consistency checkers.
+
+### Return type (shared)
+
+Both functions use safeParse semantics. Use a unified result type:
 
 ```ts
-type ValidationError = {
-  path: string;   // e.g. "heat.primaryEnergyCarrier"
-  message: string;
-};
+export type ValidationIssue = { path: string; message: string };
+
+export type ValidationResult<T> =
+  | { success: true; data: T }
+  | { success: false; issues: ValidationIssue[] };
 ```
 
-## Design rules
+Zod errors get mapped to `ValidationIssue[]`. Custom consistency errors use the same shape.
+This gives consumers a single error handling story regardless of which check failed.
 
-- Validation is **pure and non-mutating** — does not modify input, does not throw. Caller decides what to do with the error list.
-- Exposed as a standalone exported utility, not coupled to the calculator execution path. Caller can validate before passing input to the calculator.
+---
+
+### 1. `validateConfig(data: unknown): ValidationResult<DETConfig>`
+
+**File:** `src/validators/config.ts`
+
+Step 1 — shape: `DETConfigSchema.safeParse(data)`. On failure, map `ZodError.errors` to `ValidationIssue[]`.
+
+Step 2 — self-consistency (only runs if shape passes). Checks to implement:
+
+| Rule | Path hint |
+|---|---|
+| Every `primaryEnergyCarriers[i].value` has an entry in `primaryEnergyCarrierData` | `heat.primaryEnergyCarrierData` |
+| `defaultPrimaryEnergyCarrier` is in `primaryEnergyCarriers` | `heat.defaultPrimaryEnergyCarrier` |
+| Every `heatingSystemTypes[i].value` has entries in `heatingPerformanceFactor`, `temperatureControlPerformanceFactor`, `electricalRatio`, `hasInternalGains` | `heat.heatingPerformanceFactor` etc. |
+| Every `primaryEnergyCarriers[i].value` has an entry in `defaultHeatingSystemType` | `heat.defaultHeatingSystemType` |
+| `defaultHeatingSurfaceType` is in `heatingSurfaceTypes` | `heat.defaultHeatingSurfaceType` |
+| Every `electricityTypes[i].value` has an entry in `electricityTypeData` | `heat.electricityTypeData` |
+| `defaultElectricityType` is in `electricityTypes` | `heat.defaultElectricityType` |
+| `allowedHeatingSystemTypesByCarrier` keys are valid carrier values | `heat.allowedHeatingSystemTypesByCarrier` |
+| `allowedHeatingSystemTypesByCarrier` allowed values are valid system type values | `heat.allowedHeatingSystemTypesByCarrier` |
+| `renovation.primaryEnergyCarrierTargets` are all in `primaryEnergyCarriers` | `renovation.primaryEnergyCarrierTargets` |
+| `renovation.heatingRenovations[i].targetCarrier` in carriers, `targetSystem` in system types | `renovation.heatingRenovations` |
+| `renovation.heatingSurfaceRenovations[i].targetSurfaceType` in surface types | `renovation.heatingSurfaceRenovations` |
+
+---
+
+### 2. `validateInput(data: unknown, config: DETConfig): ValidationResult<DETInput>`
+
+**File:** `src/validators/input.ts`
+
+Step 1 — shape: `DETInputSchema.safeParse(data)`. On failure, map to `ValidationIssue[]`.
+
+Step 2 — cross-validation against config (only runs if shape passes):
+
+| Rule | Path hint |
+|---|---|
+| `heat.primaryEnergyCarrier` if provided → in `config.heat.primaryEnergyCarriers[].value` | `heat.primaryEnergyCarrier` |
+| `heat.heatingSystemType` if provided → in `config.heat.heatingSystemTypes[].value` | `heat.heatingSystemType` |
+| `heat.heatingSystemType` + `heat.primaryEnergyCarrier` → system allowed for carrier via `allowedHeatingSystemTypesByCarrier` | `heat.heatingSystemType` |
+| `heat.heatingSurfaceType` if provided → in `config.heat.heatingSurfaceTypes[].value` | `heat.heatingSurfaceType` |
+| `electricity.electricityType` if provided → in `config.heat.electricityTypes[].value` | `electricity.electricityType` |
+| `preRenovationValues.primaryEnergyCarrier` if provided → in `config.heat.primaryEnergyCarriers[].value` | `preRenovationValues.primaryEnergyCarrier` |
+| `preRenovationValues.heatingSystemType` if provided → in `config.heat.heatingSystemTypes[].value` | `preRenovationValues.heatingSystemType` |
+
+---
+
+### 3. Public API surface
+
+**File:** `src/validators/index.ts` — re-exports `validateConfig`, `validateInput`, `ValidationResult`, `ValidationIssue`.
+
+Export both from the library's main `src/index.ts`.
+
+Also export the schemas themselves (`DETConfigSchema`, `DETInputSchema`) for consumers who want to compose their own validation.

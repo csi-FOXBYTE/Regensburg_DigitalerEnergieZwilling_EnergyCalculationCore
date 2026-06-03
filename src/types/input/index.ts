@@ -1,23 +1,26 @@
-import type { DETElectricityInput } from "./electricity";
-import type { DETExteriorWallWindowsInput } from "./exteriorWallWindows";
-import type { DETGeneralInput } from "./general";
-import type { DETHeatInput } from "./heat";
-import type { PreRenovationValues } from "./preRenovation";
-import type { DETRoofInput } from "./roof";
-import type { DETRoofWindowsInput } from "./roofWindows";
-import type { DETTopFloorInput } from "./topFloor";
-import type { DETOuterWallInput } from "./outerWall";
-import type { DETBottomFloorInput } from "./bottomFloor";
+import { z } from "zod";
+import { DETGeneralInputSchema } from "./general.js";
+import { DETHeatInputSchema } from "./heat.js";
+import { DETElectricityInputSchema } from "./electricity.js";
+import { DETRoofInputSchema } from "./roof.js";
+import { DETRoofWindowsInputSchema } from "./roofWindows.js";
+import { DETExteriorWallWindowsInputSchema } from "./exteriorWallWindows.js";
+import { DETTopFloorInputSchema } from "./topFloor.js";
+import { DETOuterWallInputSchema } from "./outerWall.js";
+import { DETBottomFloorInputSchema } from "./bottomFloor.js";
+import { PreRenovationValuesSchema } from "./preRenovation.js";
 
-export type DETInput = {
-  general: DETGeneralInput;
-  heat: DETHeatInput;
-  electricity: DETElectricityInput;
-  roof: DETRoofInput;
-  roofWindows: DETRoofWindowsInput;
-  exteriorWallWindows: DETExteriorWallWindowsInput;
-  topFloor: DETTopFloorInput;
-  outerWall: DETOuterWallInput;
-  bottomFloor: DETBottomFloorInput;
-  preRenovationValues?: PreRenovationValues | null;
-};
+export const DETInputSchema = z.object({
+  general: DETGeneralInputSchema,
+  heat: DETHeatInputSchema,
+  electricity: DETElectricityInputSchema,
+  roof: DETRoofInputSchema,
+  roofWindows: DETRoofWindowsInputSchema,
+  exteriorWallWindows: DETExteriorWallWindowsInputSchema,
+  topFloor: DETTopFloorInputSchema,
+  outerWall: DETOuterWallInputSchema,
+  bottomFloor: DETBottomFloorInputSchema,
+  preRenovationValues: PreRenovationValuesSchema.nullable().optional(),
+});
+
+export type DETInput = z.infer<typeof DETInputSchema>;

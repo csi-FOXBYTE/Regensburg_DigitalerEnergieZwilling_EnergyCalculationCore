@@ -1,12 +1,15 @@
-import type { RangeKey } from "../range-bands";
-import type { RoofInsulationType } from "../roof-insulation-type";
+import { z } from "zod";
+import { RangeKeySchema } from "../range-bands.js";
+import { RoofInsulationTypeSchema } from "../roof-insulation-type.js";
 
-export type DETRoofInput = {
-  area: number;
-  year?: number | RangeKey | null;
-  hasInsulation?: boolean | null;
-  insulationType?: RoofInsulationType | null;
-  constructionType?: string | null;
-  insulationThickness?: number | null;
-  uValue?: number | null;
-};
+export const DETRoofInputSchema = z.object({
+  area: z.number(),
+  year: z.union([z.number(), RangeKeySchema]).nullable().optional(),
+  hasInsulation: z.boolean().nullable().optional(),
+  insulationType: RoofInsulationTypeSchema.nullable().optional(),
+  constructionType: z.string().nullable().optional(),
+  insulationThickness: z.number().nullable().optional(),
+  uValue: z.number().nullable().optional(),
+});
+
+export type DETRoofInput = z.infer<typeof DETRoofInputSchema>;

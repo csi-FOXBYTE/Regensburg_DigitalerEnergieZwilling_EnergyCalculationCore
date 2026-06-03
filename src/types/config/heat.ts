@@ -1,34 +1,65 @@
-import type { DETInput } from "../input";
-import type { HeatFlowDirection } from "../heat-flow-direction";
-import type { KeyedValues } from "../keyed-values";
-import type { RangeBands, YearBands } from "../range-bands";
-import type { Selection, SelectionFilter } from "../selection";
+import { z } from "zod";
+import { keyedValues } from "../keyed-values.js";
+import { rangeBands, yearBands } from "../range-bands.js";
+import { HeatFlowDirectionSchema } from "../heat-flow-direction.js";
+import { SelectionSchema, selectionFilter } from "../selection.js";
+import type { DETInput } from "../input/index.js";
 
-export type PrimaryEnergyCarrierData = {
-  energyPerUnit: number;
-  unit: string;
-  unitRate: number;
-  baseRate: number;
-  co2Factor: number;
-  primaryEnergyFactor: number;
-};
+export const CarrierRequirementsSchema = z.object({
+  storage: z.boolean().optional(),
+  gas: z.boolean().optional(),
+  bioGas: z.boolean().optional(),
+});
+export type CarrierRequirements = z.infer<typeof CarrierRequirementsSchema>;
 
-export type ElectricityTypeData = {
-  co2Factor: number;
-  unitRate: number;
-  baseRate: number;
-  primaryEnergyFactor: number;
-};
+export const CarrierSelectionSchema = SelectionSchema.extend({
+  requirements: CarrierRequirementsSchema.optional(),
+});
+export type CarrierSelection = z.infer<typeof CarrierSelectionSchema>;
 
-export type CarrierRequirements = {
-  storage?: boolean;
-  gas?: boolean;
-  bioGas?: boolean;
-};
+export const PrimaryEnergyCarrierDataSchema = z.object({
+  energyPerUnit: z.number(),
+  unit: z.string(),
+  unitRate: z.number(),
+  baseRate: z.number(),
+  co2Factor: z.number(),
+  primaryEnergyFactor: z.number(),
+});
+export type PrimaryEnergyCarrierData = z.infer<typeof PrimaryEnergyCarrierDataSchema>;
 
-export type CarrierSelection = Selection & {
-  requirements?: CarrierRequirements;
-};
+export const ElectricityTypeDataSchema = z.object({
+  co2Factor: z.number(),
+  unitRate: z.number(),
+  baseRate: z.number(),
+  primaryEnergyFactor: z.number(),
+});
+export type ElectricityTypeData = z.infer<typeof ElectricityTypeDataSchema>;
+
+export const DETHeatConfigSchema = z.object({
+  primaryEnergyCarriers: z.array(CarrierSelectionSchema),
+  heatingSystemTypes: z.array(SelectionSchema),
+  heatingSurfaceTypes: z.array(SelectionSchema),
+  allowedHeatingSystemTypesByCarrier: selectionFilter(z.string(), z.string()),
+  electricityTypes: z.array(SelectionSchema),
+  defaultElectricityType: z.string(),
+  electricityTypeData: keyedValues(z.string(), ElectricityTypeDataSchema),
+  electricalRatio: keyedValues(z.string(), z.number()),
+  hasInternalGains: keyedValues(z.string(), z.boolean()),
+  internalGainsFactorByBuildingType: keyedValues(z.string(), z.number()),
+
+  hotWaterEnergyDemandFromAreaFactor: z.number(),
+  ventilationHeatLossCorrectionFactor: z.number(),
+  heatingDegreeDays: z.number(),
+  defaultPrimaryEnergyCarrier: z.string(),
+  defaultHeatingSystemType: keyedValues(z.string(), z.string()),
+  defaultHeatingSurfaceType: z.string(),
+  heatingPerformanceFactor: keyedValues(z.string(), yearBands(rangeBands(z.number()))),
+  temperatureControlPerformanceFactor: keyedValues(z.string(), yearBands(keyedValues(z.string(), z.number()))),
+  primaryEnergyCarrierData: keyedValues(z.string(), PrimaryEnergyCarrierDataSchema),
+  innerSurfaceThermalResistance: keyedValues(HeatFlowDirectionSchema, z.number()),
+  outerSurfaceThermalResistance: keyedValues(HeatFlowDirectionSchema, z.number()),
+});
+export type DETHeatConfig = z.infer<typeof DETHeatConfigSchema>;
 
 export function isCarrierCompatible(carrier: CarrierSelection, input: DETInput): boolean {
   const { requirements } = carrier;
@@ -38,28 +69,3 @@ export function isCarrierCompatible(carrier: CarrierSelection, input: DETInput):
   if (requirements.bioGas !== undefined && requirements.bioGas !== (input.heat.hasBioGas ?? false)) return false;
   return true;
 }
-
-export type DETHeatConfig = {
-  primaryEnergyCarriers: CarrierSelection[];
-  heatingSystemTypes: Selection[];
-  heatingSurfaceTypes: Selection[];
-  allowedHeatingSystemTypesByCarrier: SelectionFilter;
-  electricityTypes: Selection[];
-  defaultElectricityType: string;
-  electricityTypeData: KeyedValues<string, ElectricityTypeData>;
-  electricalRatio: KeyedValues<string, number>;
-  hasInternalGains: KeyedValues<string, boolean>;
-  internalGainsFactorByBuildingType: KeyedValues<string, number>;
-
-  hotWaterEnergyDemandFromAreaFactor: number;
-  ventilationHeatLossCorrectionFactor: number;
-  heatingDegreeDays: number;
-  defaultPrimaryEnergyCarrier: string;
-  defaultHeatingSystemType: KeyedValues<string, string>;
-  defaultHeatingSurfaceType: string;
-  heatingPerformanceFactor: KeyedValues<string, YearBands<RangeBands<number>>>;
-  temperatureControlPerformanceFactor: KeyedValues<string, YearBands<KeyedValues<string, number>>>;
-  primaryEnergyCarrierData: KeyedValues<string, PrimaryEnergyCarrierData>;
-  innerSurfaceThermalResistance: KeyedValues<HeatFlowDirection, number>;
-  outerSurfaceThermalResistance: KeyedValues<HeatFlowDirection, number>;
-};

@@ -38,6 +38,9 @@ importers:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
+      zod:
+        specifier: ^3.24.0
+        version: 3.25.76
 
 packages:
 
@@ -695,6 +698,9 @@ packages:
     engines: {node: '>= 14.6'}
     hasBin: true
 
+  zod@3.25.76:
+    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+
 snapshots:
 
   '@babel/generator@8.0.0-rc.2':
@@ -1229,3 +1235,5 @@ snapshots:
       rolldown: 1.0.0-rc.7
 
   yaml@2.8.2: {}
+
+  zod@3.25.76: {}

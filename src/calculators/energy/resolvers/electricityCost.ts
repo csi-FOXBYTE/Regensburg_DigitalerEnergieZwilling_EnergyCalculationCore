@@ -11,7 +11,7 @@ export default {
   key: "electricityCost",
   resolve: (ctx) =>
     ctx.get("electricalEnergyDemand") * ctx.get("electricityUnitRate") +
-    ctx.get("electricityTypeData").baseRate,
+    ctx.get("electricityBaseRate"),
 } satisfies Resolver<
   DETCalculatorContext,
   DETCalculatorRegistry,
