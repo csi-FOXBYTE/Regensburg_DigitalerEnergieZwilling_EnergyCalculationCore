@@ -164,9 +164,9 @@ describe("validateConfig — heat year bands", () => {
   test("fails when heatingPerformanceFactor yearBands cannot resolve a generalYearBand key", () => {
     const cfg = fresh();
     // Only covers { to: 2000 }, leaving { from: 2000 } unresolvable
-    // @ts-expect-error single-entry band is intentionally incomplete
     cfg.heat.heatingPerformanceFactor = [{
       key: "boiler",
+      // @ts-expect-error single-entry band is intentionally incomplete
       value: [{ to: 2000, value: [{ value: 0.85 }] }],
     }];
     assertFailed(validateConfig(cfg), "heat.heatingPerformanceFactor[boiler]");
@@ -174,9 +174,9 @@ describe("validateConfig — heat year bands", () => {
 
   test("fails when temperatureControlPerformanceFactor yearBands cannot resolve a generalYearBand key", () => {
     const cfg = fresh();
-    // @ts-expect-error single-entry band is intentionally incomplete
     cfg.heat.temperatureControlPerformanceFactor = [{
       key: "boiler",
+      // @ts-expect-error single-entry band is intentionally incomplete
       value: [{ to: 2000, value: [{ key: "radiator", value: 1.0 }] }],
     }];
     assertFailed(validateConfig(cfg), "heat.temperatureControlPerformanceFactor[boiler]");
@@ -337,8 +337,8 @@ describe("validateConfig — bottomFloor", () => {
 
   test("fails when defaultConstructionType yearBands cannot resolve a generalYearBand key", () => {
     const cfg = fresh();
-    // @ts-expect-error single-entry band is intentionally incomplete
     cfg.bottomFloor.defaultConstructionType = [
+      // @ts-expect-error single-entry band is intentionally incomplete
       { key: true,  value: [{ to: 2000, value: "concrete" }] },
       { key: false, value: [{ to: 2000, value: "concrete" }, { from: 2000, value: "concrete" }] },
     ];

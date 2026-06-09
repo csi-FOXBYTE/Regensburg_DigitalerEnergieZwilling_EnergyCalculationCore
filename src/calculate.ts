@@ -63,7 +63,7 @@ export function calculate(
         electricityType: ctx.get("electricityType"),
         electricityUnitRate: ctx.get("electricityUnitRate"),
         userElectricityBaseRate: ctx.get("electricityBaseRate"),
-        userElectricityConsumption: ctx.get("electricityConsumption"),
+        userElectricityConsumption: ctx.get("electricalEnergyDemand"),
       },
       roof: {
         area: ctx.get("roofArea"),

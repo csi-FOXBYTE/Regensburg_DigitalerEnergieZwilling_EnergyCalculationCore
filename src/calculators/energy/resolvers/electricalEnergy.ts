@@ -12,7 +12,6 @@ declare module "../" {
     electricityBaseRate: number;
     electricalBaseLoadFromFloorAreaFactor: number;
     baseElectricalLoad: number;
-    electricityConsumption: number;
     electricityCost: number;
     electricityCo2Emissions: number;
     electricalPrimaryEnergyDemand: number;
@@ -77,11 +76,6 @@ export const baseElectricalLoad = {
   },
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "baseElectricalLoad">;
 
-export const electricityConsumption = {
-  key: "electricityConsumption",
-  resolve: (ctx) => ctx.get("electricalEnergyDemand"),
-} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "electricityConsumption">;
-
 export const electricityCost = {
   key: "electricityCost",
   resolve: (ctx) =>
@@ -109,7 +103,6 @@ export default [
   electricityBaseRate,
   electricalBaseLoadFromFloorAreaFactor,
   baseElectricalLoad,
-  electricityConsumption,
   electricityCost,
   electricityCo2Emissions,
   electricalPrimaryEnergyDemand,

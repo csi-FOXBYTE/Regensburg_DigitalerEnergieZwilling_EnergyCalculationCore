@@ -3,7 +3,7 @@ import type { DETCalculatorRegistry, DETCalculatorContext } from "../";
 
 declare module "../" {
   interface DETCalculatorRegistry {
-    thermalCarrierConsumption: number;
+    thermalCarrierDemand: number;
     thermalUnitRate: number;
     thermalBaseRate: number;
     thermalCarrierCost: number;
@@ -12,11 +12,11 @@ declare module "../" {
   }
 }
 
-export const thermalCarrierConsumption = {
-  key: "thermalCarrierConsumption",
+export const thermalCarrierDemand = {
+  key: "thermalCarrierDemand",
   resolve: (ctx) =>
     ctx.get("thermalEnergyDemand") / ctx.get("primaryEnergyCarrierData").energyPerUnit,
-} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "thermalCarrierConsumption">;
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "thermalCarrierDemand">;
 
 export const thermalUnitRate = {
   key: "thermalUnitRate",
@@ -53,7 +53,7 @@ export const thermalBaseRate = {
 export const thermalCarrierCost = {
   key: "thermalCarrierCost",
   resolve: (ctx) =>
-    ctx.get("thermalCarrierConsumption") * ctx.get("thermalUnitRate") + ctx.get("thermalBaseRate"),
+    ctx.get("thermalCarrierDemand") * ctx.get("thermalUnitRate") + ctx.get("thermalBaseRate"),
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "thermalCarrierCost">;
 
 export const thermalCo2Emissions = {
@@ -69,7 +69,7 @@ export const thermalPrimaryEnergyDemand = {
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "thermalPrimaryEnergyDemand">;
 
 export default [
-  thermalCarrierConsumption,
+  thermalCarrierDemand,
   thermalUnitRate,
   thermalBaseRate,
   thermalCarrierCost,
