@@ -55,9 +55,15 @@ export function calculate(
         hasGasSupply: ctx.get("hasGasSupply"),
         hasBioGas: ctx.get("hasBioGas"),
         hasStorage: ctx.get("hasStorage"),
+        userThermalUnitRate: ctx.get("thermalUnitRate"),
+        userThermalBaseRate: ctx.get("thermalBaseRate"),
+        userThermalTotalCost: ctx.get("thermalCarrierCost"),
       },
       electricity: {
         electricityType: ctx.get("electricityType"),
+        electricityUnitRate: ctx.get("electricityUnitRate"),
+        userElectricityBaseRate: ctx.get("electricityBaseRate"),
+        userElectricityConsumption: ctx.get("electricityConsumption"),
       },
       roof: {
         area: ctx.get("roofArea"),

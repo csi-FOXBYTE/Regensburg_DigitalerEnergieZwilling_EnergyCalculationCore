@@ -1,6 +1,6 @@
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
-import resolver from "../../src/calculators/energy/resolvers/electricityBaseRate.js";
+import { electricityBaseRate as resolver } from "../../src/calculators/energy/resolvers/electricalEnergy.js";
 import type { DETCalculatorContext, DETCalculatorRegistry } from "../../src/calculators/energy/index.js";
 import type { ResolverContext } from "../../src/engine/types.js";
 import type { ElectricityTypeData } from "../../src/types/config/heat.js";

@@ -3,11 +3,23 @@ import type { DETCalculatorRegistry, DETCalculatorContext } from "../../";
 
 declare module "../../" {
   interface DETCalculatorRegistry {
+    outerWallHeatLossFactor: number;
+    adjacentWallUValue: number;
     outerWallHeatLoss: number;
   }
 }
 
-export default {
+export const outerWallHeatLossFactor = {
+  key: "outerWallHeatLossFactor",
+  resolve: (ctx) => ctx.input.config.outerWall.heatLossFactor,
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "outerWallHeatLossFactor">;
+
+export const adjacentWallUValue = {
+  key: "adjacentWallUValue",
+  resolve: () => 0,
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "adjacentWallUValue">;
+
+export const outerWallHeatLoss = {
   key: "outerWallHeatLoss",
   resolve: (ctx) => {
     const adjacentArea = ctx.get("adjacentWallArea");
@@ -17,8 +29,6 @@ export default {
       adjacentArea * ctx.get("adjacentWallUValue")
     ) * ctx.get("outerWallHeatLossFactor");
   },
-} satisfies Resolver<
-  DETCalculatorContext,
-  DETCalculatorRegistry,
-  "outerWallHeatLoss"
->;
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "outerWallHeatLoss">;
+
+export default [outerWallHeatLossFactor, adjacentWallUValue, outerWallHeatLoss];

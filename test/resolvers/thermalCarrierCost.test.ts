@@ -1,6 +1,6 @@
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
-import resolver from "../../src/calculators/energy/resolvers/energyCarrierCost.js";
+import { thermalCarrierCost as resolver } from "../../src/calculators/energy/resolvers/thermalEnergy.js";
 import { mockCtx } from "../helpers/mock-ctx.js";
 
 describe("thermalCarrierCost", () => {

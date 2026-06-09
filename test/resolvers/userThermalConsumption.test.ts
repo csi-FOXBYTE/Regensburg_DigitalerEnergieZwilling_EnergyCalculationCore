@@ -1,6 +1,6 @@
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
-import resolver from "../../src/calculators/energy/resolvers/userThermalConsumption.js";
+import { userThermalConsumption as resolver } from "../../src/calculators/energy/resolvers/renovation.js";
 import { mockCtx } from "../helpers/mock-ctx.js";
 import type { PrimaryEnergyCarrierData } from "../../src/types/config/heat.js";
 
