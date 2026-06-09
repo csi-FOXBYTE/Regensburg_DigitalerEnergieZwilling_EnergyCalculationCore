@@ -10,7 +10,7 @@ declare module "../" {
     electricityCo2Factor: number;
     electricityUnitRate: number;
     electricityBaseRate: number;
-    electricityOffset: number;
+    baseElectricalLoad: number;
     electricityConsumption: number;
     electricityCost: number;
     electricityCo2Emissions: number;
@@ -56,8 +56,8 @@ export const electricityBaseRate = {
   },
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "electricityBaseRate">;
 
-export const electricityOffset = {
-  key: "electricityOffset",
+export const baseElectricalLoad = {
+  key: "baseElectricalLoad",
   resolve: (ctx) => {
     const preRenovationValues = ctx.input.input.preRenovationValues;
     if (preRenovationValues != null) {
@@ -65,11 +65,11 @@ export const electricityOffset = {
     }
     const userElectricityConsumption = ctx.input.input.electricity.userElectricityConsumption;
     if (userElectricityConsumption != null) {
-      return userElectricityConsumption - ctx.get("calculatedElectricalEnergyDemand");
+      return userElectricityConsumption - ctx.get("electricalDemandWithoutOffset");
     }
     return 0;
   },
-} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "electricityOffset">;
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "baseElectricalLoad">;
 
 export const electricityConsumption = {
   key: "electricityConsumption",
@@ -101,7 +101,7 @@ export default [
   electricityCo2Factor,
   electricityUnitRate,
   electricityBaseRate,
-  electricityOffset,
+  baseElectricalLoad,
   electricityConsumption,
   electricityCost,
   electricityCo2Emissions,

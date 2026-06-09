@@ -3,18 +3,18 @@ import type { DETCalculatorRegistry, DETCalculatorContext } from "../";
 
 declare module "../" {
   interface DETCalculatorRegistry {
-    heatLossSum: number;
-    preliminaryHeatingEnergyDemand: number;
-    heatingEnergyDemand: number;
+    totalHeatLoss: number;
+    rawSpaceHeatingDemand: number;
+    spaceHeatingDemand: number;
     hotWaterEnergyDemandFromAreaFactor: number;
     hotWaterEnergyDemand: number;
-    calculatedTotalEnergyDemand: number;
-    totalEnergyDemand: number;
+    calculatedThermalBaseline: number;
+    thermalBaseline: number;
   }
 }
 
-export const heatLossSum = {
-  key: "heatLossSum",
+export const totalHeatLoss = {
+  key: "totalHeatLoss",
   resolve: (ctx) =>
     ctx.get("ventilationHeatLoss") +
     ctx.get("roofHeatLoss") +
@@ -23,18 +23,18 @@ export const heatLossSum = {
     ctx.get("exteriorWallWindowsHeatLoss") +
     ctx.get("outerWallHeatLoss") +
     ctx.get("bottomFloorHeatLoss"),
-} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "heatLossSum">;
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "totalHeatLoss">;
 
-export const preliminaryHeatingEnergyDemand = {
-  key: "preliminaryHeatingEnergyDemand",
-  resolve: (ctx) => ctx.get("heatLossSum") * ctx.get("heatingDegreeDays") * 0.024,
-} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "preliminaryHeatingEnergyDemand">;
+export const rawSpaceHeatingDemand = {
+  key: "rawSpaceHeatingDemand",
+  resolve: (ctx) => ctx.get("totalHeatLoss") * ctx.get("heatingDegreeDays") * 0.024,
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "rawSpaceHeatingDemand">;
 
 // NOTE: may be replaced with a more precise calculation method soon
-export const heatingEnergyDemand = {
-  key: "heatingEnergyDemand",
-  resolve: (ctx) => ctx.get("preliminaryHeatingEnergyDemand"),
-} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "heatingEnergyDemand">;
+export const spaceHeatingDemand = {
+  key: "spaceHeatingDemand",
+  resolve: (ctx) => ctx.get("rawSpaceHeatingDemand"),
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "spaceHeatingDemand">;
 
 export const hotWaterEnergyDemandFromAreaFactor = {
   key: "hotWaterEnergyDemandFromAreaFactor",
@@ -46,29 +46,29 @@ export const hotWaterEnergyDemand = {
   resolve: (ctx) => ctx.get("netFloorArea") * ctx.get("hotWaterEnergyDemandFromAreaFactor"),
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "hotWaterEnergyDemand">;
 
-export const calculatedTotalEnergyDemand = {
-  key: "calculatedTotalEnergyDemand",
+export const calculatedThermalBaseline = {
+  key: "calculatedThermalBaseline",
   resolve: (ctx) =>
-    ctx.get("heatingEnergyDemand") * ctx.get("combinedHeatingPerformanceFactor") +
+    ctx.get("spaceHeatingDemand") * ctx.get("combinedHeatingPerformanceFactor") +
     ctx.get("hotWaterEnergyDemand"),
-} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "calculatedTotalEnergyDemand">;
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "calculatedThermalBaseline">;
 
-export const totalEnergyDemand = {
-  key: "totalEnergyDemand",
+export const thermalBaseline = {
+  key: "thermalBaseline",
   resolve: (ctx) => {
     if (ctx.get("userThermalConsumption") != null) {
       return ctx.get("userTotalEnergyDemand") * ctx.get("renovationFactor");
     }
-    return ctx.get("calculatedTotalEnergyDemand");
+    return ctx.get("calculatedThermalBaseline");
   },
-} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "totalEnergyDemand">;
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "thermalBaseline">;
 
 export default [
-  heatLossSum,
-  preliminaryHeatingEnergyDemand,
-  heatingEnergyDemand,
+  totalHeatLoss,
+  rawSpaceHeatingDemand,
+  spaceHeatingDemand,
   hotWaterEnergyDemandFromAreaFactor,
   hotWaterEnergyDemand,
-  calculatedTotalEnergyDemand,
-  totalEnergyDemand,
+  calculatedThermalBaseline,
+  thermalBaseline,
 ];

@@ -6,7 +6,7 @@ declare module "../" {
   interface DETCalculatorRegistry {
     hasInternalGains: boolean;
     internalGainsFactor: number;
-    effectiveHeatingDemand: number;
+    netThermalDemand: number;
   }
 }
 
@@ -27,9 +27,9 @@ export const internalGainsFactor = {
   },
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "internalGainsFactor">;
 
-export const effectiveHeatingDemand = {
-  key: "effectiveHeatingDemand",
-  resolve: (ctx) => ctx.get("totalEnergyDemand") * ctx.get("internalGainsFactor"),
-} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "effectiveHeatingDemand">;
+export const netThermalDemand = {
+  key: "netThermalDemand",
+  resolve: (ctx) => ctx.get("thermalBaseline") * ctx.get("internalGainsFactor"),
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "netThermalDemand">;
 
-export default [hasInternalGains, internalGainsFactor, effectiveHeatingDemand];
+export default [hasInternalGains, internalGainsFactor, netThermalDemand];

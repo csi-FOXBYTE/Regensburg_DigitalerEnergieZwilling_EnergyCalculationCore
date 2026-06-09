@@ -85,7 +85,7 @@ export const renovationFactor = {
   resolve: (ctx) => {
     const preRenovationTotal = ctx.input.input.preRenovationValues?.totalEnergyDemand;
     if (preRenovationTotal == null || preRenovationTotal === 0) return 1;
-    return ctx.get("calculatedTotalEnergyDemand") / preRenovationTotal;
+    return ctx.get("calculatedThermalBaseline") / preRenovationTotal;
   },
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "renovationFactor">;
 

@@ -32,10 +32,10 @@ export function calculate(
     co2Emissions: ctx.get("totalCo2Emissions"),
     hadInternalGains: ctx.get("hasInternalGains"),
     preRenovationValues: input.preRenovationValues ?? {
-      totalEnergyDemand: ctx.get("calculatedTotalEnergyDemand"),
+      totalEnergyDemand: ctx.get("calculatedThermalBaseline"),
       primaryEnergyCarrier: ctx.get("primaryEnergyCarrier"),
       heatingSystemType: ctx.get("heatingSystemType"),
-      electricityOffset: ctx.get("electricityOffset"),
+      electricityOffset: ctx.get("baseElectricalLoad"),
       hadInternalGains: ctx.get("hasInternalGains"),
     },
     resolvedInput: {

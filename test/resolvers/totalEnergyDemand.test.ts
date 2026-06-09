@@ -1,14 +1,14 @@
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
-import { totalEnergyDemand as resolver } from "../../src/calculators/energy/resolvers/heatingDemand.js";
+import { thermalBaseline as resolver } from "../../src/calculators/energy/resolvers/heatingDemand.js";
 import { mockCtx } from "../helpers/mock-ctx.js";
 
-describe("totalEnergyDemand", () => {
+describe("thermalBaseline", () => {
   test("takes physics path when userThermalConsumption is null", () => {
     const result = resolver.resolve(
       mockCtx({}, {
         userThermalConsumption: null,
-        calculatedTotalEnergyDemand: 5000,
+        calculatedThermalBaseline: 5000,
       }),
     );
     assert.strictEqual(result, 5000);
@@ -43,7 +43,7 @@ describe("totalEnergyDemand", () => {
         { userThermalTotalCost: 1200 },
         {
           userThermalConsumption: null,   // resolver returned null (rate=0)
-          calculatedTotalEnergyDemand: 5000,
+          calculatedThermalBaseline: 5000,
         },
       ),
     );

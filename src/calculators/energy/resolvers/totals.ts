@@ -5,7 +5,7 @@ import { resolveRangeBand } from "../../../types/range-bands.js";
 
 declare module "../" {
   interface DETCalculatorRegistry {
-    totalEnergyConsumption: number;
+    totalEnergyDemand: number;
     totalEnergyDemandPerSquareMeter: number;
     primaryEnergyDemand: number;
     primaryEnergyDemandPerSquareMeter: number;
@@ -15,14 +15,14 @@ declare module "../" {
   }
 }
 
-export const totalEnergyConsumption = {
-  key: "totalEnergyConsumption",
+export const totalEnergyDemand = {
+  key: "totalEnergyDemand",
   resolve: (ctx) => ctx.get("thermalEnergyDemand") + ctx.get("electricalEnergyDemand"),
-} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "totalEnergyConsumption">;
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "totalEnergyDemand">;
 
 export const totalEnergyDemandPerSquareMeter = {
   key: "totalEnergyDemandPerSquareMeter",
-  resolve: (ctx) => ctx.get("totalEnergyConsumption") / ctx.get("usableFloorArea"),
+  resolve: (ctx) => ctx.get("totalEnergyDemand") / ctx.get("usableFloorArea"),
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "totalEnergyDemandPerSquareMeter">;
 
 export const primaryEnergyDemand = {
@@ -59,7 +59,7 @@ export const energyEfficiencyClass = {
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "energyEfficiencyClass">;
 
 export default [
-  totalEnergyConsumption,
+  totalEnergyDemand,
   totalEnergyDemandPerSquareMeter,
   primaryEnergyDemand,
   primaryEnergyDemandPerSquareMeter,

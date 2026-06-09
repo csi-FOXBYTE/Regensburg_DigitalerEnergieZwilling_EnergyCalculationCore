@@ -3,44 +3,44 @@ import type { DETCalculatorRegistry, DETCalculatorContext } from "../";
 
 declare module "../" {
   interface DETCalculatorRegistry {
-    thermalHeatingDemand: number;
-    electricalHeatingDemand: number;
-    calculatedElectricalEnergyDemand: number;
+    thermalSpaceHeatingDemand: number;
+    electricalSpaceHeatingDemand: number;
+    electricalDemandWithoutOffset: number;
     thermalEnergyDemand: number;
     electricalEnergyDemand: number;
   }
 }
 
-export const thermalHeatingDemand = {
-  key: "thermalHeatingDemand",
-  resolve: (ctx) => ctx.get("heatingEnergyDemand") * (1 - ctx.get("electricalRatio")),
-} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "thermalHeatingDemand">;
+export const thermalSpaceHeatingDemand = {
+  key: "thermalSpaceHeatingDemand",
+  resolve: (ctx) => ctx.get("spaceHeatingDemand") * (1 - ctx.get("electricalRatio")),
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "thermalSpaceHeatingDemand">;
 
-export const electricalHeatingDemand = {
-  key: "electricalHeatingDemand",
-  resolve: (ctx) => ctx.get("heatingEnergyDemand") * ctx.get("electricalRatio"),
-} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "electricalHeatingDemand">;
+export const electricalSpaceHeatingDemand = {
+  key: "electricalSpaceHeatingDemand",
+  resolve: (ctx) => ctx.get("spaceHeatingDemand") * ctx.get("electricalRatio"),
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "electricalSpaceHeatingDemand">;
 
-export const calculatedElectricalEnergyDemand = {
-  key: "calculatedElectricalEnergyDemand",
-  resolve: (ctx) => ctx.get("effectiveHeatingDemand") * ctx.get("electricalRatio"),
-} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "calculatedElectricalEnergyDemand">;
+export const electricalDemandWithoutOffset = {
+  key: "electricalDemandWithoutOffset",
+  resolve: (ctx) => ctx.get("netThermalDemand") * ctx.get("electricalRatio"),
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "electricalDemandWithoutOffset">;
 
 export const thermalEnergyDemand = {
   key: "thermalEnergyDemand",
-  resolve: (ctx) => ctx.get("effectiveHeatingDemand") * (1 - ctx.get("electricalRatio")),
+  resolve: (ctx) => ctx.get("netThermalDemand") * (1 - ctx.get("electricalRatio")),
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "thermalEnergyDemand">;
 
 export const electricalEnergyDemand = {
   key: "electricalEnergyDemand",
   resolve: (ctx) =>
-    ctx.get("effectiveHeatingDemand") * ctx.get("electricalRatio") + ctx.get("electricityOffset"),
+    ctx.get("netThermalDemand") * ctx.get("electricalRatio") + ctx.get("baseElectricalLoad"),
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "electricalEnergyDemand">;
 
 export default [
-  thermalHeatingDemand,
-  electricalHeatingDemand,
-  calculatedElectricalEnergyDemand,
+  thermalSpaceHeatingDemand,
+  electricalSpaceHeatingDemand,
+  electricalDemandWithoutOffset,
   thermalEnergyDemand,
   electricalEnergyDemand,
 ];
