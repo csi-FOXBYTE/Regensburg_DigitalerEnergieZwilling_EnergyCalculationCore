@@ -315,6 +315,7 @@ export const DEFAULT_CONFIG: DETConfig = {
     ventilationHeatLossCorrectionFactor: 0.79,
     // kQwb
     hotWaterEnergyDemandFromAreaFactor: 9.84,
+    electricalBaseLoadFromFloorAreaFactor: 23,
 
     // bheiz, barb, bgrund, xco2, fp
     primaryEnergyCarrierData: [

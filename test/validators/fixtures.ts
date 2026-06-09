@@ -1,5 +1,8 @@
+import type { DETConfig } from "../../src/types/config/index.js";
+import type { DETInput } from "../../src/types/input/index.js";
+
 /** Minimal valid config fixture. All year bands align with generalYearBands [{ to: 2000 }, { from: 2000 }]. */
-export function baseConfig() {
+export function baseConfig(): DETConfig {
   return {
     general: {
       supportedLocales: ["de"],
@@ -28,6 +31,7 @@ export function baseConfig() {
       hasInternalGains: [{ key: "boiler", value: true }],
       internalGainsFactorByBuildingType: [{ key: "singleFamily", value: 0.5 }, { key: "multiFamily", value: 0.4 }],
       hotWaterEnergyDemandFromAreaFactor: 20,
+      electricalBaseLoadFromFloorAreaFactor: 23,
       ventilationHeatLossCorrectionFactor: 0.8,
       heatingDegreeDays: 3000,
       defaultPrimaryEnergyCarrier: "gas",
@@ -130,7 +134,7 @@ export function baseConfig() {
 }
 
 /** Minimal valid input fixture — no optional selection fields set. */
-export function baseInput() {
+export function baseInput(): DETInput {
   return {
     general: {
       buildingYear: 2005,

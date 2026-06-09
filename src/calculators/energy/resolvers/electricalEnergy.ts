@@ -10,6 +10,7 @@ declare module "../" {
     electricityCo2Factor: number;
     electricityUnitRate: number;
     electricityBaseRate: number;
+    electricalBaseLoadFromFloorAreaFactor: number;
     baseElectricalLoad: number;
     electricityConsumption: number;
     electricityCost: number;
@@ -56,6 +57,11 @@ export const electricityBaseRate = {
   },
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "electricityBaseRate">;
 
+export const electricalBaseLoadFromFloorAreaFactor = {
+  key: "electricalBaseLoadFromFloorAreaFactor",
+  resolve: (ctx) => ctx.input.config.heat.electricalBaseLoadFromFloorAreaFactor,
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "electricalBaseLoadFromFloorAreaFactor">;
+
 export const baseElectricalLoad = {
   key: "baseElectricalLoad",
   resolve: (ctx) => {
@@ -67,7 +73,7 @@ export const baseElectricalLoad = {
     if (userElectricityConsumption != null) {
       return userElectricityConsumption - ctx.get("electricalDemandWithoutOffset");
     }
-    return 0;
+    return ctx.get("netFloorArea") * ctx.get("electricalBaseLoadFromFloorAreaFactor");
   },
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "baseElectricalLoad">;
 
@@ -101,6 +107,7 @@ export default [
   electricityCo2Factor,
   electricityUnitRate,
   electricityBaseRate,
+  electricalBaseLoadFromFloorAreaFactor,
   baseElectricalLoad,
   electricityConsumption,
   electricityCost,

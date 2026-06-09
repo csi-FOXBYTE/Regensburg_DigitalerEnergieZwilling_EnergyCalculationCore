@@ -48,6 +48,7 @@ export const DETHeatConfigSchema = z.object({
   internalGainsFactorByBuildingType: keyedValues(z.string(), z.number()),
 
   hotWaterEnergyDemandFromAreaFactor: z.number(),
+  electricalBaseLoadFromFloorAreaFactor: z.number(),
   ventilationHeatLossCorrectionFactor: z.number(),
   heatingDegreeDays: z.number(),
   defaultPrimaryEnergyCarrier: z.string(),

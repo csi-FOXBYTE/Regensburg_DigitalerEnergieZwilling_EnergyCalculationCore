@@ -164,6 +164,7 @@ describe("validateConfig — heat year bands", () => {
   test("fails when heatingPerformanceFactor yearBands cannot resolve a generalYearBand key", () => {
     const cfg = fresh();
     // Only covers { to: 2000 }, leaving { from: 2000 } unresolvable
+    // @ts-expect-error single-entry band is intentionally incomplete
     cfg.heat.heatingPerformanceFactor = [{
       key: "boiler",
       value: [{ to: 2000, value: [{ value: 0.85 }] }],
@@ -173,6 +174,7 @@ describe("validateConfig — heat year bands", () => {
 
   test("fails when temperatureControlPerformanceFactor yearBands cannot resolve a generalYearBand key", () => {
     const cfg = fresh();
+    // @ts-expect-error single-entry band is intentionally incomplete
     cfg.heat.temperatureControlPerformanceFactor = [{
       key: "boiler",
       value: [{ to: 2000, value: [{ key: "radiator", value: 1.0 }] }],
@@ -234,6 +236,7 @@ describe("validateConfig — roof", () => {
 
   test("fails when uValue yearBands cannot resolve a generalYearBand key", () => {
     const cfg = fresh();
+    // @ts-expect-error single-entry band is intentionally incomplete
     cfg.roof.uValue = [{ key: "rafter", value: [{ to: 2000, value: 1.5 }] }];
     assertFailed(validateConfig(cfg), "roof.uValue[rafter]");
   });
@@ -260,12 +263,14 @@ describe("validateConfig — topFloor", () => {
   test("fails when defaultTopFloorType yearBands cannot resolve a generalYearBand key", () => {
     const cfg = fresh();
     // Only covers { to: 2000 }
+    // @ts-expect-error single-entry band is intentionally incomplete
     cfg.topFloor.defaultTopFloorType = [{ to: 2000, value: "flatRoof" }];
     assertFailed(validateConfig(cfg), "topFloor.defaultTopFloorType");
   });
 
   test("fails when uValue yearBands cannot resolve a generalYearBand key", () => {
     const cfg = fresh();
+    // @ts-expect-error single-entry band is intentionally incomplete
     cfg.topFloor.uValue = [{ key: "flatRoof", value: [{ to: 2000, value: 1.5 }] }];
     assertFailed(validateConfig(cfg), "topFloor.uValue[flatRoof]");
   });
@@ -291,12 +296,14 @@ describe("validateConfig — outerWall", () => {
 
   test("fails when defaultConstructionType yearBands cannot resolve a generalYearBand key", () => {
     const cfg = fresh();
+    // @ts-expect-error single-entry band is intentionally incomplete
     cfg.outerWall.defaultConstructionType = [{ to: 2000, value: "brick" }];
     assertFailed(validateConfig(cfg), "outerWall.defaultConstructionType");
   });
 
   test("fails when uValue yearBands cannot resolve a generalYearBand key", () => {
     const cfg = fresh();
+    // @ts-expect-error single-entry band is intentionally incomplete
     cfg.outerWall.uValue = [{ key: "brick", value: [{ to: 2000, value: 1.5 }] }];
     assertFailed(validateConfig(cfg), "outerWall.uValue[brick]");
   });
@@ -330,6 +337,7 @@ describe("validateConfig — bottomFloor", () => {
 
   test("fails when defaultConstructionType yearBands cannot resolve a generalYearBand key", () => {
     const cfg = fresh();
+    // @ts-expect-error single-entry band is intentionally incomplete
     cfg.bottomFloor.defaultConstructionType = [
       { key: true,  value: [{ to: 2000, value: "concrete" }] },
       { key: false, value: [{ to: 2000, value: "concrete" }, { from: 2000, value: "concrete" }] },
@@ -339,6 +347,7 @@ describe("validateConfig — bottomFloor", () => {
 
   test("fails when uValue yearBands cannot resolve a generalYearBand key", () => {
     const cfg = fresh();
+    // @ts-expect-error single-entry band is intentionally incomplete
     cfg.bottomFloor.uValue = [{ key: "concrete", value: [{ to: 2000, value: 1.5 }] }];
     assertFailed(validateConfig(cfg), "bottomFloor.uValue[concrete]");
   });
@@ -364,12 +373,14 @@ describe("validateConfig — windows", () => {
 
   test("fails when defaultWindowType yearBands cannot resolve a generalYearBand key", () => {
     const cfg = fresh();
+    // @ts-expect-error single-entry band is intentionally incomplete
     cfg.windows.defaultWindowType = [{ to: 2000, value: "double" }];
     assertFailed(validateConfig(cfg), "windows.defaultWindowType");
   });
 
   test("fails when uValue yearBands cannot resolve a generalYearBand key", () => {
     const cfg = fresh();
+    // @ts-expect-error single-entry band is intentionally incomplete
     cfg.windows.uValue = [{ key: "double", value: [{ to: 2000, value: 2.0 }] }];
     assertFailed(validateConfig(cfg), "windows.uValue[double]");
   });
