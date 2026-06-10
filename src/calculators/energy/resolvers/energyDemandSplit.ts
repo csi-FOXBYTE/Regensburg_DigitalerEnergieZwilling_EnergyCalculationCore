@@ -5,7 +5,7 @@ declare module "../" {
   interface DETCalculatorRegistry {
     thermalSpaceHeatingDemand: number;
     electricalSpaceHeatingDemand: number;
-    electricalDemandWithoutOffset: number;
+    electricalHeatingEnergyDemand: number;
     thermalEnergyDemand: number;
     electricalEnergyDemand: number;
   }
@@ -21,10 +21,10 @@ export const electricalSpaceHeatingDemand = {
   resolve: (ctx) => ctx.get("spaceHeatingDemand") * ctx.get("electricalRatio"),
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "electricalSpaceHeatingDemand">;
 
-export const electricalDemandWithoutOffset = {
-  key: "electricalDemandWithoutOffset",
+export const electricalHeatingEnergyDemand = {
+  key: "electricalHeatingEnergyDemand",
   resolve: (ctx) => ctx.get("netThermalDemand") * ctx.get("electricalRatio"),
-} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "electricalDemandWithoutOffset">;
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "electricalHeatingEnergyDemand">;
 
 export const thermalEnergyDemand = {
   key: "thermalEnergyDemand",
@@ -40,7 +40,7 @@ export const electricalEnergyDemand = {
 export default [
   thermalSpaceHeatingDemand,
   electricalSpaceHeatingDemand,
-  electricalDemandWithoutOffset,
+  electricalHeatingEnergyDemand,
   thermalEnergyDemand,
   electricalEnergyDemand,
 ];

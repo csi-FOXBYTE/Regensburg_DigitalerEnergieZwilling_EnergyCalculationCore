@@ -7,9 +7,34 @@ import { DETEnergyCaluclator } from "./calculators/energy/index.js";
 export type CalculationResult = {
   energyConsumptionPerSquareMeter: number;
   energyEfficiencyClass: EnergyEfficiencyClass;
+  /** @deprecated use annualTotalCost */
   yearlyCost: number;
+  /** @deprecated use annualCo2EmissionsTonnes */
   co2Emissions: number;
   hadInternalGains: boolean;
+
+  annualTotalEnergyDemand: number;
+  annualTotalCost: number;
+  annualHeatingEnergyDemand: number;
+  annualTotalHeatingCost: number;
+  annualPrimaryEnergyDemand: number;
+  annualElectricalPrimaryEnergyDemand: number;
+  annualEnergyCarrierPrimaryDemand: number;
+  annualCo2EmissionsTonnes: number;
+  annualTotalElectricalEnergyDemand: number;
+  annualHouseholdElectricalEnergyDemand: number;
+  annualElectricalHeatingEnergyDemand: number;
+  annualHouseholdElectricalEnergyCost: number;
+  electricityBaseRate: number;
+  electricityUnitRate: number;
+  annualCarrierHeatingEnergyDemand: number;
+  annualEnergyCarrierHeatingCost: number;
+  heatingSystemType: string;
+  energyCarrierType: string;
+  energyCarrierUnit: string;
+  energyCarrierUnitRate: number;
+  energyCarrierBaseRate: number;
+
   preRenovationValues: PreRenovationValues;
   resolvedInput: DETInput;
 };
@@ -25,12 +50,38 @@ export function calculate(
 ): CalculationResult {
   const ctx = DETEnergyCaluclator({ config, input });
 
+  const totalCost = ctx.get("totalCost");
+  const totalCo2Emissions = ctx.get("totalCo2Emissions");
+
   const result: CalculationResult = {
     energyConsumptionPerSquareMeter: ctx.get("totalEnergyDemandPerSquareMeter"),
     energyEfficiencyClass: ctx.get("energyEfficiencyClass"),
-    yearlyCost: ctx.get("totalCost"),
-    co2Emissions: ctx.get("totalCo2Emissions"),
+    yearlyCost: totalCost,
+    co2Emissions: totalCo2Emissions,
     hadInternalGains: ctx.get("hasInternalGains"),
+
+    annualTotalEnergyDemand: ctx.get("totalEnergyDemand"),
+    annualTotalCost: totalCost,
+    annualHeatingEnergyDemand: ctx.get("netThermalDemand"),
+    annualTotalHeatingCost: ctx.get("totalHeatingCost"),
+    annualPrimaryEnergyDemand: ctx.get("primaryEnergyDemand"),
+    annualElectricalPrimaryEnergyDemand: ctx.get("electricalPrimaryEnergyDemand"),
+    annualEnergyCarrierPrimaryDemand: ctx.get("thermalPrimaryEnergyDemand"),
+    annualCo2EmissionsTonnes: totalCo2Emissions,
+    annualTotalElectricalEnergyDemand: ctx.get("electricalEnergyDemand"),
+    annualHouseholdElectricalEnergyDemand: ctx.get("baseElectricalLoad"),
+    annualElectricalHeatingEnergyDemand: ctx.get("electricalHeatingEnergyDemand"),
+    annualHouseholdElectricalEnergyCost: ctx.get("baseElectricalLoadCost"),
+    electricityBaseRate: ctx.get("electricityBaseRate"),
+    electricityUnitRate: ctx.get("electricityUnitRate"),
+    annualCarrierHeatingEnergyDemand: ctx.get("thermalEnergyDemand"),
+    annualEnergyCarrierHeatingCost: ctx.get("thermalCarrierCost"),
+    heatingSystemType: ctx.get("heatingSystemType"),
+    energyCarrierType: ctx.get("primaryEnergyCarrier"),
+    energyCarrierUnit: ctx.get("primaryEnergyCarrierData").unit,
+    energyCarrierUnitRate: ctx.get("thermalUnitRate"),
+    energyCarrierBaseRate: ctx.get("thermalBaseRate"),
+
     preRenovationValues: input.preRenovationValues ?? {
       totalEnergyDemand: ctx.get("calculatedThermalBaseline"),
       primaryEnergyCarrier: ctx.get("primaryEnergyCarrier"),

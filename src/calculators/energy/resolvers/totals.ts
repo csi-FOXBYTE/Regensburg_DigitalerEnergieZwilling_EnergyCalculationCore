@@ -10,6 +10,7 @@ declare module "../" {
     primaryEnergyDemand: number;
     primaryEnergyDemandPerSquareMeter: number;
     totalCost: number;
+    totalHeatingCost: number;
     totalCo2Emissions: number;
     energyEfficiencyClass: EnergyEfficiencyClass;
   }
@@ -41,6 +42,13 @@ export const totalCost = {
   resolve: (ctx) => ctx.get("thermalCarrierCost") + ctx.get("electricityCost"),
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "totalCost">;
 
+export const totalHeatingCost = {
+  key: "totalHeatingCost",
+  resolve: (ctx) =>
+    ctx.get("thermalCarrierCost") +
+    ctx.get("electricalHeatingEnergyDemand") * ctx.get("electricityUnitRate"),
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "totalHeatingCost">;
+
 export const totalCo2Emissions = {
   key: "totalCo2Emissions",
   resolve: (ctx) => ctx.get("thermalCo2Emissions") + ctx.get("electricityCo2Emissions"),
@@ -64,6 +72,7 @@ export default [
   primaryEnergyDemand,
   primaryEnergyDemandPerSquareMeter,
   totalCost,
+  totalHeatingCost,
   totalCo2Emissions,
   energyEfficiencyClass,
 ];
