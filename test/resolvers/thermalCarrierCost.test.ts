@@ -7,7 +7,7 @@ describe("thermalCarrierCost", () => {
   test("computes consumption × unitRate + baseRate", () => {
     const result = resolver.resolve(
       mockCtx({}, {
-        thermalCarrierConsumption: 200,
+        thermalCarrierDemand: 200,
         thermalUnitRate: 0.5,
         thermalBaseRate: 300,
       }),
@@ -19,7 +19,7 @@ describe("thermalCarrierCost", () => {
     // Provide different values to confirm the resolver reads thermalBaseRate, not config
     const result = resolver.resolve(
       mockCtx({}, {
-        thermalCarrierConsumption: 100,
+        thermalCarrierDemand: 100,
         thermalUnitRate: 1,
         thermalBaseRate: 999,
         // If the resolver mistakenly read primaryEnergyCarrierData.baseRate it would use 0
@@ -32,7 +32,7 @@ describe("thermalCarrierCost", () => {
   test("zero consumption still includes base rate", () => {
     const result = resolver.resolve(
       mockCtx({}, {
-        thermalCarrierConsumption: 0,
+        thermalCarrierDemand: 0,
         thermalUnitRate: 0.5,
         thermalBaseRate: 181.83,
       }),
