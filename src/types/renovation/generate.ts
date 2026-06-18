@@ -8,6 +8,7 @@ import type {
   InsulationRenovationKeys,
   Renovation,
 } from "./renovation";
+import { DETEnergyCaluclator } from "../../calculators/energy/index.js";
 
 function isYearInRange(
   year: number | RangeKey | null | undefined,
@@ -32,12 +33,16 @@ function isInsulationRecommended(
   const { recommendYearRange } = config.renovation.insulationRenovations[key];
   switch (key) {
     case "roof":
+      if (input.roof.hasInsulation === true) return false;
       return isYearInRange(input.roof.year, recommendYearRange) || input.roof.hasInsulation === false;
     case "topFloor":
+      if (input.topFloor.hasInsulation === true) return false;
       return isYearInRange(input.topFloor.year, recommendYearRange) || input.topFloor.hasInsulation === false;
     case "bottomFloor":
+      if (input.bottomFloor.hasInsulation === true) return false;
       return isYearInRange(input.bottomFloor.year, recommendYearRange) || input.bottomFloor.hasInsulation === false;
     case "outerWalls":
+      if (input.outerWall.hasInsulation === true) return false;
       return isYearInRange(input.outerWall.year, recommendYearRange) || input.outerWall.hasInsulation === false;
     case "outerWindows":
       return isYearInRange(input.exteriorWallWindows.year, recommendYearRange);
@@ -103,34 +108,34 @@ export function generateHeatingRenovations(
   return renovations;
 }
 
-function makeInsulationPatch(
+function makeInsulationRenovation(
   key: InsulationRenovationKeys,
   config: DETConfig,
+  ctx: ReturnType<typeof DETEnergyCaluclator>,
+  input: DETInput,
   lastYearBand: RangeLast,
-): InputPatch {
-  const uValue = config.renovation.insulationRenovations[key].uValue;
-  let patch: InputPatch;
+): { patch: InputPatch; recommended: boolean } {
+  const targetUValue = config.renovation.insulationRenovations[key].uValue;
   switch (key) {
     case "roof":
-      patch = { roof: { uValue, year: lastYearBand } };
-      break;
+      if (ctx.get("roofUValue") <= targetUValue) return { patch: {}, recommended: false };
+      return { patch: { roof: { uValue: targetUValue, year: lastYearBand } }, recommended: isInsulationRecommended(key, config, input) };
     case "topFloor":
-      patch = { topFloor: { uValue, year: lastYearBand } };
-      break;
+      if (ctx.get("topFloorUValue") <= targetUValue) return { patch: {}, recommended: false };
+      return { patch: { topFloor: { uValue: targetUValue, year: lastYearBand } }, recommended: isInsulationRecommended(key, config, input) };
     case "bottomFloor":
-      patch = { bottomFloor: { uValue, year: lastYearBand } };
-      break;
+      if (ctx.get("bottomFloorUValue") <= targetUValue) return { patch: {}, recommended: false };
+      return { patch: { bottomFloor: { uValue: targetUValue, year: lastYearBand } }, recommended: isInsulationRecommended(key, config, input) };
     case "outerWalls":
-      patch = { outerWall: { uValue, year: lastYearBand } };
-      break;
+      if (ctx.get("outerWallUValue") <= targetUValue) return { patch: {}, recommended: false };
+      return { patch: { outerWall: { uValue: targetUValue, year: lastYearBand } }, recommended: isInsulationRecommended(key, config, input) };
     case "outerWindows":
-      patch = { exteriorWallWindows: { uValue, year: lastYearBand } };
-      break;
+      if (ctx.get("exteriorWallWindowsUValue") <= targetUValue) return { patch: {}, recommended: false };
+      return { patch: { exteriorWallWindows: { uValue: targetUValue, year: lastYearBand } }, recommended: isInsulationRecommended(key, config, input) };
     case "roofWindows":
-      patch = { roofWindows: { uValue, year: lastYearBand } };
-      break;
+      if (ctx.get("roofWindowsUValue") <= targetUValue) return { patch: {}, recommended: false };
+      return { patch: { roofWindows: { uValue: targetUValue, year: lastYearBand } }, recommended: isInsulationRecommended(key, config, input) };
   }
-  return patch;
 }
 
 export function generateInsulationRenovations(
@@ -142,10 +147,10 @@ export function generateInsulationRenovations(
   const lastYearBand = config.general.generalYearBands[
     config.general.generalYearBands.length - 1
   ] as RangeLast;
+  const ctx = DETEnergyCaluclator({ config, input });
   for (const key of insulationKeys) {
-    const patch = makeInsulationPatch(key, config, lastYearBand);
+    const { patch, recommended } = makeInsulationRenovation(key, config, ctx, input, lastYearBand);
     const label = translate(key);
-    const recommended = isInsulationRecommended(key, config, input);
     renovations.push({ id: `envelope_${key}`, patch, label, recommended });
   }
   return renovations;
