@@ -161,6 +161,10 @@ export function generateHeatingSurfaceRenovations(
   input: DETInput,
   locale: string,
 ): Renovation[] {
+  const currentSystem = input.heat.heatingSystemType ?? "";
+  const currentSurfaceIsRecommended = config.renovation.heatingSurfaceRenovations.some(
+    (r) => r.targetSurfaceType === input.heat.heatingSurfaceType && r.recommendedForSystems.includes(currentSystem),
+  );
   const renovations: Renovation[] = [];
   for (const hRenConf of config.renovation.heatingSurfaceRenovations) {
     if (hRenConf.targetSurfaceType === input.heat.heatingSurfaceType) continue;
@@ -173,12 +177,8 @@ export function generateHeatingSurfaceRenovations(
     renovations.push({
       id: `surface_${hRenConf.targetSurfaceType}`,
       label,
-      patch: {
-        heat: {
-          heatingSurfaceType: hRenConf.targetSurfaceType,
-        },
-      },
-      recommended: false,
+      patch: { heat: { heatingSurfaceType: hRenConf.targetSurfaceType } },
+      recommended: !currentSurfaceIsRecommended && hRenConf.recommendedForSystems.includes(currentSystem),
     });
   }
   return renovations;

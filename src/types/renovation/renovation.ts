@@ -40,6 +40,7 @@ export type HeatingRenovationConfig = z.infer<typeof HeatingRenovationConfigSche
 export const HeatingSurfaceRenovationConfigSchema = z.object({
   targetSurfaceType: z.string(),
   localization: z.record(z.string()),
+  recommendedForSystems: z.array(z.string()),
 });
 export type HeatingSurfaceRenovationConfig = z.infer<typeof HeatingSurfaceRenovationConfigSchema>;
 

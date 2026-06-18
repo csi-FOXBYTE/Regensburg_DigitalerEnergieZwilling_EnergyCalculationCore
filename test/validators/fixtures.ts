@@ -128,7 +128,7 @@ export function baseConfig(): DETConfig {
         outerWindows: { uValue: 1.3,  recommendYearRange: { from: 1980 } },
         roofWindows:  { uValue: 1.3,  recommendYearRange: { from: 1980 } },
       },
-      heatingSurfaceRenovations: [{ targetSurfaceType: "radiator", localization: {} }],
+      heatingSurfaceRenovations: [{ targetSurfaceType: "radiator", localization: {}, recommendedForSystems: [] }],
     },
   };
 }

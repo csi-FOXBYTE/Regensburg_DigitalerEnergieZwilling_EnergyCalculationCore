@@ -52,8 +52,8 @@ export type { CalculationResult, CalculateOptions } from "./calculate.js";
 export { makeNgsiLdEntity } from "./ngsi-ld.js";
 export type { NgsiLdProperty, DETBuildingEnergyProfileEntity } from "./types/ngsi-ld.js";
 
-export { validateConfig, validateInput } from "./validators/index.js";
-export type { ValidationResult, ValidationIssue } from "./validators/index.js";
+export { validateConfig, validateInput, detectMigrations, validateAndMigrate } from "./validators/index.js";
+export type { ValidationResult, ValidationIssue, ConfigMigrator, ValidateAndMigrateResult } from "./validators/index.js";
 export { DETConfigSchema } from "./types/config/index.js";
 export { DETInputSchema } from "./types/input/index.js";
 

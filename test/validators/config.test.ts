@@ -206,7 +206,7 @@ describe("validateConfig — renovation", () => {
 
   test("fails when heatingSurfaceRenovation.targetSurfaceType is not a valid surface type", () => {
     const cfg = fresh();
-    cfg.renovation.heatingSurfaceRenovations = [{ targetSurfaceType: "underfloor", localization: {} }];
+    cfg.renovation.heatingSurfaceRenovations = [{ targetSurfaceType: "underfloor", localization: {}, recommendedForSystems: [] }];
     assertFailed(validateConfig(cfg), "renovation.heatingSurfaceRenovations");
   });
 

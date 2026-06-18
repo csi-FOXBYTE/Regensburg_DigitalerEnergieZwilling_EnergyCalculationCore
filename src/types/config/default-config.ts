@@ -1272,6 +1272,13 @@ export const DEFAULT_CONFIG: DETConfig = {
           en: "Switch to radiant surface heating",
         },
         targetSurfaceType: "radiant_surface_heating",
+        recommendedForSystems: [
+          "air_source_heat_pump_55_45",
+          "air_source_heat_pump_lt_40",
+          "ground_source_heat_pump_55_45",
+          "ground_source_heat_pump_lt_40",
+          "gas_heat_pump_hybrid",
+        ],
       },
     ],
     insulationRenovations: {
