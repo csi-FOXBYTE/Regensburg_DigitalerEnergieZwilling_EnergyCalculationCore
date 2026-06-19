@@ -994,15 +994,15 @@ export const DEFAULT_CONFIG: DETConfig = {
       {
         value: "brick_wall",
         localization: {
-          de: "Vollziegelwand",
-          en: "Brick wall",
+          de: "Massivwand über 30cm Wandstärke",
+          en: "Solid wall over 30cm thickness",
         },
       },
       {
         value: "other_wall",
         localization: {
-          de: "Sonstige Wand",
-          en: "Other wall",
+          de: "Massivwand bis 30cm Wandstärke",
+          en: "Solid wall up to 30cm thickness",
         },
       },
       {

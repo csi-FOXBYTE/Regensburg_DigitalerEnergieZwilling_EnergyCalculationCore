@@ -1,7 +1,14 @@
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
-import { detectMigrations, validateAndMigrate } from "../../src/validators/index.js";
+import {
+  detectMigrations,
+  validateAndMigrate,
+  applyMigrators,
+  ConfigMigrationError,
+  type ConfigMigrator,
+} from "../../src/validators/index.js";
 import { baseConfig } from "./fixtures.js";
+import { DEFAULT_CONFIG } from "../../src/types/config/default-config.js";
 
 const MISSING_RECOMMENDED = {
   path: "renovation.heatingSurfaceRenovations.0.recommendedForSystems",
@@ -141,5 +148,95 @@ describe("validateAndMigrate", () => {
     const result = validateAndMigrate(raw);
     assert.strictEqual(result.success, false);
     assert.strictEqual(result.migrated, false);
+  });
+
+  test("full DEFAULT_CONFIG without recommendedForSystems migrates successfully", () => {
+    const raw = structuredClone(DEFAULT_CONFIG) as any;
+    for (const entry of raw.renovation.heatingSurfaceRenovations) {
+      delete entry.recommendedForSystems;
+    }
+    const result = validateAndMigrate(raw);
+    assert.strictEqual(result.success, true);
+    assert.strictEqual(result.migrated, true);
+    if (!result.success) return;
+    for (const entry of result.data.renovation.heatingSurfaceRenovations) {
+      assert.ok(Array.isArray(entry.recommendedForSystems), `${entry.targetSurfaceType} missing recommendedForSystems`);
+    }
+    const radiant = result.data.renovation.heatingSurfaceRenovations.find(
+      (e) => e.targetSurfaceType === "radiant_surface_heating",
+    );
+    assert.ok(radiant);
+    assert.deepStrictEqual(radiant.recommendedForSystems, [
+      "air_source_heat_pump_55_45",
+      "air_source_heat_pump_lt_40",
+      "ground_source_heat_pump_55_45",
+      "ground_source_heat_pump_lt_40",
+      "gas_heat_pump_hybrid",
+    ]);
+  });
+});
+
+// ── applyMigrators / ConfigMigrationError ─────────────────────────────────────
+
+describe("applyMigrators", () => {
+  test("threads each migrator's output into the next", () => {
+    const a: ConfigMigrator = {
+      id: "a",
+      canFix: () => true,
+      migrate: (raw) => ({ ...(raw as Record<string, unknown>), a: true }),
+    };
+    const b: ConfigMigrator = {
+      id: "b",
+      canFix: () => true,
+      migrate: (raw) => ({ ...(raw as Record<string, unknown>), b: true }),
+    };
+    assert.deepStrictEqual(applyMigrators({}, [a, b]), { a: true, b: true });
+  });
+
+  test("returns the input unchanged when no migrators are given", () => {
+    const raw = { untouched: true };
+    assert.strictEqual(applyMigrators(raw, []), raw);
+  });
+
+  test("wraps a throwing migrator in ConfigMigrationError with id and cause", () => {
+    const boom: ConfigMigrator = {
+      id: "boom",
+      canFix: () => true,
+      migrate: () => {
+        throw new TypeError("x.map is not a function");
+      },
+    };
+    assert.throws(
+      () => applyMigrators({}, [boom]),
+      (err: unknown) => {
+        assert.ok(err instanceof ConfigMigrationError);
+        assert.ok(err instanceof Error);
+        assert.strictEqual(err.migratorId, "boom");
+        assert.match(err.message, /boom/);
+        assert.match(err.message, /x\.map is not a function/);
+        assert.ok(err.cause instanceof TypeError);
+        return true;
+      },
+    );
+  });
+
+  test("names the failing migrator even when an earlier one succeeded", () => {
+    const ok: ConfigMigrator = {
+      id: "ok",
+      canFix: () => true,
+      migrate: (raw) => raw,
+    };
+    const bad: ConfigMigrator = {
+      id: "bad",
+      canFix: () => true,
+      migrate: () => {
+        throw new Error("nope");
+      },
+    };
+    assert.throws(
+      () => applyMigrators({}, [ok, bad]),
+      (err: unknown) =>
+        err instanceof ConfigMigrationError && err.migratorId === "bad",
+    );
   });
 });

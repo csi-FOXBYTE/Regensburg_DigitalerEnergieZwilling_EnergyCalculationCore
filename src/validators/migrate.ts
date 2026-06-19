@@ -1,7 +1,11 @@
 import { DEFAULT_CONFIG } from "../types/config/default-config.js";
 import { validateConfig } from "./config.js";
-import type { ValidationIssue, ValidationResult } from "./types.js";
+import type { ValidationIssue } from "./types.js";
 import type { DETConfig } from "../types/config/index.js";
+
+function isRecord(v: unknown): v is Record<string, unknown> {
+  return typeof v === "object" && v !== null && !Array.isArray(v);
+}
 
 export type ConfigMigrator = {
   id: string;
@@ -16,16 +20,28 @@ const addRecommendedForSystems: ConfigMigrator = {
       issue.path,
     ),
   migrate: (raw) => {
-    const config = raw as Record<string, unknown>;
-    const systemTypes: string[] =
-      (config?.heat as any)?.heatingSystemTypes?.map((s: any) => s.value) ?? [];
-    const hsr = (config?.renovation as any)?.heatingSurfaceRenovations;
+    if (!isRecord(raw)) return raw;
+
+    const heat = raw.heat;
+    const renovation = raw.renovation;
+
+    const heatingSystemTypes = isRecord(heat) ? heat.heatingSystemTypes : undefined;
+    const systemTypes: string[] = Array.isArray(heatingSystemTypes)
+      ? heatingSystemTypes.flatMap((s) =>
+          isRecord(s) && typeof s.value === "string" ? [s.value] : [],
+        )
+      : [];
+
+    if (!isRecord(renovation)) return raw;
+    const hsr = renovation.heatingSurfaceRenovations;
     if (!Array.isArray(hsr)) return raw;
+
     return {
-      ...config,
+      ...raw,
       renovation: {
-        ...(config.renovation as object),
-        heatingSurfaceRenovations: hsr.map((entry: any) => {
+        ...renovation,
+        heatingSurfaceRenovations: hsr.map((entry) => {
+          if (!isRecord(entry)) return entry;
           if (entry.recommendedForSystems != null) return entry;
           const defaultEntry =
             DEFAULT_CONFIG.renovation.heatingSurfaceRenovations.find(
@@ -47,6 +63,52 @@ const addRecommendedForSystems: ConfigMigrator = {
 
 const migrators: ConfigMigrator[] = [addRecommendedForSystems];
 
+/**
+ * Thrown when a {@link ConfigMigrator} crashes while transforming a config.
+ *
+ * Carrying the failing migrator's `id` and the original error as `cause` makes
+ * it possible to see *which* migration step blew up on malformed input, instead
+ * of an opaque error surfacing from deep inside a migrator on the backend.
+ */
+export class ConfigMigrationError extends Error {
+  /** `id` of the migrator that threw. */
+  readonly migratorId: string;
+
+  constructor(migratorId: string, options?: { cause?: unknown }) {
+    const reason =
+      options?.cause instanceof Error
+        ? options.cause.message
+        : options?.cause != null
+          ? String(options.cause)
+          : "unknown error";
+    super(`Config migrator "${migratorId}" failed: ${reason}`, options);
+    this.name = "ConfigMigrationError";
+    this.migratorId = migratorId;
+  }
+}
+
+/**
+ * Runs each migrator in order, threading one migrator's output into the next.
+ *
+ * If a migrator throws, the error is wrapped in a {@link ConfigMigrationError}
+ * that names the failing migrator and preserves the original error as `cause`,
+ * so logs point straight at the culprit.
+ */
+export function applyMigrators(
+  raw: unknown,
+  migratorsToApply: ConfigMigrator[],
+): unknown {
+  let fixed = raw;
+  for (const migrator of migratorsToApply) {
+    try {
+      fixed = migrator.migrate(fixed);
+    } catch (cause) {
+      throw new ConfigMigrationError(migrator.id, { cause });
+    }
+  }
+  return fixed;
+}
+
 export function detectMigrations(
   _raw: unknown,
   issues: ValidationIssue[],
@@ -64,11 +126,19 @@ export type ValidateAndMigrateResult =
   | { success: true; data: DETConfig; migrated: boolean }
   | { success: false; issues: ValidationIssue[]; migrated: boolean };
 
+/**
+ * Validates a config and, if it fails only with auto-fixable issues, applies
+ * the matching migrators and re-validates.
+ *
+ * @throws {ConfigMigrationError} if a matched migrator crashes while
+ * transforming the config — the error names the failing migrator and preserves
+ * the original error as `cause`.
+ */
 export function validateAndMigrate(raw: unknown): ValidateAndMigrateResult {
   const result = validateConfig(raw);
   if (result.success) return { ...result, migrated: false };
   const applicable = detectMigrations(raw, result.issues);
   if (applicable.length === 0) return { ...result, migrated: false };
-  const fixed = applicable.reduce((acc, m) => m.migrate(acc), raw);
+  const fixed = applyMigrators(raw, applicable);
   return { ...validateConfig(fixed), migrated: true };
 }
