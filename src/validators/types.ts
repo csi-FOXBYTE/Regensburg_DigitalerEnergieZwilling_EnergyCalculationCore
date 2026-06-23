@@ -7,7 +7,7 @@ export type ValidationResult<T> =
   | { success: false; issues: ValidationIssue[] };
 
 export function mapZodError(error: ZodError): ValidationIssue[] {
-  return error.errors.map((issue) => ({
+  return error.issues.map((issue) => ({
     path: issue.path.join("."),
     message: issue.message,
   }));
