@@ -4,8 +4,12 @@
   "description": "Domain-based TypeScript energy calculation core with JSON-configurable catalogs and rules for building envelope and heating evaluation.",
   "type": "module",
   "main": "./dist/index.cjs",
+  "bin": {
+    "generate-det-building-energy-profile": "./dist/bin/generate-det-building-energy-profile.js"
+  },
   "scripts": {
     "test": "node --test --import tsx \"test/**/*.test.ts\"",
+    "gen:det-building-energy-profile": "tsx scripts/generate-det-building-energy-profile-artifacts.ts",
     "build": "pnpm run lint && pnpm run test && tsdown",
     "lint": "tsc --noEmit",
     "gen:docs": "typedoc --options typedoc.json",

@@ -1,7 +1,7 @@
 import { defineConfig } from "tsdown";
 
 export default defineConfig({
-    entry: ["src/index.ts"],
+    entry: ["src/index.ts", "src/bin/generate-det-building-energy-profile.ts"],
     outDir: "dist",
     publint: true,
     platform: "neutral",

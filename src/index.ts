@@ -51,6 +51,19 @@ export type { CalculationResult, CalculateOptions } from "./calculate.js";
 
 export { makeNgsiLdEntity } from "./ngsi-ld.js";
 export type { NgsiLdProperty, DETBuildingEnergyProfileEntity } from "./types/ngsi-ld.js";
+export { detBuildingEnergyProfileModel } from "./model/det-building-energy-profile.definition.js";
+export type {
+  ModelAttributeSetDefinition,
+  ModelAttributeDefinition,
+  ModelDefinition,
+  ModelValueType,
+  NgsiLdAttributeType,
+} from "./model/det-building-energy-profile.definition.js";
+export { generateDetBuildingEnergyProfileArtifacts } from "./model/det-building-energy-profile.generator.js";
+export type {
+  DetBuildingEnergyProfileGeneratorConfig,
+  DetBuildingEnergyProfileGeneratorOptions,
+} from "./model/det-building-energy-profile.generator.js";
 
 export { validateConfig, validateInput, detectMigrations, validateAndMigrate, applyMigrators, ConfigMigrationError } from "./validators/index.js";
 export type { ValidationResult, ValidationIssue, ConfigMigrator, ValidateAndMigrateResult } from "./validators/index.js";

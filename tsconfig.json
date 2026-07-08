@@ -37,5 +37,5 @@
     "moduleDetection": "force",
     "skipLibCheck": true
   },
-  "include": ["src", "test"]
+  "include": ["src", "test", "scripts", "det-building-energy-profile.config.ts"]
 }
