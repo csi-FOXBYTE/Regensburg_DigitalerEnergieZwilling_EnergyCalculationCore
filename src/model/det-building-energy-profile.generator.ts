@@ -44,8 +44,8 @@ function withGeneratorConfig(config: DetBuildingEnergyProfileGeneratorConfig): M
     ...detBuildingEnergyProfileModel,
     contextUrl: config.contextUrl,
     namespace: config.namespace,
-    schemaId: config.schemaId,
-    description: config.description,
+    ...(config.schemaId !== undefined ? { schemaId: config.schemaId } : {}),
+    ...(config.description !== undefined ? { description: config.description } : {}),
   };
 }
 
