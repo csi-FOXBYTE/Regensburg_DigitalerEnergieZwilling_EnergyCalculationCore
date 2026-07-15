@@ -965,7 +965,7 @@ export const DEFAULT_CONFIG: DETConfig = {
       { from: 1969, value: "solid_ceiling" },
     ],
     thermalConductivity: 0.032,
-    assumedInsulationThickness: 0.35,
+    assumedInsulationThickness: 0.24,
     heatLossFactor: 1,
     uValue: [
       {
@@ -1023,7 +1023,7 @@ export const DEFAULT_CONFIG: DETConfig = {
       },
     ],
     thermalConductivity: 0.035,
-    assumedInsulationThickness: 0.35,
+    assumedInsulationThickness: 0.14,
     heatLossFactor: 1,
     uValue: [
       {
@@ -1097,7 +1097,7 @@ export const DEFAULT_CONFIG: DETConfig = {
       },
     ],
     thermalConductivity: 0.03,
-    assumedInsulationThickness: 0.3,
+    assumedInsulationThickness: 0.12,
     heatLossFactor: 1,
     uValue: [
       {
