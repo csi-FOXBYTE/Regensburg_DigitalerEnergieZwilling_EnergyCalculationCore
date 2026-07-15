@@ -113,7 +113,11 @@ describe("generateHeatingRenovations — system renewal opt-out", () => {
     config = baseConfig(),
     input = baseInput(),
   ): boolean {
-    return generateHeatingRenovations(config, input, "en", "Renew system").some(
+    const localizedConfig = structuredClone(config);
+    for (const renovation of localizedConfig.renovation.heatingRenovations) {
+      renovation.localization.en ??= "Heating renovation";
+    }
+    return generateHeatingRenovations(localizedConfig, input, "en", "Renew system").some(
       (renovation) => renovation.id === "heat_renew",
     );
   }
