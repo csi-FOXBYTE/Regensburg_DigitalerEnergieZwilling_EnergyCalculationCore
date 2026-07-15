@@ -26,7 +26,11 @@ export const exteriorWallWindowsArea = {
   key: "exteriorWallWindowsArea",
   resolve: (ctx) =>
     ctx.input.input.exteriorWallWindows.area ??
-    (ctx.get("outerWallArea") - ctx.get("adjacentWallArea")) * ctx.input.config.windows.exteriorWallAreaFactor,
+    Math.max(
+      0,
+      (ctx.get("outerWallArea") - ctx.get("adjacentWallArea")) *
+        ctx.input.config.windows.exteriorWallAreaFactor,
+    ),
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "exteriorWallWindowsArea">;
 
 export const exteriorWallWindowsType = {

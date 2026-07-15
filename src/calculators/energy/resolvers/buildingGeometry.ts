@@ -36,9 +36,12 @@ export const numberOfStories = {
   resolve: (ctx) => {
     const override = ctx.input.input.general.numberOfStories;
     if (override != null) return override;
-    return Math.round(
-      ctx.get("buildingHeight") /
-        (ctx.get("interiorStoryHeight") + ctx.get("floorSlabThickness")),
+    return Math.max(
+      1,
+      Math.round(
+        ctx.get("buildingHeight") /
+          (ctx.get("interiorStoryHeight") + ctx.get("floorSlabThickness")),
+      ),
     );
   },
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "numberOfStories">;

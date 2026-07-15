@@ -163,6 +163,49 @@ describe("validateInput — heat", () => {
     input.heat = { heatingSurfaceType: "underfloor" };
     assertFailed(validateInput(input, cfg), "heat.heatingSurfaceType");
   });
+
+  test("fails when a submitted carrier does not meet its requirements", () => {
+    const localCfg = freshConfig();
+    localCfg.heat.primaryEnergyCarriers[0]!.requirements = { gas: true };
+    const input = freshInput();
+    input.heat = { primaryEnergyCarrier: "gas", hasGasSupply: false };
+
+    assertFailed(validateInput(input, localCfg), "heat.primaryEnergyCarrier");
+  });
+
+  test("passes when a submitted carrier meets its requirements", () => {
+    const localCfg = freshConfig();
+    localCfg.heat.primaryEnergyCarriers[0]!.requirements = { gas: true };
+    const input = freshInput();
+    input.heat = { primaryEnergyCarrier: "gas", hasGasSupply: true };
+
+    assertPassed(validateInput(input, localCfg));
+  });
+
+  test("fails when the effective thermal base rate exceeds the total cost", () => {
+    const input = freshInput();
+    input.heat = { userThermalTotalCost: 50 };
+
+    assertFailed(validateInput(input, cfg), "heat.userThermalBaseRate");
+  });
+
+  test("fails when the effective thermal unit rate is not positive", () => {
+    const input = freshInput();
+    input.heat = { userThermalTotalCost: 200, userThermalUnitRate: 0 };
+
+    assertFailed(validateInput(input, cfg), "heat.userThermalUnitRate");
+  });
+
+  test("passes when effective thermal rates are consistent with the total cost", () => {
+    const input = freshInput();
+    input.heat = {
+      userThermalTotalCost: 200,
+      userThermalBaseRate: 100,
+      userThermalUnitRate: 0.08,
+    };
+
+    assertPassed(validateInput(input, cfg));
+  });
 });
 
 // ── Electricity cross-check ───────────────────────────────────────────────────
@@ -275,6 +318,99 @@ describe("validateInput — components", () => {
   test("passes when roofWindows.windowType is valid", () => {
     const input = freshInput();
     input.roofWindows = { windowType: "double" };
+    assertPassed(validateInput(input, cfg));
+  });
+
+  test("fails when roof-window area exceeds roof area", () => {
+    const input = freshInput();
+    input.roofWindows.area = 101;
+
+    assertFailed(validateInput(input, cfg), "roofWindows.area");
+  });
+
+  test("fails when roof area is smaller than top-floor area", () => {
+    const input = freshInput();
+    input.roof.area = 99;
+
+    assertFailed(validateInput(input, cfg), "roof.area");
+  });
+});
+
+// ── Basic numeric constraints ────────────────────────────────────────────────
+
+describe("validateInput — basic numeric constraints", () => {
+  test("fails when numberOfStories is less than one", () => {
+    const input = freshInput();
+    input.general.numberOfStories = 0;
+
+    assertFailed(validateInput(input, cfg), "general.numberOfStories");
+  });
+
+  test("fails when numberOfStories is not an integer", () => {
+    const input = freshInput();
+    input.general.numberOfStories = 1.5;
+
+    assertFailed(validateInput(input, cfg), "general.numberOfStories");
+  });
+
+  test("fails when buildingBaseArea is not positive", () => {
+    const input = freshInput();
+    input.general.buildingBaseArea = 0;
+
+    assertFailed(validateInput(input, cfg), "general.buildingBaseArea");
+  });
+
+  test("fails when a numeric calendar year is not an integer", () => {
+    const input = freshInput();
+    input.roof.year = 2005.5;
+
+    assertFailed(validateInput(input, cfg), "roof.year");
+  });
+});
+
+// ── Renovation chronology ────────────────────────────────────────────────────
+
+describe("validateInput — renovation chronology", () => {
+  const cases: Array<{
+    path: string;
+    setYear: (input: Input, year: number) => void;
+  }> = [
+    {
+      path: "heat.heatingSystemConstructionYear",
+      setYear: (input, year) => { input.heat.heatingSystemConstructionYear = year; },
+    },
+    { path: "roof.year", setYear: (input, year) => { input.roof.year = year; } },
+    { path: "roofWindows.year", setYear: (input, year) => { input.roofWindows.year = year; } },
+    {
+      path: "exteriorWallWindows.year",
+      setYear: (input, year) => { input.exteriorWallWindows.year = year; },
+    },
+    { path: "topFloor.year", setYear: (input, year) => { input.topFloor.year = year; } },
+    { path: "outerWall.year", setYear: (input, year) => { input.outerWall.year = year; } },
+    { path: "bottomFloor.year", setYear: (input, year) => { input.bottomFloor.year = year; } },
+  ];
+
+  for (const { path, setYear } of cases) {
+    test(`fails when ${path} predates the building`, () => {
+      const input = freshInput();
+      setYear(input, 2004);
+
+      assertFailed(validateInput(input, cfg), path);
+    });
+  }
+
+  test("passes when component years equal the building year", () => {
+    const input = freshInput();
+    for (const { setYear } of cases) setYear(input, 2005);
+
+    assertPassed(validateInput(input, cfg));
+  });
+
+  test("does not compare numeric component years with a building-year range", () => {
+    const input = freshInput();
+    input.general.buildingYear = { from: 2000, to: 2010 };
+    input.roof.year = 1990;
+
     assertPassed(validateInput(input, cfg));
   });
 });

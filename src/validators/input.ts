@@ -1,6 +1,7 @@
 import { DETInputSchema } from "../types/input/index.js";
 import type { DETInput } from "../types/input/index.js";
 import type { DETConfig } from "../types/config/index.js";
+import { isCarrierCompatible } from "../types/config/heat.js";
 import { mapZodError, type ValidationIssue, type ValidationResult } from "./types.js";
 
 export function validateInput(data: unknown, config: DETConfig): ValidationResult<DETInput> {
@@ -29,6 +30,16 @@ export function validateInput(data: unknown, config: DETConfig): ValidationResul
     issues.push({ path: "heat.primaryEnergyCarrier", message: `primaryEnergyCarrier "${input.heat.primaryEnergyCarrier}" is not in config.heat.primaryEnergyCarriers` });
   }
 
+  const submittedCarrier = heat.primaryEnergyCarriers.find(
+    (carrier) => carrier.value === input.heat.primaryEnergyCarrier,
+  );
+  if (submittedCarrier != null && !isCarrierCompatible(submittedCarrier, input)) {
+    issues.push({
+      path: "heat.primaryEnergyCarrier",
+      message: `primaryEnergyCarrier "${submittedCarrier.value}" is incompatible with the supplied gas, biogas, or storage availability`,
+    });
+  }
+
   if (input.heat.heatingSystemType != null && !systemTypeValues.includes(input.heat.heatingSystemType)) {
     issues.push({ path: "heat.heatingSystemType", message: `heatingSystemType "${input.heat.heatingSystemType}" is not in config.heat.heatingSystemTypes` });
   }
@@ -42,6 +53,30 @@ export function validateInput(data: unknown, config: DETConfig): ValidationResul
 
   if (input.heat.heatingSurfaceType != null && !surfaceTypeValues.includes(input.heat.heatingSurfaceType)) {
     issues.push({ path: "heat.heatingSurfaceType", message: `heatingSurfaceType "${input.heat.heatingSurfaceType}" is not in config.heat.heatingSurfaceTypes` });
+  }
+
+  const effectiveCarrier = input.heat.primaryEnergyCarrier ?? heat.defaultPrimaryEnergyCarrier;
+  const effectiveCarrierData = heat.primaryEnergyCarrierData.find(
+    (entry) => entry.key === effectiveCarrier,
+  )?.value;
+  if (input.heat.userThermalTotalCost != null) {
+    const effectiveBaseRate =
+      input.heat.userThermalBaseRate ?? effectiveCarrierData?.baseRate;
+    if (effectiveBaseRate != null && effectiveBaseRate > input.heat.userThermalTotalCost) {
+      issues.push({
+        path: "heat.userThermalBaseRate",
+        message: "effective thermal base rate must be less than or equal to userThermalTotalCost",
+      });
+    }
+
+    const effectiveUnitRate =
+      input.heat.userThermalUnitRate ?? effectiveCarrierData?.unitRate;
+    if (effectiveUnitRate != null && effectiveUnitRate <= 0) {
+      issues.push({
+        path: "heat.userThermalUnitRate",
+        message: "effective thermal unit rate must be greater than zero when userThermalTotalCost is supplied",
+      });
+    }
   }
 
   // ── Electricity cross-checks ──────────────────────────────────────────────────
@@ -86,6 +121,41 @@ export function validateInput(data: unknown, config: DETConfig): ValidationResul
 
   if (input.roofWindows.windowType != null && !windowTypeValues.includes(input.roofWindows.windowType)) {
     issues.push({ path: "roofWindows.windowType", message: `roofWindows.windowType "${input.roofWindows.windowType}" is not in config.windows.windowTypes` });
+  }
+
+  if (input.roofWindows.area != null && input.roofWindows.area > input.roof.area) {
+    issues.push({
+      path: "roofWindows.area",
+      message: "roofWindows.area must be less than or equal to roof.area",
+    });
+  }
+
+  if (input.roof.area < input.topFloor.area) {
+    issues.push({
+      path: "roof.area",
+      message: "roof.area must be greater than or equal to topFloor.area",
+    });
+  }
+
+  if (typeof input.general.buildingYear === "number") {
+    const constructionYears = [
+      ["heat.heatingSystemConstructionYear", input.heat.heatingSystemConstructionYear],
+      ["roof.year", input.roof.year],
+      ["roofWindows.year", input.roofWindows.year],
+      ["exteriorWallWindows.year", input.exteriorWallWindows.year],
+      ["topFloor.year", input.topFloor.year],
+      ["outerWall.year", input.outerWall.year],
+      ["bottomFloor.year", input.bottomFloor.year],
+    ] as const;
+
+    for (const [path, year] of constructionYears) {
+      if (typeof year === "number" && year < input.general.buildingYear) {
+        issues.push({
+          path,
+          message: `${path} must be greater than or equal to general.buildingYear`,
+        });
+      }
+    }
   }
 
   if (issues.length > 0) {

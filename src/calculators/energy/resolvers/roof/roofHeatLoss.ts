@@ -17,7 +17,9 @@ export const roofHeatLoss = {
   key: "roofHeatLoss",
   resolve: (ctx) =>
     ctx.get("isSpaceBelowRoofHeated")
-      ? ctx.get("roofHeatLossFactor") * ctx.get("roofUValue") * ctx.get("roofArea")
+      ? ctx.get("roofHeatLossFactor") *
+        ctx.get("roofUValue") *
+        Math.max(0, ctx.get("roofArea") - ctx.get("roofWindowsArea"))
       : 0,
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "roofHeatLoss">;
 

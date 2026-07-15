@@ -41,7 +41,8 @@ export const livingArea = {
 
 export const isBasementHeated = {
   key: "isBasementHeated",
-  resolve: (ctx) => ctx.input.input.bottomFloor.isBasementHeated ?? false,
+  resolve: (ctx) =>
+    ctx.get("hasBasement") && (ctx.input.input.bottomFloor.isBasementHeated ?? false),
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "isBasementHeated">;
 
 export default [buildingYear, buildingHeight, buildingBaseArea, buildingType, livingArea, isBasementHeated];

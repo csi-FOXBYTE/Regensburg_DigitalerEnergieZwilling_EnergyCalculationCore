@@ -23,7 +23,10 @@ export const outerWallHeatLoss = {
   key: "outerWallHeatLoss",
   resolve: (ctx) => {
     const adjacentArea = ctx.get("adjacentWallArea");
-    const freeArea = ctx.get("outerWallArea") - ctx.get("exteriorWallWindowsArea") - adjacentArea;
+    const freeArea = Math.max(
+      0,
+      ctx.get("outerWallArea") - ctx.get("exteriorWallWindowsArea") - adjacentArea,
+    );
     return (
       freeArea * ctx.get("outerWallUValue") +
       adjacentArea * ctx.get("adjacentWallUValue")

@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { RangeKeySchema } from "../range-bands.js";
+import { YearInputSchema } from "../range-bands.js";
 
 export const DETHeatInputSchema = z.object({
-  heatingSystemConstructionYear: z.union([z.number(), RangeKeySchema]).nullable().optional(),
+  heatingSystemConstructionYear: YearInputSchema.nullable().optional(),
   primaryEnergyCarrier: z.string().nullable().optional(),
   heatingSystemType: z.string().nullable().optional(),
   heatingSurfaceType: z.string().nullable().optional(),

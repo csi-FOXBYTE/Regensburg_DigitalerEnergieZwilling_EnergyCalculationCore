@@ -23,6 +23,7 @@ export type {
   ElectricityTypeData,
   CarrierSelection,
   CarrierRequirements,
+  HeatingSystemSelection,
 } from "./types/config/heat.js";
 export { isCarrierCompatible } from "./types/config/heat.js";
 export type { DETRoofConfig } from "./types/config/roof.js";

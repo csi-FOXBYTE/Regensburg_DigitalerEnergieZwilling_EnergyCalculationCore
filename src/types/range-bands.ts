@@ -22,6 +22,8 @@ export const RangeKeySchema = z.object({
 });
 export type RangeKey = z.infer<typeof RangeKeySchema>;
 
+export const YearInputSchema = z.union([z.number().int(), RangeKeySchema]);
+
 // ── Schema factories ──────────────────────────────────────────────────────────
 
 function checkPositions(bands: object[], ctx: z.RefinementCtx): void {

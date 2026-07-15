@@ -14,8 +14,14 @@ export type CarrierRequirements = z.infer<typeof CarrierRequirementsSchema>;
 
 export const CarrierSelectionSchema = SelectionSchema.extend({
   requirements: CarrierRequirementsSchema.optional(),
+  excludeFromSystemRenewal: z.boolean().optional(),
 });
 export type CarrierSelection = z.infer<typeof CarrierSelectionSchema>;
+
+export const HeatingSystemSelectionSchema = SelectionSchema.extend({
+  excludeFromSystemRenewal: z.boolean().optional(),
+});
+export type HeatingSystemSelection = z.infer<typeof HeatingSystemSelectionSchema>;
 
 export const PrimaryEnergyCarrierDataSchema = z.object({
   energyPerUnit: z.number(),
@@ -37,7 +43,7 @@ export type ElectricityTypeData = z.infer<typeof ElectricityTypeDataSchema>;
 
 export const DETHeatConfigSchema = z.object({
   primaryEnergyCarriers: z.array(CarrierSelectionSchema),
-  heatingSystemTypes: z.array(SelectionSchema),
+  heatingSystemTypes: z.array(HeatingSystemSelectionSchema),
   heatingSurfaceTypes: z.array(SelectionSchema),
   allowedHeatingSystemTypesByCarrier: selectionFilter(z.string(), z.string()),
   electricityTypes: z.array(SelectionSchema),

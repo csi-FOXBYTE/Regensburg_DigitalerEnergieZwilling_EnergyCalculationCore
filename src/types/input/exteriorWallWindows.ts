@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { RangeKeySchema } from "../range-bands.js";
+import { YearInputSchema } from "../range-bands.js";
 
 export const DETExteriorWallWindowsInputSchema = z.object({
   area: z.number().optional(),
-  year: z.union([z.number(), RangeKeySchema]).nullable().optional(),
+  year: YearInputSchema.nullable().optional(),
   windowType: z.string().nullable().optional(),
   uValue: z.number().nullable().optional(),
 });

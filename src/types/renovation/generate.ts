@@ -34,16 +34,16 @@ function isInsulationRecommended(
   switch (key) {
     case "roof":
       if (input.roof.hasInsulation === true) return false;
-      return isYearInRange(input.roof.year, recommendYearRange) || input.roof.hasInsulation === false;
+      return isYearInRange(input.roof.year, recommendYearRange);
     case "topFloor":
       if (input.topFloor.hasInsulation === true) return false;
-      return isYearInRange(input.topFloor.year, recommendYearRange) || input.topFloor.hasInsulation === false;
+      return isYearInRange(input.topFloor.year, recommendYearRange);
     case "bottomFloor":
       if (input.bottomFloor.hasInsulation === true) return false;
-      return isYearInRange(input.bottomFloor.year, recommendYearRange) || input.bottomFloor.hasInsulation === false;
+      return isYearInRange(input.bottomFloor.year, recommendYearRange);
     case "outerWalls":
       if (input.outerWall.hasInsulation === true) return false;
-      return isYearInRange(input.outerWall.year, recommendYearRange) || input.outerWall.hasInsulation === false;
+      return isYearInRange(input.outerWall.year, recommendYearRange);
     case "outerWindows":
       return isYearInRange(input.exteriorWallWindows.year, recommendYearRange);
     case "roofWindows":
@@ -62,12 +62,25 @@ export function generateHeatingRenovations(
     config.general.generalYearBands.length - 1
   ] as RangeLast;
   if (systemRenewalLabel != null) {
-    renovations.push({
-      id: "heat_renew",
-      label: systemRenewalLabel,
-      patch: { heat: { heatingSystemConstructionYear: lastYearBand } },
-      recommended: false,
-    });
+    const ctx = DETEnergyCaluclator({ config, input });
+    const currentCarrier = config.heat.primaryEnergyCarriers.find(
+      (carrier) => carrier.value === ctx.get("primaryEnergyCarrier"),
+    );
+    const currentSystem = config.heat.heatingSystemTypes.find(
+      (system) => system.value === ctx.get("heatingSystemType"),
+    );
+    const excludeFromSystemRenewal =
+      currentCarrier?.excludeFromSystemRenewal === true ||
+      currentSystem?.excludeFromSystemRenewal === true;
+
+    if (!excludeFromSystemRenewal) {
+      renovations.push({
+        id: "heat_renew",
+        label: systemRenewalLabel,
+        patch: { heat: { heatingSystemConstructionYear: lastYearBand } },
+        recommended: false,
+      });
+    }
   }
 
   const currentCarrierIsTarget = config.renovation.primaryEnergyCarrierTargets.includes(
@@ -148,7 +161,10 @@ export function generateInsulationRenovations(
     config.general.generalYearBands.length - 1
   ] as RangeLast;
   const ctx = DETEnergyCaluclator({ config, input });
+  const isSpaceBelowRoofHeated = ctx.get("isSpaceBelowRoofHeated");
   for (const key of insulationKeys) {
+    if (key === "roof" && !isSpaceBelowRoofHeated) continue;
+    if (key === "topFloor" && isSpaceBelowRoofHeated) continue;
     const { patch, recommended } = makeInsulationRenovation(key, config, ctx, input, lastYearBand);
     const label = translate(key);
     renovations.push({ id: `envelope_${key}`, patch, label, recommended });

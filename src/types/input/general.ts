@@ -1,12 +1,12 @@
 import { z } from "zod";
 import { BuildingTypeSchema } from "../building-type.js";
-import { RangeKeySchema } from "../range-bands.js";
+import { YearInputSchema } from "../range-bands.js";
 
 export const DETGeneralInputSchema = z.object({
-  buildingYear: z.union([z.number(), RangeKeySchema]),
-  numberOfStories: z.number().nullable().optional(),
+  buildingYear: YearInputSchema,
+  numberOfStories: z.number().int().min(1).nullable().optional(),
   buildingHeight: z.number(),
-  buildingBaseArea: z.number(),
+  buildingBaseArea: z.number().positive(),
   livingArea: z.number().nullable().optional(),
   type: BuildingTypeSchema,
 });

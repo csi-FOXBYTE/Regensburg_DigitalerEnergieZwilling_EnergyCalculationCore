@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { RangeKeySchema } from "../range-bands.js";
+import { YearInputSchema } from "../range-bands.js";
 
 export const DETBottomFloorInputSchema = z.object({
   area: z.number(),
-  year: z.union([z.number(), RangeKeySchema]).nullable().optional(),
+  year: YearInputSchema.nullable().optional(),
   isHeated: z.boolean().nullable().optional(),
   hasInsulation: z.boolean().nullable().optional(),
   constructionType: z.string().nullable().optional(),

@@ -87,6 +87,7 @@ export const DEFAULT_CONFIG: DETConfig = {
           en: "Heating oil",
         },
         requirements: { storage: true },
+        excludeFromSystemRenewal: true,
       },
       {
         value: "none",
