@@ -36,7 +36,7 @@ export function validateInput(data: unknown, config: DETConfig): ValidationResul
   if (submittedCarrier != null && !isCarrierCompatible(submittedCarrier, input)) {
     issues.push({
       path: "heat.primaryEnergyCarrier",
-      message: `primaryEnergyCarrier "${submittedCarrier.value}" is incompatible with the supplied gas, biogas, or storage availability`,
+      message: `primaryEnergyCarrier "${submittedCarrier.value}" is incompatible with the supplied gas or storage availability`,
     });
   }
 

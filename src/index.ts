@@ -28,7 +28,10 @@ export type {
 export { isCarrierCompatible } from "./types/config/heat.js";
 export type { DETRoofConfig } from "./types/config/roof.js";
 export type { DETTopFloorConfig } from "./types/config/topFloor.js";
-export type { DETOuterWallConfig } from "./types/config/outerWall.js";
+export type {
+  DETOuterWallConfig,
+  OuterWallConstructionType,
+} from "./types/config/outerWall.js";
 export type { DETBottomFloorConfig } from "./types/config/bottomFloor.js";
 export type { DETWindowsConfig } from "./types/config/windows.js";
 export type { DETRenovationConfig } from "./types/config/renovation.js";
@@ -48,7 +51,7 @@ export { resolveKeyedValue } from "./types/keyed-values.js";
 export { resolveRangeBand, resolveYearBand } from "./types/range-bands.js";
 
 export { calculate } from "./calculate.js";
-export type { CalculationResult, CalculateOptions } from "./calculate.js";
+export type { CalculationResult, CalculateOptions, ResolvedDETInput } from "./calculate.js";
 
 export { makeNgsiLdEntity } from "./ngsi-ld.js";
 export type { NgsiLdProperty, DETBuildingEnergyProfileEntity } from "./types/ngsi-ld.js";

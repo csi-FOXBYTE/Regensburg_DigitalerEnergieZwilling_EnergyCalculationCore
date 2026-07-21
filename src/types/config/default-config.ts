@@ -102,7 +102,7 @@ export const DEFAULT_CONFIG: DETConfig = {
           de: "Erdgas",
           en: "Natural gas",
         },
-        requirements: { gas: true, bioGas: false },
+        requirements: { gas: true },
       },
       {
         value: "bio_gas",
@@ -110,7 +110,7 @@ export const DEFAULT_CONFIG: DETConfig = {
           de: "Biogas",
           en: "Biogas",
         },
-        requirements: { gas: true, bioGas: true },
+        requirements: { gas: true },
       },
       {
         value: "wood_biomass",
@@ -298,7 +298,7 @@ export const DEFAULT_CONFIG: DETConfig = {
       },
     ],
 
-    defaultPrimaryEnergyCarrier: "heating_oil",
+    defaultPrimaryEnergyCarrier: "natural_gas",
     defaultHeatingSystemType: [
       { key: "heating_oil", value: "standard_boiler_70_55" },
       { key: "natural_gas", value: "standard_boiler_70_55" },
@@ -1012,6 +1012,7 @@ export const DEFAULT_CONFIG: DETConfig = {
           de: "Massivwand mit Wärmedämmverbundsystem",
           en: "Solid wall with thermal insulation composite system",
         },
+        allowsAdditionalInsulation: false,
       },
     ],
     defaultConstructionType: [
@@ -1243,12 +1244,6 @@ export const DEFAULT_CONFIG: DETConfig = {
         targetCarrier: "wood_pellets",
         targetSystem: "standard_boiler_70_55",
         priority: 2,
-      },
-      {
-        localization: { de: "Wechsel zu Gas", en: "Switch to gas" },
-        targetCarrier: "natural_gas",
-        targetSystem: "improved_condensing_boiler_55_45",
-        priority: 3,
       },
       {
         localization: { de: "Wechsel zu Biogas", en: "Switch to biogas" },

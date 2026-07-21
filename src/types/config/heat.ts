@@ -8,7 +8,6 @@ import type { DETInput } from "../input/index.js";
 export const CarrierRequirementsSchema = z.object({
   storage: z.boolean().optional(),
   gas: z.boolean().optional(),
-  bioGas: z.boolean().optional(),
 });
 export type CarrierRequirements = z.infer<typeof CarrierRequirementsSchema>;
 
@@ -72,7 +71,6 @@ export function isCarrierCompatible(carrier: CarrierSelection, input: DETInput):
   const { requirements } = carrier;
   if (!requirements) return true;
   if (requirements.storage !== undefined && requirements.storage !== (input.heat.hasStorage ?? false)) return false;
-  if (requirements.gas !== undefined && requirements.gas !== (input.heat.hasGasSupply ?? false)) return false;
-  if (requirements.bioGas !== undefined && requirements.bioGas !== (input.heat.hasBioGas ?? false)) return false;
+  if (requirements.gas !== undefined && requirements.gas !== (input.heat.hasGasSupply ?? true)) return false;
   return true;
 }

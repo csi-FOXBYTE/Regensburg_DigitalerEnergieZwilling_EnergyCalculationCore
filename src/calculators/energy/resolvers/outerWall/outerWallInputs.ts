@@ -9,6 +9,7 @@ declare module "../../" {
     adjacentWallArea: number;
     outerWallHasInsulation: boolean;
     outerWallInsulationThickness: number;
+    outerWallAllowsAdditionalInsulation: boolean;
   }
 }
 
@@ -45,4 +46,21 @@ export const outerWallInsulationThickness = {
   },
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "outerWallInsulationThickness">;
 
-export default [outerWallYear, outerWallArea, adjacentWallArea, outerWallHasInsulation, outerWallInsulationThickness];
+export const outerWallAllowsAdditionalInsulation = {
+  key: "outerWallAllowsAdditionalInsulation",
+  resolve: (ctx) => {
+    const constructionType = ctx.input.config.outerWall.constructionTypes.find(
+      (entry) => entry.value === ctx.get("outerWallConstructionType"),
+    );
+    return constructionType?.allowsAdditionalInsulation ?? true;
+  },
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "outerWallAllowsAdditionalInsulation">;
+
+export default [
+  outerWallYear,
+  outerWallArea,
+  adjacentWallArea,
+  outerWallHasInsulation,
+  outerWallInsulationThickness,
+  outerWallAllowsAdditionalInsulation,
+];

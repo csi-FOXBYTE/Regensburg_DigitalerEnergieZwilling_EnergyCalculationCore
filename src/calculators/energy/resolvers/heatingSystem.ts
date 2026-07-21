@@ -7,7 +7,6 @@ import { resolveRangeBand } from "../../../types/range-bands.js";
 declare module "../" {
   interface DETCalculatorRegistry {
     hasGasSupply: boolean;
-    hasBioGas: boolean;
     hasStorage: boolean;
     heatingSystemType: string;
     heatingSystemConstructionYear: number | RangeKey;
@@ -21,13 +20,8 @@ declare module "../" {
 
 export const hasGasSupply = {
   key: "hasGasSupply",
-  resolve: (ctx) => ctx.input.input.heat.hasGasSupply ?? false,
+  resolve: (ctx) => ctx.input.input.heat.hasGasSupply ?? true,
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "hasGasSupply">;
-
-export const hasBioGas = {
-  key: "hasBioGas",
-  resolve: (ctx) => ctx.input.input.heat.hasBioGas ?? false,
-} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "hasBioGas">;
 
 export const hasStorage = {
   key: "hasStorage",
@@ -106,7 +100,6 @@ export const electricalRatio = {
 
 export default [
   hasGasSupply,
-  hasBioGas,
   hasStorage,
   heatingSystemType,
   heatingSystemConstructionYear,

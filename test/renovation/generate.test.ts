@@ -140,11 +140,42 @@ describe("generateHeatingRenovations — system renewal opt-out", () => {
     assert.equal(hasRenewal(config), false);
   });
 
-  test("uses resolved defaults when input carrier and system are omitted", () => {
+  test("generates renewal for the resolved natural-gas defaults", () => {
     const input = baseInput();
     input.heat.primaryEnergyCarrier = null;
     input.heat.heatingSystemType = null;
 
-    assert.equal(hasRenewal(DEFAULT_CONFIG, input), false);
+    assert.equal(hasRenewal(DEFAULT_CONFIG, input), true);
+  });
+});
+
+describe("generateHeatingRenovations — gas supply", () => {
+  function heatingRenovationIds(hasGasSupply?: boolean): string[] {
+    const input = baseInput();
+    input.heat.hasGasSupply = hasGasSupply;
+    return generateHeatingRenovations(DEFAULT_CONFIG, input, "en").map(
+      (renovation) => renovation.id,
+    );
+  }
+
+  test("offers biogas when a gas supply is available", () => {
+    const ids = heatingRenovationIds(true);
+
+    assert.ok(ids.includes("heat_bio_gas_improved_condensing_boiler_55_45"));
+    assert.ok(!ids.includes("heat_natural_gas_improved_condensing_boiler_55_45"));
+  });
+
+  test("offers biogas when gas supply availability is omitted", () => {
+    const ids = heatingRenovationIds();
+
+    assert.ok(ids.includes("heat_bio_gas_improved_condensing_boiler_55_45"));
+    assert.ok(!ids.includes("heat_natural_gas_improved_condensing_boiler_55_45"));
+  });
+
+  test("does not offer a gas renovation when a gas supply is unavailable", () => {
+    const ids = heatingRenovationIds(false);
+
+    assert.ok(!ids.includes("heat_bio_gas_improved_condensing_boiler_55_45"));
+    assert.ok(!ids.includes("heat_natural_gas_improved_condensing_boiler_55_45"));
   });
 });

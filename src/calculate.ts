@@ -4,6 +4,12 @@ import type { PreRenovationValues } from "./types/input/preRenovation.js";
 import type { EnergyEfficiencyClass } from "./types/energy-efficiency-class.js";
 import { DETEnergyCaluclator } from "./calculators/energy/index.js";
 
+export type ResolvedDETInput = Omit<DETInput, "outerWall"> & {
+  outerWall: DETInput["outerWall"] & {
+    allowsAdditionalInsulation: boolean;
+  };
+};
+
 export type CalculationResult = {
   energyConsumptionPerSquareMeter: number;
   energyEfficiencyClass: EnergyEfficiencyClass;
@@ -36,7 +42,7 @@ export type CalculationResult = {
   energyCarrierBaseRate: number;
 
   preRenovationValues: PreRenovationValues;
-  resolvedInput: DETInput;
+  resolvedInput: ResolvedDETInput;
 };
 
 export type CalculateOptions = {
@@ -104,7 +110,6 @@ export function calculate(
         heatingSystemType: ctx.get("heatingSystemType"),
         heatingSurfaceType: ctx.get("heatingSurfaceType"),
         hasGasSupply: ctx.get("hasGasSupply"),
-        hasBioGas: ctx.get("hasBioGas"),
         hasStorage: ctx.get("hasStorage"),
         userThermalUnitRate: ctx.get("thermalUnitRate"),
         userThermalBaseRate: ctx.get("thermalBaseRate"),
@@ -152,6 +157,7 @@ export function calculate(
         hasInsulation: ctx.get("outerWallHasInsulation"),
         constructionType: ctx.get("outerWallConstructionType"),
         insulationThickness: ctx.get("outerWallInsulationThickness"),
+        allowsAdditionalInsulation: ctx.get("outerWallAllowsAdditionalInsulation"),
       },
       bottomFloor: {
         area: ctx.get("bottomFloorArea"),
