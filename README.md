@@ -33,6 +33,12 @@ const result = calculate(DEFAULT_CONFIG, {
 // result: { energyConsumptionPerSquareMeter, energyEfficiencyClass, yearlyCost, co2Emissions }
 ```
 
+The artifact generator is Node-only and is available through a dedicated subpath:
+
+```ts
+import { generateDetBuildingEnergyProfileArtifacts } from "@csi-foxbyte/regensburg_digitalerenergiezwilling_energycalculationcore/generator";
+```
+
 ## Exports
 
 **Calculation:**

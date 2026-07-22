@@ -63,12 +63,6 @@ export type {
   ModelValueType,
   NgsiLdAttributeType,
 } from "./model/det-building-energy-profile.definition.js";
-export { generateDetBuildingEnergyProfileArtifacts } from "./model/det-building-energy-profile.generator.js";
-export type {
-  DetBuildingEnergyProfileGeneratorConfig,
-  DetBuildingEnergyProfileGeneratorOptions,
-} from "./model/det-building-energy-profile.generator.js";
-
 export { validateConfig, validateInput, detectMigrations, validateAndMigrate, applyMigrators, ConfigMigrationError } from "./validators/index.js";
 export type { ValidationResult, ValidationIssue, ConfigMigrator, ValidateAndMigrateResult } from "./validators/index.js";
 export { DETConfigSchema } from "./types/config/index.js";
