@@ -15,6 +15,11 @@ const MISSING_RECOMMENDED = {
   message: "Required",
 };
 
+const MISSING_HEATING_RENOVATION_LABEL_TEMPLATES = {
+  path: "renovation.heatingRenovationLabelTemplates",
+  message: "Required",
+};
+
 // ── detectMigrations ──────────────────────────────────────────────────────────
 
 describe("detectMigrations", () => {
@@ -33,6 +38,25 @@ describe("detectMigrations", () => {
     ];
     const result = detectMigrations({}, issues);
     assert.strictEqual(result.length, 1);
+  });
+
+  test("returns the label-template migrator for a missing template config", () => {
+    const result = detectMigrations({}, [MISSING_HEATING_RENOVATION_LABEL_TEMPLATES]);
+    assert.deepStrictEqual(
+      result.map((migrator) => migrator.id),
+      ["add-heating-renovation-label-templates"],
+    );
+  });
+
+  test("returns both migrators when both additions are missing", () => {
+    const result = detectMigrations({}, [
+      MISSING_RECOMMENDED,
+      MISSING_HEATING_RENOVATION_LABEL_TEMPLATES,
+    ]);
+    assert.deepStrictEqual(
+      result.map((migrator) => migrator.id),
+      ["add-recommended-for-systems", "add-heating-renovation-label-templates"],
+    );
   });
 
   test("returns empty when any issue is not fixable", () => {
@@ -125,6 +149,50 @@ describe("add-recommended-for-systems migrator", () => {
   });
 });
 
+// ── add-heating-renovation-label-templates migrator ──────────────────────────
+
+describe("add-heating-renovation-label-templates migrator", () => {
+  function getMigrator() {
+    const migrators = detectMigrations({}, [
+      MISSING_HEATING_RENOVATION_LABEL_TEMPLATES,
+    ]);
+    const migrator = migrators[0];
+    assert.ok(migrator);
+    return migrator;
+  }
+
+  test("adds a copy of the default templates", () => {
+    const raw = { renovation: {} };
+    const result = getMigrator().migrate(raw) as any;
+
+    assert.deepStrictEqual(
+      result.renovation.heatingRenovationLabelTemplates,
+      DEFAULT_CONFIG.renovation.heatingRenovationLabelTemplates,
+    );
+    assert.notStrictEqual(
+      result.renovation.heatingRenovationLabelTemplates,
+      DEFAULT_CONFIG.renovation.heatingRenovationLabelTemplates,
+    );
+  });
+
+  test("does not overwrite existing templates", () => {
+    const templates = {
+      carrierAndSystem: { de: "custom-both" },
+      carrierOnly: { de: "custom-carrier" },
+      systemOnly: { de: "custom-system" },
+    };
+    const raw = {
+      renovation: { heatingRenovationLabelTemplates: templates },
+    };
+
+    const result = getMigrator().migrate(raw) as any;
+    assert.strictEqual(
+      result.renovation.heatingRenovationLabelTemplates,
+      templates,
+    );
+  });
+});
+
 // ── validateAndMigrate ────────────────────────────────────────────────────────
 
 describe("validateAndMigrate", () => {
@@ -138,6 +206,32 @@ describe("validateAndMigrate", () => {
     const raw = structuredClone(baseConfig()) as any;
     delete raw.renovation.heatingSurfaceRenovations[0].recommendedForSystems;
     const result = validateAndMigrate(raw);
+    assert.strictEqual(result.success, true);
+    assert.strictEqual(result.migrated, true);
+  });
+
+  test("migrates missing heatingRenovationLabelTemplates", () => {
+    const raw = structuredClone(baseConfig()) as any;
+    delete raw.renovation.heatingRenovationLabelTemplates;
+
+    const result = validateAndMigrate(raw);
+
+    assert.strictEqual(result.success, true);
+    assert.strictEqual(result.migrated, true);
+    if (!result.success) return;
+    assert.deepStrictEqual(
+      result.data.renovation.heatingRenovationLabelTemplates,
+      DEFAULT_CONFIG.renovation.heatingRenovationLabelTemplates,
+    );
+  });
+
+  test("migrates templates and recommended systems together", () => {
+    const raw = structuredClone(baseConfig()) as any;
+    delete raw.renovation.heatingRenovationLabelTemplates;
+    delete raw.renovation.heatingSurfaceRenovations[0].recommendedForSystems;
+
+    const result = validateAndMigrate(raw);
+
     assert.strictEqual(result.success, true);
     assert.strictEqual(result.migrated, true);
   });

@@ -1219,48 +1219,45 @@ export const DEFAULT_CONFIG: DETConfig = {
   renovation: {
     heatingRenovations: [
       {
-        localization: {
-          de: "Wechsel zur Luftwärmepumpe",
-          en: "Switch to air source heat pump",
-        },
         targetCarrier: "none",
         targetSystem: "air_source_heat_pump_lt_40",
         priority: 1,
       },
       {
-        localization: {
-          de: "Wechsel zur Erdwärmepumpe",
-          en: "Switch to ground source heat pump",
-        },
         targetCarrier: "none",
         targetSystem: "ground_source_heat_pump_lt_40",
         priority: 1,
       },
       {
-        localization: {
-          de: "Wechsel zu Holzpellets",
-          en: "Switch to wood pellets",
-        },
         targetCarrier: "wood_pellets",
         targetSystem: "standard_boiler_70_55",
         priority: 2,
       },
       {
-        localization: { de: "Wechsel zu Biogas", en: "Switch to biogas" },
         targetCarrier: "bio_gas",
         targetSystem: "improved_condensing_boiler_55_45",
         priority: 3,
       },
       {
-        localization: {
-          de: "Wechsel zu Fernwärme",
-          en: "Switch to district heating",
-        },
         targetCarrier: "district_heating",
         targetSystem: "district_heating_all_temperatures",
         priority: 3,
       },
     ],
+    heatingRenovationLabelTemplates: {
+      carrierAndSystem: {
+        de: "Wechsel zu {{system}} mit Energieträger {{carrier}}",
+        en: "Switch to {{system}} using {{carrier}}",
+      },
+      carrierOnly: {
+        de: "Energieträger auf {{carrier}} umstellen",
+        en: "Switch energy carrier to {{carrier}}",
+      },
+      systemOnly: {
+        de: "Heizungssystem auf {{system}} umstellen",
+        en: "Switch heating system to {{system}}",
+      },
+    },
     heatingSurfaceRenovations: [
       {
         localization: {

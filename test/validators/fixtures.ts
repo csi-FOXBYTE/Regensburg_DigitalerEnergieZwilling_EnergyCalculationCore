@@ -119,7 +119,12 @@ export function baseConfig(): DETConfig {
     },
     renovation: {
       primaryEnergyCarrierTargets: ["gas"],
-      heatingRenovations: [{ targetCarrier: "gas", targetSystem: "boiler", priority: 1, localization: {} }],
+      heatingRenovations: [{ targetCarrier: "gas", targetSystem: "boiler", priority: 1 }],
+      heatingRenovationLabelTemplates: {
+        carrierAndSystem: { de: "{{system}} mit {{carrier}}" },
+        carrierOnly: { de: "{{carrier}}" },
+        systemOnly: { de: "{{system}}" },
+      },
       insulationRenovations: {
         roof:         { uValue: 0.2,  recommendYearRange: { from: 1980 } },
         topFloor:     { uValue: 0.2,  recommendYearRange: { from: 1980 } },

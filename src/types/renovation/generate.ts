@@ -10,6 +10,45 @@ import type {
 } from "./renovation";
 import { DETEnergyCaluclator } from "../../calculators/energy/index.js";
 
+function localizedValue(
+  localization: Record<string, string>,
+  locale: string,
+  description: string,
+): string {
+  const value = localization[locale];
+  if (value == null) {
+    throw new Error(`Translation for ${description} did not exist for locale ${locale}`);
+  }
+  return value;
+}
+
+function generateHeatingRenovationLabel(
+  config: DETConfig,
+  locale: string,
+  currentCarrier: string,
+  currentSystem: string,
+  targetCarrier: string,
+  targetSystem: string,
+): string {
+  const templates = config.renovation.heatingRenovationLabelTemplates;
+  const carrierChanged = targetCarrier !== currentCarrier;
+  const systemChanged = targetSystem !== currentSystem;
+  const templateLocalization = carrierChanged && systemChanged
+    ? templates.carrierAndSystem
+    : carrierChanged
+      ? templates.carrierOnly
+      : templates.systemOnly;
+  const template = localizedValue(templateLocalization, locale, "heating renovation label template");
+  const carrier = config.heat.primaryEnergyCarriers.find((entry) => entry.value === targetCarrier);
+  const system = config.heat.heatingSystemTypes.find((entry) => entry.value === targetSystem);
+  if (carrier == null || system == null) {
+    throw new Error("Heating renovation references an unknown carrier or system");
+  }
+  const carrierLabel = localizedValue(carrier.localization, locale, `primary energy carrier ${targetCarrier}`);
+  const systemLabel = localizedValue(system.localization, locale, `heating system ${targetSystem}`);
+  return template.replaceAll("{{carrier}}", carrierLabel).replaceAll("{{system}}", systemLabel);
+}
+
 function isYearInRange(
   year: number | RangeKey | null | undefined,
   range: RangeKey,
@@ -61,13 +100,15 @@ export function generateHeatingRenovations(
   const lastYearBand = config.general.generalYearBands[
     config.general.generalYearBands.length - 1
   ] as RangeLast;
+  const ctx = DETEnergyCaluclator({ config, input });
+  const currentCarrierValue = ctx.get("primaryEnergyCarrier");
+  const currentSystemValue = ctx.get("heatingSystemType");
   if (systemRenewalLabel != null) {
-    const ctx = DETEnergyCaluclator({ config, input });
     const currentCarrier = config.heat.primaryEnergyCarriers.find(
-      (carrier) => carrier.value === ctx.get("primaryEnergyCarrier"),
+      (carrier) => carrier.value === currentCarrierValue,
     );
     const currentSystem = config.heat.heatingSystemTypes.find(
-      (system) => system.value === ctx.get("heatingSystemType"),
+      (system) => system.value === currentSystemValue,
     );
     const excludeFromSystemRenewal =
       currentCarrier?.excludeFromSystemRenewal === true ||
@@ -84,10 +125,11 @@ export function generateHeatingRenovations(
   }
 
   const currentCarrierIsTarget = config.renovation.primaryEnergyCarrierTargets.includes(
-    input.heat.primaryEnergyCarrier ?? "",
+    currentCarrierValue,
   );
 
   const compatible = config.renovation.heatingRenovations.filter((hRenConf) => {
+    if (hRenConf.targetCarrier === currentCarrierValue && hRenConf.targetSystem === currentSystemValue) return false;
     const carrier = config.heat.primaryEnergyCarriers.find(
       (c) => c.value === hRenConf.targetCarrier,
     );
@@ -99,12 +141,14 @@ export function generateHeatingRenovations(
     : Infinity;
 
   for (const hRenConf of compatible) {
-    const label = hRenConf.localization[locale];
-    if (label == null) {
-      throw new Error(
-        "Translation for heat renovation did not exist for locale " + locale,
-      );
-    }
+    const label = generateHeatingRenovationLabel(
+      config,
+      locale,
+      currentCarrierValue,
+      currentSystemValue,
+      hRenConf.targetCarrier,
+      hRenConf.targetSystem,
+    );
     renovations.push({
       id: `heat_${hRenConf.targetCarrier}_${hRenConf.targetSystem}`,
       label,

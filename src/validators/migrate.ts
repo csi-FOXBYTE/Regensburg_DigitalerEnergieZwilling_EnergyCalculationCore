@@ -61,7 +61,35 @@ const addRecommendedForSystems: ConfigMigrator = {
   },
 };
 
-const migrators: ConfigMigrator[] = [addRecommendedForSystems];
+const addHeatingRenovationLabelTemplates: ConfigMigrator = {
+  id: "add-heating-renovation-label-templates",
+  canFix: (issue) =>
+    issue.path === "renovation.heatingRenovationLabelTemplates",
+  migrate: (raw) => {
+    if (!isRecord(raw)) return raw;
+    const renovation = raw.renovation;
+    if (!isRecord(renovation)) return raw;
+    if (renovation.heatingRenovationLabelTemplates != null) return raw;
+
+    const defaults = DEFAULT_CONFIG.renovation.heatingRenovationLabelTemplates;
+    return {
+      ...raw,
+      renovation: {
+        ...renovation,
+        heatingRenovationLabelTemplates: {
+          carrierAndSystem: { ...defaults.carrierAndSystem },
+          carrierOnly: { ...defaults.carrierOnly },
+          systemOnly: { ...defaults.systemOnly },
+        },
+      },
+    };
+  },
+};
+
+const migrators: ConfigMigrator[] = [
+  addRecommendedForSystems,
+  addHeatingRenovationLabelTemplates,
+];
 
 /**
  * Thrown when a {@link ConfigMigrator} crashes while transforming a config.

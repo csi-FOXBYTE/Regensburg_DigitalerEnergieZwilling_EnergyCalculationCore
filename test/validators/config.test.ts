@@ -194,13 +194,13 @@ describe("validateConfig — renovation", () => {
 
   test("fails when heatingRenovation.targetCarrier is not a valid carrier", () => {
     const cfg = fresh();
-    cfg.renovation.heatingRenovations = [{ targetCarrier: "oil", targetSystem: "boiler", priority: 1, localization: {} }];
+    cfg.renovation.heatingRenovations = [{ targetCarrier: "oil", targetSystem: "boiler", priority: 1 }];
     assertFailed(validateConfig(cfg), "renovation.heatingRenovations");
   });
 
   test("fails when heatingRenovation.targetSystem is not a valid heatingSystemType", () => {
     const cfg = fresh();
-    cfg.renovation.heatingRenovations = [{ targetCarrier: "gas", targetSystem: "heatPump", priority: 1, localization: {} }];
+    cfg.renovation.heatingRenovations = [{ targetCarrier: "gas", targetSystem: "heatPump", priority: 1 }];
     assertFailed(validateConfig(cfg), "renovation.heatingRenovations");
   });
 

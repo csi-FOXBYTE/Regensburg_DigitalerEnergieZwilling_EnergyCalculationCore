@@ -113,11 +113,7 @@ describe("generateHeatingRenovations — system renewal opt-out", () => {
     config = baseConfig(),
     input = baseInput(),
   ): boolean {
-    const localizedConfig = structuredClone(config);
-    for (const renovation of localizedConfig.renovation.heatingRenovations) {
-      renovation.localization.en ??= "Heating renovation";
-    }
-    return generateHeatingRenovations(localizedConfig, input, "en", "Renew system").some(
+    return generateHeatingRenovations(config, input, "de", "Renew system").some(
       (renovation) => renovation.id === "heat_renew",
     );
   }
@@ -146,6 +142,45 @@ describe("generateHeatingRenovations — system renewal opt-out", () => {
     input.heat.heatingSystemType = null;
 
     assert.equal(hasRenewal(DEFAULT_CONFIG, input), true);
+  });
+});
+
+describe("generateHeatingRenovations — matching systems and generated labels", () => {
+  function configWithHeatingRenovations() {
+    const config = baseConfig();
+    config.heat.primaryEnergyCarriers[0]!.localization = { de: "Erdgas" };
+    config.heat.primaryEnergyCarriers.push({ value: "bio_gas", localization: { de: "Biogas" } });
+    config.heat.heatingSystemTypes[0]!.localization = { de: "Standardkessel" };
+    config.heat.heatingSystemTypes.push({ value: "condensing_boiler", localization: { de: "Brennwertkessel" } });
+    config.renovation.heatingRenovations = [
+      { targetCarrier: "gas", targetSystem: "boiler", priority: 1 },
+      { targetCarrier: "bio_gas", targetSystem: "boiler", priority: 2 },
+      { targetCarrier: "gas", targetSystem: "condensing_boiler", priority: 3 },
+      { targetCarrier: "bio_gas", targetSystem: "condensing_boiler", priority: 4 },
+    ];
+    config.renovation.heatingRenovationLabelTemplates = {
+      carrierAndSystem: { de: "{{system}} mit {{carrier}}" },
+      carrierOnly: { de: "Energieträger: {{carrier}}" },
+      systemOnly: { de: "Heizungssystem: {{system}}" },
+    };
+    return config;
+  }
+
+  test("removes an exact resolved carrier/system match before choosing priority", () => {
+    const renovations = generateHeatingRenovations(configWithHeatingRenovations(), baseInput(), "de");
+
+    assert.ok(!renovations.some((renovation) => renovation.id === "heat_gas_boiler"));
+    assert.equal(renovations.find((renovation) => renovation.id === "heat_bio_gas_boiler")?.recommended, true);
+    assert.equal(renovations.find((renovation) => renovation.id === "heat_gas_condensing_boiler")?.recommended, false);
+  });
+
+  test("generates labels for carrier-only, system-only, and combined changes", () => {
+    const renovations = generateHeatingRenovations(configWithHeatingRenovations(), baseInput(), "de");
+    const labels = new Map(renovations.map((renovation) => [renovation.id, renovation.label]));
+
+    assert.equal(labels.get("heat_bio_gas_boiler"), "Energieträger: Biogas");
+    assert.equal(labels.get("heat_gas_condensing_boiler"), "Heizungssystem: Brennwertkessel");
+    assert.equal(labels.get("heat_bio_gas_condensing_boiler"), "Brennwertkessel mit Biogas");
   });
 });
 

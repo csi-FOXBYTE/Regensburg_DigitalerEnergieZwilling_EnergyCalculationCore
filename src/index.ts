@@ -78,6 +78,7 @@ export type {
   InputPatch,
   Renovation,
   HeatingRenovationConfig,
+  HeatingRenovationLabelTemplates,
   HeatingSurfaceRenovationConfig,
   InsulationRenovationKeys,
   InsulationRenovationConfig,
