@@ -17,7 +17,13 @@ export const CarrierSelectionSchema = SelectionSchema.extend({
 });
 export type CarrierSelection = z.infer<typeof CarrierSelectionSchema>;
 
+export const HeatingSystemRequirementsSchema = z.object({
+  geothermal: z.literal(true).optional(),
+});
+export type HeatingSystemRequirements = z.infer<typeof HeatingSystemRequirementsSchema>;
+
 export const HeatingSystemSelectionSchema = SelectionSchema.extend({
+  requirements: HeatingSystemRequirementsSchema.optional(),
   excludeFromSystemRenewal: z.boolean().optional(),
 });
 export type HeatingSystemSelection = z.infer<typeof HeatingSystemSelectionSchema>;
@@ -73,4 +79,12 @@ export function isCarrierCompatible(carrier: CarrierSelection, input: DETInput):
   if (requirements.storage !== undefined && requirements.storage !== (input.heat.hasStorage ?? false)) return false;
   if (requirements.gas !== undefined && requirements.gas !== (input.heat.hasGasSupply ?? true)) return false;
   return true;
+}
+
+export function isHeatingSystemCompatible(
+  system: HeatingSystemSelection,
+  input: DETInput,
+): boolean {
+  if (system.requirements?.geothermal !== true) return true;
+  return input.heat.hasGeothermalAvailability ?? false;
 }

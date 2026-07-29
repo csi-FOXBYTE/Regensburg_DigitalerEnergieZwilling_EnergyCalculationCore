@@ -193,6 +193,7 @@ export const DEFAULT_CONFIG: DETConfig = {
           de: "Elektrowärmepumpe Erdreich/Grundwasser / Sole-Wasser / Wasser-Wasser 55/45°C",
           en: "Ground-source heat pump 55/45°C",
         },
+        requirements: { geothermal: true },
       },
       {
         value: "ground_source_heat_pump_lt_40",
@@ -200,6 +201,7 @@ export const DEFAULT_CONFIG: DETConfig = {
           de: "Elektrowärmepumpe Erdreich/Grundwasser / Sole-Wasser / Wasser-Wasser <40°C",
           en: "Ground-source heat pump <40°C",
         },
+        requirements: { geothermal: true },
       },
       {
         value: "oil_fired_single_stove",

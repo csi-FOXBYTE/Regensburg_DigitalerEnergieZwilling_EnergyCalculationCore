@@ -1,5 +1,8 @@
 import type { DETConfig } from "../config";
-import { isCarrierCompatible } from "../config/heat";
+import {
+  isCarrierCompatible,
+  isHeatingSystemCompatible,
+} from "../config/heat";
 import type { DETInput } from "../input";
 import type { RangeKey, RangeLast } from "../range-bands";
 import { insulationKeys } from "./renovation";
@@ -133,7 +136,15 @@ export function generateHeatingRenovations(
     const carrier = config.heat.primaryEnergyCarriers.find(
       (c) => c.value === hRenConf.targetCarrier,
     );
-    return carrier != null && isCarrierCompatible(carrier, input);
+    const system = config.heat.heatingSystemTypes.find(
+      (s) => s.value === hRenConf.targetSystem,
+    );
+    return (
+      carrier != null &&
+      system != null &&
+      isCarrierCompatible(carrier, input) &&
+      isHeatingSystemCompatible(system, input)
+    );
   });
 
   const highestPriority = currentCarrierIsTarget

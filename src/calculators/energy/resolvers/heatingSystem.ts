@@ -8,6 +8,7 @@ declare module "../" {
   interface DETCalculatorRegistry {
     hasGasSupply: boolean;
     hasStorage: boolean;
+    hasGeothermalAvailability: boolean;
     heatingSystemType: string;
     heatingSystemConstructionYear: number | RangeKey;
     heatingSurfaceType: string;
@@ -27,6 +28,11 @@ export const hasStorage = {
   key: "hasStorage",
   resolve: (ctx) => ctx.input.input.heat.hasStorage ?? false,
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "hasStorage">;
+
+export const hasGeothermalAvailability = {
+  key: "hasGeothermalAvailability",
+  resolve: (ctx) => ctx.input.input.heat.hasGeothermalAvailability ?? false,
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "hasGeothermalAvailability">;
 
 export const heatingSystemType = {
   key: "heatingSystemType",
@@ -101,6 +107,7 @@ export const electricalRatio = {
 export default [
   hasGasSupply,
   hasStorage,
+  hasGeothermalAvailability,
   heatingSystemType,
   heatingSystemConstructionYear,
   heatingSurfaceType,

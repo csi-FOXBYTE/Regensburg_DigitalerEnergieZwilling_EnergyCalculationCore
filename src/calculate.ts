@@ -111,6 +111,7 @@ export function calculate(
         heatingSurfaceType: ctx.get("heatingSurfaceType"),
         hasGasSupply: ctx.get("hasGasSupply"),
         hasStorage: ctx.get("hasStorage"),
+        hasGeothermalAvailability: ctx.get("hasGeothermalAvailability"),
         userThermalUnitRate: ctx.get("thermalUnitRate"),
         userThermalBaseRate: ctx.get("thermalBaseRate"),
         userThermalTotalCost: ctx.get("thermalCarrierCost"),

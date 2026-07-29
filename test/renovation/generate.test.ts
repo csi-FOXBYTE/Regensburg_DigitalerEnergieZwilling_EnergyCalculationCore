@@ -214,3 +214,34 @@ describe("generateHeatingRenovations — gas supply", () => {
     assert.ok(!ids.includes("heat_natural_gas_improved_condensing_boiler_55_45"));
   });
 });
+
+describe("generateHeatingRenovations — geothermal availability", () => {
+  function heatingRenovationIds(hasGeothermalAvailability?: boolean): string[] {
+    const input = baseInput();
+    input.heat.hasGeothermalAvailability = hasGeothermalAvailability;
+    return generateHeatingRenovations(DEFAULT_CONFIG, input, "en").map(
+      (renovation) => renovation.id,
+    );
+  }
+
+  test("offers ground-source and air-source heat pumps when geothermal energy is available", () => {
+    const ids = heatingRenovationIds(true);
+
+    assert.ok(ids.includes("heat_none_ground_source_heat_pump_lt_40"));
+    assert.ok(ids.includes("heat_none_air_source_heat_pump_lt_40"));
+  });
+
+  test("does not offer a ground-source heat pump when geothermal energy is unavailable", () => {
+    const ids = heatingRenovationIds(false);
+
+    assert.ok(!ids.includes("heat_none_ground_source_heat_pump_lt_40"));
+    assert.ok(ids.includes("heat_none_air_source_heat_pump_lt_40"));
+  });
+
+  test("assumes geothermal energy is unavailable when availability is omitted", () => {
+    const ids = heatingRenovationIds();
+
+    assert.ok(!ids.includes("heat_none_ground_source_heat_pump_lt_40"));
+    assert.ok(ids.includes("heat_none_air_source_heat_pump_lt_40"));
+  });
+});

@@ -8,6 +8,7 @@ export const DETHeatInputSchema = z.object({
   heatingSurfaceType: z.string().nullable().optional(),
   hasGasSupply: z.boolean().nullable().optional(),
   hasStorage: z.boolean().nullable().optional(),
+  hasGeothermalAvailability: z.boolean().nullable().optional(),
   userThermalUnitRate: z.number().nullable().optional(),
   userThermalTotalCost: z.number().nullable().optional(),
   userThermalBaseRate: z.number().nullable().optional(),

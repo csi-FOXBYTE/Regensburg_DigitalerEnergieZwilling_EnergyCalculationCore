@@ -24,8 +24,12 @@ export type {
   CarrierSelection,
   CarrierRequirements,
   HeatingSystemSelection,
+  HeatingSystemRequirements,
 } from "./types/config/heat.js";
-export { isCarrierCompatible } from "./types/config/heat.js";
+export {
+  isCarrierCompatible,
+  isHeatingSystemCompatible,
+} from "./types/config/heat.js";
 export type { DETRoofConfig } from "./types/config/roof.js";
 export type { DETTopFloorConfig } from "./types/config/topFloor.js";
 export type {

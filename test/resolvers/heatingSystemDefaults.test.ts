@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 
 import { DETEnergyCaluclator } from "../../src/calculators/energy/index.js";
-import { hasGasSupply } from "../../src/calculators/energy/resolvers/heatingSystem.js";
+import {
+  hasGasSupply,
+  hasGeothermalAvailability,
+} from "../../src/calculators/energy/resolvers/heatingSystem.js";
 import { DEFAULT_CONFIG } from "../../src/types/config/default-config.js";
 import { mockCtx } from "../helpers/mock-ctx.js";
 import { baseInput } from "../validators/fixtures.js";
@@ -15,6 +18,21 @@ describe("heating system defaults", () => {
 
   test("preserves an explicitly unavailable gas supply", () => {
     assert.equal(hasGasSupply.resolve(mockCtx({ hasGasSupply: false })), false);
+  });
+
+  test("assumes geothermal energy is unavailable when availability is omitted or null", () => {
+    assert.equal(hasGeothermalAvailability.resolve(mockCtx()), false);
+    assert.equal(
+      hasGeothermalAvailability.resolve(mockCtx({ hasGeothermalAvailability: null })),
+      false,
+    );
+  });
+
+  test("preserves explicitly available geothermal energy", () => {
+    assert.equal(
+      hasGeothermalAvailability.resolve(mockCtx({ hasGeothermalAvailability: true })),
+      true,
+    );
   });
 
   test("defaults to natural gas with its configured standard boiler", () => {

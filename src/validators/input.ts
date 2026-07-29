@@ -1,7 +1,10 @@
 import { DETInputSchema } from "../types/input/index.js";
 import type { DETInput } from "../types/input/index.js";
 import type { DETConfig } from "../types/config/index.js";
-import { isCarrierCompatible } from "../types/config/heat.js";
+import {
+  isCarrierCompatible,
+  isHeatingSystemCompatible,
+} from "../types/config/heat.js";
 import { mapZodError, type ValidationIssue, type ValidationResult } from "./types.js";
 
 export function validateInput(data: unknown, config: DETConfig): ValidationResult<DETInput> {
@@ -42,6 +45,16 @@ export function validateInput(data: unknown, config: DETConfig): ValidationResul
 
   if (input.heat.heatingSystemType != null && !systemTypeValues.includes(input.heat.heatingSystemType)) {
     issues.push({ path: "heat.heatingSystemType", message: `heatingSystemType "${input.heat.heatingSystemType}" is not in config.heat.heatingSystemTypes` });
+  }
+
+  const submittedSystem = heat.heatingSystemTypes.find(
+    (system) => system.value === input.heat.heatingSystemType,
+  );
+  if (submittedSystem != null && !isHeatingSystemCompatible(submittedSystem, input)) {
+    issues.push({
+      path: "heat.heatingSystemType",
+      message: `heatingSystemType "${submittedSystem.value}" is incompatible with the supplied geothermal availability`,
+    });
   }
 
   if (input.heat.heatingSystemType != null && input.heat.primaryEnergyCarrier != null) {

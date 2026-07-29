@@ -182,6 +182,30 @@ describe("validateInput — heat", () => {
     assertPassed(validateInput(input, localCfg));
   });
 
+  test("fails when a submitted heating system requires unavailable geothermal energy", () => {
+    const localCfg = freshConfig();
+    localCfg.heat.heatingSystemTypes[0]!.requirements = { geothermal: true };
+    const input = freshInput();
+    input.heat = {
+      heatingSystemType: "boiler",
+      hasGeothermalAvailability: false,
+    };
+
+    assertFailed(validateInput(input, localCfg), "heat.heatingSystemType");
+  });
+
+  test("passes when a submitted heating system meets its geothermal requirement", () => {
+    const localCfg = freshConfig();
+    localCfg.heat.heatingSystemTypes[0]!.requirements = { geothermal: true };
+    const input = freshInput();
+    input.heat = {
+      heatingSystemType: "boiler",
+      hasGeothermalAvailability: true,
+    };
+
+    assertPassed(validateInput(input, localCfg));
+  });
+
   test("fails when the effective thermal base rate exceeds the total cost", () => {
     const input = freshInput();
     input.heat = { userThermalTotalCost: 50 };
