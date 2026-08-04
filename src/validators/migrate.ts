@@ -86,9 +86,53 @@ const addHeatingRenovationLabelTemplates: ConfigMigrator = {
   },
 };
 
+const addRoofShapeDefaults: ConfigMigrator = {
+  id: "add-roof-shape-defaults",
+  canFix: (issue) =>
+    issue.path === "roof.defaultIsFlatRoof" ||
+    issue.path === "roof.defaultConstructionTypeByIsFlatRoof" ||
+    issue.path === "topFloor.defaultHasAtticByIsFlatRoof" ||
+    issue.path === "topFloor.defaultIsAtticHeated",
+  migrate: (raw) => {
+    if (!isRecord(raw)) return raw;
+
+    const roof = raw.roof;
+    const topFloor = raw.topFloor;
+    if (!isRecord(roof) || !isRecord(topFloor)) return raw;
+
+    const defaultConstructionTypeByIsFlatRoof =
+      roof.defaultConstructionTypeByIsFlatRoof ??
+      (typeof roof.defaultConstructionType === "string"
+        ? [
+            { key: true, value: roof.defaultConstructionType },
+            { key: false, value: roof.defaultConstructionType },
+          ]
+        : undefined);
+
+    return {
+      ...raw,
+      roof: {
+        ...roof,
+        defaultIsFlatRoof: roof.defaultIsFlatRoof ?? false,
+        defaultConstructionTypeByIsFlatRoof,
+      },
+      topFloor: {
+        ...topFloor,
+        defaultHasAtticByIsFlatRoof:
+          topFloor.defaultHasAtticByIsFlatRoof ?? [
+            { key: true, value: false },
+            { key: false, value: false },
+          ],
+        defaultIsAtticHeated: topFloor.defaultIsAtticHeated ?? false,
+      },
+    };
+  },
+};
+
 const migrators: ConfigMigrator[] = [
   addRecommendedForSystems,
   addHeatingRenovationLabelTemplates,
+  addRoofShapeDefaults,
 ];
 
 /**

@@ -7,6 +7,7 @@ declare module "../../" {
   interface DETCalculatorRegistry {
     roofYear: number | RangeKey;
     roofArea: number;
+    isFlatRoof: boolean;
     roofHasInsulation: boolean;
     roofInsulationThickness: number;
     roofInsulationType: RoofInsulationType;
@@ -27,6 +28,12 @@ export const roofArea = {
   key: "roofArea",
   resolve: (ctx) => ctx.input.input.roof.area,
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "roofArea">;
+
+export const isFlatRoof = {
+  key: "isFlatRoof",
+  resolve: (ctx) =>
+    ctx.input.input.roof.isFlatRoof ?? ctx.input.config.roof.defaultIsFlatRoof,
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "isFlatRoof">;
 
 export const roofHasInsulation = {
   key: "roofHasInsulation",
@@ -59,4 +66,4 @@ export const isSpaceBelowRoofHeated = {
   },
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "isSpaceBelowRoofHeated">;
 
-export default [roofYear, roofArea, roofHasInsulation, roofInsulationThickness, roofInsulationType, isSpaceBelowRoofHeated];
+export default [roofYear, roofArea, isFlatRoof, roofHasInsulation, roofInsulationThickness, roofInsulationType, isSpaceBelowRoofHeated];

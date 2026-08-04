@@ -26,7 +26,10 @@ export const roofConstructionType = {
   resolve: (ctx) => {
     const override = ctx.input.input.roof.constructionType;
     if (override != null) return override;
-    return ctx.input.config.roof.defaultConstructionType;
+    return resolveKeyedValue(
+      ctx.input.config.roof.defaultConstructionTypeByIsFlatRoof,
+      ctx.get("isFlatRoof"),
+    );
   },
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "roofConstructionType">;
 

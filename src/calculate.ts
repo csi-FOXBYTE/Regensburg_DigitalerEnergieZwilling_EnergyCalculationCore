@@ -124,6 +124,7 @@ export function calculate(
       },
       roof: {
         area: ctx.get("roofArea"),
+        isFlatRoof: ctx.get("isFlatRoof"),
         year: ctx.get("roofYear"),
         hasInsulation: ctx.get("roofHasInsulation"),
         insulationType: ctx.get("roofInsulationType"),

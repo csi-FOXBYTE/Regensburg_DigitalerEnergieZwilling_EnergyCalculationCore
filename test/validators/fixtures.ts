@@ -71,7 +71,11 @@ export function baseConfig(): DETConfig {
       heatLossFactor: 1.0,
       defaultInsulationType: "betweenRafter",
       constructionTypes: [{ value: "rafter", localization: {} }],
-      defaultConstructionType: "rafter",
+      defaultIsFlatRoof: false,
+      defaultConstructionTypeByIsFlatRoof: [
+        { key: true, value: "rafter" },
+        { key: false, value: "rafter" },
+      ],
       assumedInsulationThickness: 0.1,
       thermalConductivity: 0.04,
       insulationReductionFactor: 1.0,
@@ -80,6 +84,11 @@ export function baseConfig(): DETConfig {
     topFloor: {
       topFloorTypes: [{ value: "flatRoof", localization: {} }],
       defaultTopFloorType: [{ to: 2000, value: "flatRoof" }, { from: 2000, value: "flatRoof" }],
+      defaultHasAtticByIsFlatRoof: [
+        { key: true, value: false },
+        { key: false, value: true },
+      ],
+      defaultIsAtticHeated: false,
       thermalConductivity: 0.04,
       assumedInsulationThickness: 0.1,
       uValue: [{ key: "flatRoof", value: [{ to: 2000, value: 1.5 }, { from: 2000, value: 1.2 }] }],

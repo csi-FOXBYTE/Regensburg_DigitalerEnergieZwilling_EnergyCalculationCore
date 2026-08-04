@@ -6,6 +6,8 @@ import { SelectionSchema } from "../selection.js";
 export const DETTopFloorConfigSchema = z.object({
   topFloorTypes: z.array(SelectionSchema),
   defaultTopFloorType: yearBands(z.string()),
+  defaultHasAtticByIsFlatRoof: keyedValues(z.boolean(), z.boolean()),
+  defaultIsAtticHeated: z.boolean(),
   thermalConductivity: z.number(),
   assumedInsulationThickness: z.number(),
   uValue: keyedValues(z.string(), yearBands(z.number())),

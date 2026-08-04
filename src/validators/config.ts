@@ -136,8 +136,21 @@ export function validateConfig(data: unknown): ValidationResult<DETConfig> {
 
   const roofConstructionTypeValues = roof.constructionTypes.map((c) => c.value);
 
-  if (!roofConstructionTypeValues.includes(roof.defaultConstructionType)) {
-    issues.push({ path: "roof.defaultConstructionType", message: `defaultConstructionType "${roof.defaultConstructionType}" is not in roof.constructionTypes` });
+  for (const isFlatRoof of [true, false]) {
+    const entry = roof.defaultConstructionTypeByIsFlatRoof.find(
+      (candidate) => candidate.key === isFlatRoof,
+    );
+    if (entry == null) {
+      issues.push({
+        path: "roof.defaultConstructionTypeByIsFlatRoof",
+        message: `No defaultConstructionType entry for isFlatRoof=${isFlatRoof}`,
+      });
+    } else if (!roofConstructionTypeValues.includes(entry.value)) {
+      issues.push({
+        path: "roof.defaultConstructionTypeByIsFlatRoof",
+        message: `defaultConstructionType "${entry.value}" for isFlatRoof=${isFlatRoof} is not in roof.constructionTypes`,
+      });
+    }
   }
   for (const entry of roof.uValue) {
     if (!roofConstructionTypeValues.includes(entry.key)) {
@@ -154,6 +167,19 @@ export function validateConfig(data: unknown): ValidationResult<DETConfig> {
   // ── TopFloor: catalogue self-consistency ──────────────────────────────────────
 
   const topFloorTypeValues = topFloor.topFloorTypes.map((t) => t.value);
+
+  for (const isFlatRoof of [true, false]) {
+    if (
+      !topFloor.defaultHasAtticByIsFlatRoof.some(
+        (entry) => entry.key === isFlatRoof,
+      )
+    ) {
+      issues.push({
+        path: "topFloor.defaultHasAtticByIsFlatRoof",
+        message: `No defaultHasAttic entry for isFlatRoof=${isFlatRoof}`,
+      });
+    }
+  }
 
   for (const band of topFloor.defaultTopFloorType) {
     if (!topFloorTypeValues.includes(band.value)) {

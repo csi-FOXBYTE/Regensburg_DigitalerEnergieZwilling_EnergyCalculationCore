@@ -285,6 +285,18 @@ describe("validateInput — components", () => {
     assertPassed(validateInput(input, cfg));
   });
 
+  test("passes when roof.isFlatRoof is boolean", () => {
+    const input = freshInput();
+    input.roof.isFlatRoof = true;
+    assertPassed(validateInput(input, cfg));
+  });
+
+  test("fails when roof.isFlatRoof is not boolean", () => {
+    const input = freshInput() as any;
+    input.roof.isFlatRoof = "yes";
+    assertFailed(validateInput(input, cfg), "roof.isFlatRoof");
+  });
+
   test("fails when topFloor.topFloorType is not in config topFloor.topFloorTypes", () => {
     const input = freshInput();
     input.topFloor = { area: 100, topFloorType: "pitchedRoof" };

@@ -1,6 +1,7 @@
 import type { Resolver } from "../../../../engine/index.js";
 import type { DETCalculatorRegistry, DETCalculatorContext } from "../../";
 import type { RangeKey } from "../../../../types/range-bands.js";
+import { resolveKeyedValue } from "../../../../types/keyed-values.js";
 
 declare module "../../" {
   interface DETCalculatorRegistry {
@@ -29,12 +30,21 @@ export const topFloorArea = {
 
 export const hasAttic = {
   key: "hasAttic",
-  resolve: (ctx) => ctx.input.input.topFloor.hasAttic ?? false,
+  resolve: (ctx) => {
+    const override = ctx.input.input.topFloor.hasAttic;
+    if (override != null) return override;
+    return resolveKeyedValue(
+      ctx.input.config.topFloor.defaultHasAtticByIsFlatRoof,
+      ctx.get("isFlatRoof"),
+    );
+  },
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "hasAttic">;
 
 export const isAtticHeated = {
   key: "isAtticHeated",
-  resolve: (ctx) => ctx.input.input.topFloor.isAtticHeated ?? false,
+  resolve: (ctx) =>
+    ctx.input.input.topFloor.isAtticHeated ??
+    ctx.input.config.topFloor.defaultIsAtticHeated,
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "isAtticHeated">;
 
 export const topFloorHasInsulation = {

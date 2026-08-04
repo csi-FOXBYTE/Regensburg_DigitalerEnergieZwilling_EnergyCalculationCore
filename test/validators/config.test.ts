@@ -222,16 +222,24 @@ describe("validateConfig — renovation", () => {
 // ── Roof ──────────────────────────────────────────────────────────────────────
 
 describe("validateConfig — roof", () => {
-  test("fails when defaultConstructionType is not in constructionTypes", () => {
-    const cfg = fresh();
-    cfg.roof.defaultConstructionType = "tileRoof";
-    assertFailed(validateConfig(cfg), "roof.defaultConstructionType");
-  });
-
   test("fails when a uValue key is not in constructionTypes", () => {
     const cfg = fresh();
     cfg.roof.uValue = [{ key: "tileRoof", value: [{ to: 2000, value: 1.5 }, { from: 2000, value: 1.2 }] }];
     assertFailed(validateConfig(cfg), "roof.uValue");
+  });
+
+  test("fails when a roof-shape construction default is not in constructionTypes", () => {
+    const cfg = fresh();
+    cfg.roof.defaultConstructionTypeByIsFlatRoof[0]!.value = "tileRoof";
+    assertFailed(validateConfig(cfg), "roof.defaultConstructionTypeByIsFlatRoof");
+  });
+
+  test("fails when a roof-shape construction default is missing", () => {
+    const cfg = fresh();
+    cfg.roof.defaultConstructionTypeByIsFlatRoof = [
+      { key: true, value: "rafter" },
+    ];
+    assertFailed(validateConfig(cfg), "roof.defaultConstructionTypeByIsFlatRoof");
   });
 
   test("fails when uValue yearBands cannot resolve a generalYearBand key", () => {
@@ -245,6 +253,12 @@ describe("validateConfig — roof", () => {
 // ── TopFloor ──────────────────────────────────────────────────────────────────
 
 describe("validateConfig — topFloor", () => {
+  test("fails when a roof-shape attic default is missing", () => {
+    const cfg = fresh();
+    cfg.topFloor.defaultHasAtticByIsFlatRoof = [{ key: true, value: false }];
+    assertFailed(validateConfig(cfg), "topFloor.defaultHasAtticByIsFlatRoof");
+  });
+
   test("fails when a defaultTopFloorType band value is not in topFloorTypes", () => {
     const cfg = fresh();
     cfg.topFloor.defaultTopFloorType = [

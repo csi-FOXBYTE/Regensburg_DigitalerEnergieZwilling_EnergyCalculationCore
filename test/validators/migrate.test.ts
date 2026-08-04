@@ -20,6 +20,26 @@ const MISSING_HEATING_RENOVATION_LABEL_TEMPLATES = {
   message: "Required",
 };
 
+const MISSING_ROOF_SHAPE_CONSTRUCTION_DEFAULTS = {
+  path: "roof.defaultConstructionTypeByIsFlatRoof",
+  message: "Required",
+};
+
+const MISSING_DEFAULT_IS_FLAT_ROOF = {
+  path: "roof.defaultIsFlatRoof",
+  message: "Required",
+};
+
+const MISSING_ROOF_SHAPE_ATTIC_DEFAULTS = {
+  path: "topFloor.defaultHasAtticByIsFlatRoof",
+  message: "Required",
+};
+
+const MISSING_DEFAULT_IS_ATTIC_HEATED = {
+  path: "topFloor.defaultIsAtticHeated",
+  message: "Required",
+};
+
 // ── detectMigrations ──────────────────────────────────────────────────────────
 
 describe("detectMigrations", () => {
@@ -56,6 +76,19 @@ describe("detectMigrations", () => {
     assert.deepStrictEqual(
       result.map((migrator) => migrator.id),
       ["add-recommended-for-systems", "add-heating-renovation-label-templates"],
+    );
+  });
+
+  test("returns one roof-shape migrator for all missing roof-shape defaults", () => {
+    const result = detectMigrations({}, [
+      MISSING_DEFAULT_IS_FLAT_ROOF,
+      MISSING_ROOF_SHAPE_CONSTRUCTION_DEFAULTS,
+      MISSING_ROOF_SHAPE_ATTIC_DEFAULTS,
+      MISSING_DEFAULT_IS_ATTIC_HEATED,
+    ]);
+    assert.deepStrictEqual(
+      result.map((migrator) => migrator.id),
+      ["add-roof-shape-defaults"],
     );
   });
 
@@ -190,6 +223,35 @@ describe("add-heating-renovation-label-templates migrator", () => {
       result.renovation.heatingRenovationLabelTemplates,
       templates,
     );
+  });
+});
+
+// ── add-roof-shape-defaults migrator ─────────────────────────────────────────
+
+describe("add-roof-shape-defaults migrator", () => {
+  test("preserves legacy behavior for configs without roof-shape defaults", () => {
+    const raw = structuredClone(baseConfig()) as any;
+    raw.roof.defaultConstructionType = "rafter";
+    delete raw.roof.defaultIsFlatRoof;
+    delete raw.roof.defaultConstructionTypeByIsFlatRoof;
+    delete raw.topFloor.defaultHasAtticByIsFlatRoof;
+    delete raw.topFloor.defaultIsAtticHeated;
+
+    const result = validateAndMigrate(raw);
+
+    assert.strictEqual(result.success, true);
+    assert.strictEqual(result.migrated, true);
+    if (!result.success) return;
+    assert.strictEqual(result.data.roof.defaultIsFlatRoof, false);
+    assert.deepStrictEqual(result.data.roof.defaultConstructionTypeByIsFlatRoof, [
+      { key: true, value: "rafter" },
+      { key: false, value: "rafter" },
+    ]);
+    assert.deepStrictEqual(result.data.topFloor.defaultHasAtticByIsFlatRoof, [
+      { key: true, value: false },
+      { key: false, value: false },
+    ]);
+    assert.strictEqual(result.data.topFloor.defaultIsAtticHeated, false);
   });
 });
 
