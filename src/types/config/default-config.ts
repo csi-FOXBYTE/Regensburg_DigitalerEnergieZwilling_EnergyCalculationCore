@@ -115,15 +115,15 @@ export const DEFAULT_CONFIG: DETConfig = {
       {
         value: "wood_biomass",
         localization: {
-          de: "Biomasse Holz",
-          en: "Wood biomass",
+          de: "Holzscheite",
+          en: "Wood logs",
         },
         requirements: { storage: true },
       },
       {
         value: "wood_pellets",
         localization: {
-          de: "Holz Pellets",
+          de: "Holzpellets",
           en: "Wood pellets",
         },
         requirements: { storage: true },
