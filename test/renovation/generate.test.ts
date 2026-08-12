@@ -3,6 +3,7 @@ import { describe, test } from "node:test";
 
 import {
   generateHeatingRenovations,
+  generateHeatingSurfaceRenovations,
   generateInsulationRenovations,
 } from "../../src/types/renovation/generate.js";
 import type { InsulationRenovationKeys } from "../../src/types/renovation/renovation.js";
@@ -54,9 +55,73 @@ describe("generateInsulationRenovations — roof boundary", () => {
     assert.ok(!ids.includes("envelope_roof"));
     assert.ok(ids.includes("envelope_topFloor"));
   });
+
+  test("does not show roof-window renovation when the attic is unheated", () => {
+    const input = baseInput();
+    input.topFloor.hasAttic = true;
+    input.topFloor.isAtticHeated = false;
+
+    const ids = renovationIds(input);
+
+    assert.ok(!ids.includes("envelope_roofWindows"));
+  });
+
+  test("shows roof-window renovation when the roof renovation is shown", () => {
+    const input = baseInput();
+    input.topFloor.hasAttic = true;
+    input.topFloor.isAtticHeated = true;
+
+    const ids = renovationIds(input);
+
+    assert.ok(ids.includes("envelope_roof"));
+    assert.ok(ids.includes("envelope_roofWindows"));
+  });
 });
 
 describe("generateInsulationRenovations — insulation recommendation", () => {
+  test("uses the resolved building year for roof windows when their year is omitted", () => {
+    const input = baseInput();
+    input.general.buildingYear = 1990;
+    input.roofWindows.year = undefined;
+    input.topFloor.hasAttic = true;
+    input.topFloor.isAtticHeated = true;
+
+    const renovation = generate(input).find(
+      (entry) => entry.id === "envelope_roofWindows",
+    );
+
+    assert.equal(renovation?.recommended, true);
+  });
+
+  test("uses resolved building years for the remaining envelope components", () => {
+    const input = baseInput();
+    input.general.buildingYear = 1990;
+    input.topFloor.hasAttic = true;
+    input.topFloor.isAtticHeated = true;
+
+    const renovations = new Map(
+      generate(input).map((renovation) => [renovation.id, renovation]),
+    );
+
+    assert.equal(renovations.get("envelope_roof")?.recommended, true);
+    assert.equal(renovations.get("envelope_bottomFloor")?.recommended, true);
+    assert.equal(renovations.get("envelope_outerWalls")?.recommended, true);
+    assert.equal(renovations.get("envelope_outerWindows")?.recommended, true);
+  });
+
+  test("uses the resolved building year for the top floor", () => {
+    const input = baseInput();
+    input.general.buildingYear = 1990;
+    input.topFloor.hasAttic = true;
+    input.topFloor.isAtticHeated = false;
+
+    const renovation = generate(input).find(
+      (entry) => entry.id === "envelope_topFloor",
+    );
+
+    assert.equal(renovation?.recommended, true);
+  });
+
   test("uses the year fallback when hasInsulation is false", () => {
     const oldInput = baseInput();
     oldInput.bottomFloor.hasInsulation = false;
@@ -105,6 +170,38 @@ describe("generateInsulationRenovations — insulation recommendation", () => {
     );
 
     assert.equal(renovation?.recommended, false);
+  });
+});
+
+describe("generateHeatingSurfaceRenovations — resolved defaults", () => {
+  test("uses the resolved default heating system for recommendations", () => {
+    const input = baseInput();
+    input.heat.primaryEnergyCarrier = "none";
+    input.heat.heatingSystemType = null;
+    input.heat.heatingSurfaceType = null;
+
+    const renovation = generateHeatingSurfaceRenovations(
+      DEFAULT_CONFIG,
+      input,
+      "en",
+    ).find((entry) => entry.id === "surface_radiant_surface_heating");
+
+    assert.equal(renovation?.recommended, true);
+  });
+
+  test("does not offer the resolved default heating surface", () => {
+    const config = structuredClone(DEFAULT_CONFIG);
+    config.heat.defaultHeatingSurfaceType = "radiant_surface_heating";
+    const input = baseInput();
+    input.heat.heatingSurfaceType = null;
+
+    const renovations = generateHeatingSurfaceRenovations(config, input, "en");
+
+    assert.ok(
+      !renovations.some(
+        (entry) => entry.id === "surface_radiant_surface_heating",
+      ),
+    );
   });
 });
 

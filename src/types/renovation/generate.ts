@@ -1,8 +1,4 @@
 import type { DETConfig } from "../config";
-import {
-  isCarrierCompatible,
-  isHeatingSystemCompatible,
-} from "../config/heat";
 import type { DETInput } from "../input";
 import type { RangeKey, RangeLast } from "../range-bands";
 import { insulationKeys } from "./renovation";
@@ -70,26 +66,26 @@ function isYearInRange(
 function isInsulationRecommended(
   key: InsulationRenovationKeys,
   config: DETConfig,
-  input: DETInput,
+  ctx: ReturnType<typeof DETEnergyCaluclator>,
 ): boolean {
   const { recommendYearRange } = config.renovation.insulationRenovations[key];
   switch (key) {
     case "roof":
-      if (input.roof.hasInsulation === true) return false;
-      return isYearInRange(input.roof.year, recommendYearRange);
+      if (ctx.get("roofHasInsulation")) return false;
+      return isYearInRange(ctx.get("roofYear"), recommendYearRange);
     case "topFloor":
-      if (input.topFloor.hasInsulation === true) return false;
-      return isYearInRange(input.topFloor.year, recommendYearRange);
+      if (ctx.get("topFloorHasInsulation")) return false;
+      return isYearInRange(ctx.get("topFloorYear"), recommendYearRange);
     case "bottomFloor":
-      if (input.bottomFloor.hasInsulation === true) return false;
-      return isYearInRange(input.bottomFloor.year, recommendYearRange);
+      if (ctx.get("bottomFloorHasInsulation")) return false;
+      return isYearInRange(ctx.get("bottomFloorYear"), recommendYearRange);
     case "outerWalls":
-      if (input.outerWall.hasInsulation === true) return false;
-      return isYearInRange(input.outerWall.year, recommendYearRange);
+      if (ctx.get("outerWallHasInsulation")) return false;
+      return isYearInRange(ctx.get("outerWallYear"), recommendYearRange);
     case "outerWindows":
-      return isYearInRange(input.exteriorWallWindows.year, recommendYearRange);
+      return isYearInRange(ctx.get("exteriorWallWindowsYear"), recommendYearRange);
     case "roofWindows":
-      return isYearInRange(input.roofWindows.year, recommendYearRange);
+      return isYearInRange(ctx.get("roofWindowsYear"), recommendYearRange);
   }
 }
 
@@ -139,11 +135,17 @@ export function generateHeatingRenovations(
     const system = config.heat.heatingSystemTypes.find(
       (s) => s.value === hRenConf.targetSystem,
     );
+    const carrierRequirementsSatisfied = carrier != null &&
+      (carrier.requirements?.storage === undefined ||
+        carrier.requirements.storage === ctx.get("hasStorage")) &&
+      (carrier.requirements?.gas === undefined ||
+        carrier.requirements.gas === ctx.get("hasGasSupply"));
+    const systemRequirementsSatisfied = system != null &&
+      (system.requirements?.geothermal !== true ||
+        ctx.get("hasGeothermalAvailability"));
     return (
-      carrier != null &&
-      system != null &&
-      isCarrierCompatible(carrier, input) &&
-      isHeatingSystemCompatible(system, input)
+      carrierRequirementsSatisfied &&
+      systemRequirementsSatisfied
     );
   });
 
@@ -180,29 +182,28 @@ function makeInsulationRenovation(
   key: InsulationRenovationKeys,
   config: DETConfig,
   ctx: ReturnType<typeof DETEnergyCaluclator>,
-  input: DETInput,
   lastYearBand: RangeLast,
 ): { patch: InputPatch; recommended: boolean } {
   const targetUValue = config.renovation.insulationRenovations[key].uValue;
   switch (key) {
     case "roof":
       if (ctx.get("roofUValue") <= targetUValue) return { patch: {}, recommended: false };
-      return { patch: { roof: { uValue: targetUValue, year: lastYearBand } }, recommended: isInsulationRecommended(key, config, input) };
+      return { patch: { roof: { uValue: targetUValue, year: lastYearBand } }, recommended: isInsulationRecommended(key, config, ctx) };
     case "topFloor":
       if (ctx.get("topFloorUValue") <= targetUValue) return { patch: {}, recommended: false };
-      return { patch: { topFloor: { uValue: targetUValue, year: lastYearBand } }, recommended: isInsulationRecommended(key, config, input) };
+      return { patch: { topFloor: { uValue: targetUValue, year: lastYearBand } }, recommended: isInsulationRecommended(key, config, ctx) };
     case "bottomFloor":
       if (ctx.get("bottomFloorUValue") <= targetUValue) return { patch: {}, recommended: false };
-      return { patch: { bottomFloor: { uValue: targetUValue, year: lastYearBand } }, recommended: isInsulationRecommended(key, config, input) };
+      return { patch: { bottomFloor: { uValue: targetUValue, year: lastYearBand } }, recommended: isInsulationRecommended(key, config, ctx) };
     case "outerWalls":
       if (ctx.get("outerWallUValue") <= targetUValue) return { patch: {}, recommended: false };
-      return { patch: { outerWall: { uValue: targetUValue, year: lastYearBand } }, recommended: isInsulationRecommended(key, config, input) };
+      return { patch: { outerWall: { uValue: targetUValue, year: lastYearBand } }, recommended: isInsulationRecommended(key, config, ctx) };
     case "outerWindows":
       if (ctx.get("exteriorWallWindowsUValue") <= targetUValue) return { patch: {}, recommended: false };
-      return { patch: { exteriorWallWindows: { uValue: targetUValue, year: lastYearBand } }, recommended: isInsulationRecommended(key, config, input) };
+      return { patch: { exteriorWallWindows: { uValue: targetUValue, year: lastYearBand } }, recommended: isInsulationRecommended(key, config, ctx) };
     case "roofWindows":
       if (ctx.get("roofWindowsUValue") <= targetUValue) return { patch: {}, recommended: false };
-      return { patch: { roofWindows: { uValue: targetUValue, year: lastYearBand } }, recommended: isInsulationRecommended(key, config, input) };
+      return { patch: { roofWindows: { uValue: targetUValue, year: lastYearBand } }, recommended: isInsulationRecommended(key, config, ctx) };
   }
 }
 
@@ -219,8 +220,9 @@ export function generateInsulationRenovations(
   const isSpaceBelowRoofHeated = ctx.get("isSpaceBelowRoofHeated");
   for (const key of insulationKeys) {
     if (key === "roof" && !isSpaceBelowRoofHeated) continue;
+    if (key === "roofWindows" && !isSpaceBelowRoofHeated) continue;
     if (key === "topFloor" && isSpaceBelowRoofHeated) continue;
-    const { patch, recommended } = makeInsulationRenovation(key, config, ctx, input, lastYearBand);
+    const { patch, recommended } = makeInsulationRenovation(key, config, ctx, lastYearBand);
     const label = translate(key);
     renovations.push({ id: `envelope_${key}`, patch, label, recommended });
   }
@@ -232,13 +234,15 @@ export function generateHeatingSurfaceRenovations(
   input: DETInput,
   locale: string,
 ): Renovation[] {
-  const currentSystem = input.heat.heatingSystemType ?? "";
+  const ctx = DETEnergyCaluclator({ config, input });
+  const currentSystem = ctx.get("heatingSystemType");
+  const currentSurface = ctx.get("heatingSurfaceType");
   const currentSurfaceIsRecommended = config.renovation.heatingSurfaceRenovations.some(
-    (r) => r.targetSurfaceType === input.heat.heatingSurfaceType && r.recommendedForSystems.includes(currentSystem),
+    (r) => r.targetSurfaceType === currentSurface && r.recommendedForSystems.includes(currentSystem),
   );
   const renovations: Renovation[] = [];
   for (const hRenConf of config.renovation.heatingSurfaceRenovations) {
-    if (hRenConf.targetSurfaceType === input.heat.heatingSurfaceType) continue;
+    if (hRenConf.targetSurfaceType === currentSurface) continue;
     const label = hRenConf.localization[locale];
     if (label == null) {
       throw new Error(
