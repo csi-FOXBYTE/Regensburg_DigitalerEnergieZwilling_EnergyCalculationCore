@@ -78,11 +78,7 @@ export const bottomFloorInsulationResistance = {
   key: "bottomFloorInsulationResistance",
   resolve: (ctx) => {
     if (!ctx.get("bottomFloorHasInsulation")) return 0;
-    return (
-      ctx.get("bottomFloorInnerSurfaceThermalResistance") +
-      ctx.get("bottomFloorInsulationThickness") / ctx.get("bottomFloorThermalConductivity") +
-      ctx.get("bottomFloorOuterSurfaceThermalResistance")
-    );
+    return ctx.get("bottomFloorInsulationThickness") / ctx.get("bottomFloorThermalConductivity");
   },
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "bottomFloorInsulationResistance">;
 

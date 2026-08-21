@@ -83,11 +83,7 @@ export const roofInsulationResistance = {
   key: "roofInsulationResistance",
   resolve: (ctx) => {
     if (!ctx.get("roofHasInsulation")) return 0;
-    return (
-      ctx.get("roofInnerSurfaceThermalResistance") +
-      ctx.get("roofInsulationThickness") / ctx.get("roofThermalConductivity") +
-      ctx.get("roofOuterSurfaceThermalResistance")
-    );
+    return ctx.get("roofInsulationThickness") / ctx.get("roofThermalConductivity");
   },
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "roofInsulationResistance">;
 

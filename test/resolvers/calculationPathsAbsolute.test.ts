@@ -194,6 +194,26 @@ describe("absolute calculation paths with DEFAULT_CONFIG", () => {
     assertClose(old.ctx.get("bottomFloorUValue"), 1.2);
     assertClose(old.result.annualHeatingEnergyDemand, 53882.42335150128);
 
+    const zeroThicknessInput = clone(oldInput);
+    zeroThicknessInput.roof.hasInsulation = true;
+    zeroThicknessInput.roof.insulationThickness = 0;
+    zeroThicknessInput.topFloor.hasInsulation = true;
+    zeroThicknessInput.topFloor.insulationThickness = 0;
+    zeroThicknessInput.outerWall.hasInsulation = true;
+    zeroThicknessInput.outerWall.insulationThickness = 0;
+    zeroThicknessInput.bottomFloor.hasInsulation = true;
+    zeroThicknessInput.bottomFloor.insulationThickness = 0;
+    const zeroThickness = evaluate(zeroThicknessInput);
+
+    assertClose(zeroThickness.ctx.get("roofUValue"), old.ctx.get("roofUValue"));
+    assertClose(zeroThickness.ctx.get("topFloorUValue"), old.ctx.get("topFloorUValue"));
+    assertClose(zeroThickness.ctx.get("outerWallUValue"), old.ctx.get("outerWallUValue"));
+    assertClose(zeroThickness.ctx.get("bottomFloorUValue"), old.ctx.get("bottomFloorUValue"));
+    assertClose(
+      zeroThickness.result.annualHeatingEnergyDemand,
+      old.result.annualHeatingEnergyDemand,
+    );
+
     const partialInput = clone(oldInput);
     partialInput.roof.hasInsulation = true;
     partialInput.roof.insulationThickness = 0.16;
@@ -206,15 +226,15 @@ describe("absolute calculation paths with DEFAULT_CONFIG", () => {
     partialInput.bottomFloor.insulationThickness = 0.1;
     const partial = evaluate(partialInput);
 
-    assertClose(partial.ctx.get("roofUValue"), 0.20600353148911124);
-    assertClose(partial.ctx.get("topFloorUValue"), 0.15224010439321445);
-    assertClose(partial.ctx.get("outerWallUValue"), 0.23186485591255385);
+    assertClose(partial.ctx.get("roofUValue"), 0.21212121212121213);
+    assertClose(partial.ctx.get("topFloorUValue"), 0.15555555555555556);
+    assertClose(partial.ctx.get("outerWallUValue"), 0.2413793103448276);
     assertClose(partial.ctx.get("exteriorWallWindowsUValue"), 1.5);
-    assertClose(partial.ctx.get("bottomFloorUValue"), 0.22848438690022846);
-    assertClose(partial.result.annualHeatingEnergyDemand, 21123.699443333982);
+    assertClose(partial.ctx.get("bottomFloorUValue"), 0.24);
+    assertClose(partial.result.annualHeatingEnergyDemand, 21370.356031429506);
     assertClose(
       old.result.annualHeatingEnergyDemand - partial.result.annualHeatingEnergyDemand,
-      32758.7239081673,
+      32512.067320071772,
     );
 
     const explicitInput = baseInput();
@@ -242,8 +262,8 @@ describe("absolute calculation paths with DEFAULT_CONFIG", () => {
     heatedInsulatedInput.roof.hasInsulation = true;
     heatedInsulatedInput.roof.insulationThickness = 0.16;
     const heatedInsulated = evaluate(heatedInsulatedInput);
-    assertClose(heatedInsulated.ctx.get("roofUValue"), 0.20600353148911124);
-    assertClose(heatedInsulated.result.annualHeatingEnergyDemand, 54286.68066274374);
+    assertClose(heatedInsulated.ctx.get("roofUValue"), 0.21212121212121213);
+    assertClose(heatedInsulated.result.annualHeatingEnergyDemand, 54328.05706719741);
 
     const heatedExplicitInput = clone(explicitInput);
     heatedExplicitInput.topFloor.isAtticHeated = true;

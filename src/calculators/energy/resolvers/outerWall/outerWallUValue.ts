@@ -77,11 +77,7 @@ export const outerWallInsulationResistance = {
   key: "outerWallInsulationResistance",
   resolve: (ctx) => {
     if (!ctx.get("outerWallHasInsulation")) return 0;
-    return (
-      ctx.get("outerWallInnerSurfaceThermalResistance") +
-      ctx.get("outerWallInsulationThickness") / ctx.get("outerWallThermalConductivity") +
-      ctx.get("outerWallOuterSurfaceThermalResistance")
-    );
+    return ctx.get("outerWallInsulationThickness") / ctx.get("outerWallThermalConductivity");
   },
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "outerWallInsulationResistance">;
 
