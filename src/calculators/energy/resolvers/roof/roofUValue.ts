@@ -83,6 +83,7 @@ export const roofInsulationResistance = {
   key: "roofInsulationResistance",
   resolve: (ctx) => {
     if (!ctx.get("roofHasInsulation")) return 0;
+    // Rsi and Rse are already included in the construction U-value and must not be counted again.
     return ctx.get("roofInsulationThickness") / ctx.get("roofThermalConductivity");
   },
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "roofInsulationResistance">;

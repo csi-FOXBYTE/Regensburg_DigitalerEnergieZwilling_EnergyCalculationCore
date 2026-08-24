@@ -78,6 +78,7 @@ export const bottomFloorInsulationResistance = {
   key: "bottomFloorInsulationResistance",
   resolve: (ctx) => {
     if (!ctx.get("bottomFloorHasInsulation")) return 0;
+    // Rsi and Rse are already included in the construction U-value and must not be counted again.
     return ctx.get("bottomFloorInsulationThickness") / ctx.get("bottomFloorThermalConductivity");
   },
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "bottomFloorInsulationResistance">;

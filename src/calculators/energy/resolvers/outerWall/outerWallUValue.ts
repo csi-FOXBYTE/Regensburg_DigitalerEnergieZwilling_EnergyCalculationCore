@@ -77,6 +77,7 @@ export const outerWallInsulationResistance = {
   key: "outerWallInsulationResistance",
   resolve: (ctx) => {
     if (!ctx.get("outerWallHasInsulation")) return 0;
+    // Rsi and Rse are already included in the construction U-value and must not be counted again.
     return ctx.get("outerWallInsulationThickness") / ctx.get("outerWallThermalConductivity");
   },
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "outerWallInsulationResistance">;
