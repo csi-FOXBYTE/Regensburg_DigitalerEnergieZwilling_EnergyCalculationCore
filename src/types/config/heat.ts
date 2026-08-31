@@ -35,8 +35,8 @@ export const PrimaryEnergyCarrierDataSchema = z.object({
   baseRate: z.number(),
   co2Factor: z.number(),
   primaryEnergyFactor: z.number(),
-  quelle: z.string().optional(),
-  datum: z.string().optional(),
+  source: z.string().optional(),
+  date: z.string().optional(),
 });
 export type PrimaryEnergyCarrierData = z.infer<typeof PrimaryEnergyCarrierDataSchema>;
 
@@ -45,8 +45,8 @@ export const ElectricityTypeDataSchema = z.object({
   unitRate: z.number(),
   baseRate: z.number(),
   primaryEnergyFactor: z.number(),
-  quelle: z.string().optional(),
-  datum: z.string().optional(),
+  source: z.string().optional(),
+  date: z.string().optional(),
 });
 export type ElectricityTypeData = z.infer<typeof ElectricityTypeDataSchema>;
 
@@ -69,6 +69,8 @@ export const DETHeatConfigSchema = z.object({
   defaultPrimaryEnergyCarrier: z.string(),
   defaultHeatingSystemType: keyedValues(z.string(), z.string()),
   defaultHeatingSurfaceType: z.string(),
+  globalDefaultSource: z.string(),
+  globalDefaultDate: z.string(),
   heatingPerformanceFactor: keyedValues(z.string(), yearBands(rangeBands(z.number()))),
   temperatureControlPerformanceFactor: keyedValues(z.string(), yearBands(keyedValues(z.string(), z.number()))),
   primaryEnergyCarrierData: keyedValues(z.string(), PrimaryEnergyCarrierDataSchema),
