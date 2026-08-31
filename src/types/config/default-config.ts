@@ -311,6 +311,8 @@ export const DEFAULT_CONFIG: DETConfig = {
       { key: "district_heating", value: "district_heating_all_temperatures" },
     ],
     defaultHeatingSurfaceType: "free_heat_emitter",
+    globalDefaultSource: "unbekannter Quelle",
+    globalDefaultDate: new Date().toISOString(),
 
     // HDD
     heatingDegreeDays: 3279,
@@ -331,6 +333,8 @@ export const DEFAULT_CONFIG: DETConfig = {
           baseRate: 0,
           co2Factor: 288,
           primaryEnergyFactor: 1.1,
+          source: "unbekannter Quelle",
+          date: new Date().toISOString(),
         },
       },
       {
@@ -342,6 +346,8 @@ export const DEFAULT_CONFIG: DETConfig = {
           baseRate: 0,
           co2Factor: 0,
           primaryEnergyFactor: 0,
+          source: "unbekannter Quelle",
+          date: new Date().toISOString(),
         },
       },
       {
@@ -353,6 +359,8 @@ export const DEFAULT_CONFIG: DETConfig = {
           baseRate: 181.83,
           co2Factor: 201,
           primaryEnergyFactor: 1.1,
+          source: "unbekannter Quelle",
+          date: new Date().toISOString(),
         },
       },
       {
@@ -364,6 +372,8 @@ export const DEFAULT_CONFIG: DETConfig = {
           baseRate: 181.83,
           co2Factor: 152,
           primaryEnergyFactor: 1.1,
+          source: "unbekannter Quelle",
+          date: new Date().toISOString(),
         },
       },
       {
@@ -375,6 +385,8 @@ export const DEFAULT_CONFIG: DETConfig = {
           baseRate: 0,
           co2Factor: 30,
           primaryEnergyFactor: 0.2,
+          source: "unbekannter Quelle",
+          date: new Date().toISOString(),
         },
       },
       {
@@ -386,6 +398,8 @@ export const DEFAULT_CONFIG: DETConfig = {
           baseRate: 0,
           co2Factor: 36,
           primaryEnergyFactor: 0.2,
+          source: "unbekannter Quelle",
+          date: new Date().toISOString(),
         },
       },
       {
@@ -397,6 +411,8 @@ export const DEFAULT_CONFIG: DETConfig = {
           baseRate: 50,
           co2Factor: 280,
           primaryEnergyFactor: 1,
+          source: "unbekannter Quelle",
+          date: new Date().toISOString(),
         },
       },
     ],
@@ -417,6 +433,8 @@ export const DEFAULT_CONFIG: DETConfig = {
           unitRate: 0.192,
           baseRate: 50,
           primaryEnergyFactor: 1.8,
+          source: "unbekannter Quelle",
+          date: new Date().toISOString(),
         },
       },
       {
@@ -426,6 +444,8 @@ export const DEFAULT_CONFIG: DETConfig = {
           unitRate: 0.192,
           baseRate: 50,
           primaryEnergyFactor: 0,
+          source: "unbekannter Quelle",
+          date: new Date().toISOString(),
         },
       },
     ],

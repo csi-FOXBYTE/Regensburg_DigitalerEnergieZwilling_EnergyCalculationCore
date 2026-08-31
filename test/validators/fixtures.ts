@@ -37,6 +37,8 @@ export function baseConfig(): DETConfig {
       defaultPrimaryEnergyCarrier: "gas",
       defaultHeatingSystemType: [{ key: "gas", value: "boiler" }],
       defaultHeatingSurfaceType: "radiator",
+      globalDefaultSource: "unbekannter Quelle",
+      globalDefaultDate: new Date().toISOString(),
       // outer yearBands: [{ to: 2000 }, { from: 2000 }] — matches generalYearBands
       heatingPerformanceFactor: [{
         key: "boiler",
