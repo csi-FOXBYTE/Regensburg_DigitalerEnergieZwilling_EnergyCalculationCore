@@ -35,6 +35,8 @@ export const PrimaryEnergyCarrierDataSchema = z.object({
   baseRate: z.number(),
   co2Factor: z.number(),
   primaryEnergyFactor: z.number(),
+  quelle: z.string().optional(),
+  datum: z.string().optional(),
 });
 export type PrimaryEnergyCarrierData = z.infer<typeof PrimaryEnergyCarrierDataSchema>;
 
@@ -43,6 +45,8 @@ export const ElectricityTypeDataSchema = z.object({
   unitRate: z.number(),
   baseRate: z.number(),
   primaryEnergyFactor: z.number(),
+  quelle: z.string().optional(),
+  datum: z.string().optional(),
 });
 export type ElectricityTypeData = z.infer<typeof ElectricityTypeDataSchema>;
 
