@@ -1,5 +1,10 @@
 export type { KeyedValues } from "./types/keyed-values.js";
 export type {
+  InterpolatedNumber,
+  InterpolationPoint,
+  LinearInterpolation,
+} from "./types/interpolated-number.js";
+export type {
   RangeBands,
   RangeFirst,
   RangeMiddle,
@@ -52,6 +57,7 @@ export { DEFAULT_CONFIG } from "./types/config/default-config.js";
 export type { Subsidy, SubsidyBenefit } from "./types/subsidies/subsidies.js";
 
 export { resolveKeyedValue } from "./types/keyed-values.js";
+export { resolveInterpolatedNumber } from "./types/interpolated-number.js";
 export { resolveRangeBand, resolveYearBand } from "./types/range-bands.js";
 
 export { calculate } from "./calculate.js";

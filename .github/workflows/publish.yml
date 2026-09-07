@@ -18,6 +18,7 @@ jobs:
           node-version: 22
           registry-url: https://npm.pkg.github.com
       - run: pnpm install
+      - run: pnpm run sbom
       - run: pnpm publish --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

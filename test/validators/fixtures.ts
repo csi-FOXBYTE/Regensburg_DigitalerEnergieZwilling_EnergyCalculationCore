@@ -30,7 +30,10 @@ export function baseConfig(): DETConfig {
       electricalRatio: [{ key: "boiler", value: 0.01 }],
       hasInternalGains: [{ key: "boiler", value: true }],
       internalGainsFactorByBuildingType: [{ key: "singleFamily", value: 0.5 }, { key: "multiFamily", value: 0.4 }],
-      hotWaterEnergyDemandFromAreaFactor: 20,
+      hotWaterEnergyDemandFromAreaFactor: [
+        { key: "singleFamily", value: 20 },
+        { key: "multiFamily", value: 25 },
+      ],
       electricalBaseLoadFromFloorAreaFactor: 23,
       ventilationHeatLossCorrectionFactor: 0.8,
       heatingDegreeDays: 3000,
@@ -43,8 +46,8 @@ export function baseConfig(): DETConfig {
       heatingPerformanceFactor: [{
         key: "boiler",
         value: [
-          { to: 2000, value: [{ value: 0.85 }] },
-          { from: 2000, value: [{ value: 0.9 }] },
+          { to: 2000, value: 0.85 },
+          { from: 2000, value: 0.9 },
         ],
       }],
       temperatureControlPerformanceFactor: [{

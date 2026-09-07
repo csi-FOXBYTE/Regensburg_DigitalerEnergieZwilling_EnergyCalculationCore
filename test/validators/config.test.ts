@@ -167,7 +167,7 @@ describe("validateConfig — heat year bands", () => {
     cfg.heat.heatingPerformanceFactor = [{
       key: "boiler",
       // @ts-expect-error single-entry band is intentionally incomplete
-      value: [{ to: 2000, value: [{ value: 0.85 }] }],
+      value: [{ to: 2000, value: 0.85 }],
     }];
     assertFailed(validateConfig(cfg), "heat.heatingPerformanceFactor[boiler]");
   });

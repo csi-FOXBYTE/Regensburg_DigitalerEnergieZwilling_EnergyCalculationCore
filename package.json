@@ -13,6 +13,7 @@
     "build": "pnpm run lint && pnpm run test && tsdown",
     "lint": "tsc --noEmit",
     "gen:docs": "typedoc --options typedoc.json",
+    "sbom": "node scripts/generate-sbom.mjs",
     "prepack": "pnpm run build"
   },
   "keywords": [],

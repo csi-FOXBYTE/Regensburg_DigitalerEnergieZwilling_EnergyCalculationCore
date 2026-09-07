@@ -3,6 +3,7 @@ import type { DETCalculatorRegistry, DETCalculatorContext } from "../";
 import type { RangeKey } from "../../../types/range-bands.js";
 import { resolveKeyedValue } from "../../../types/keyed-values.js";
 import { resolveRangeBand } from "../../../types/range-bands.js";
+import { resolveInterpolatedNumber } from "../../../types/interpolated-number.js";
 
 declare module "../" {
   interface DETCalculatorRegistry {
@@ -73,9 +74,7 @@ export const heatingPerformanceFactor = {
     );
     const byYear = resolveRangeBand(byEmitterType, ctx.get("heatingSystemConstructionYear"));
     if (byYear == null) throw new Error("Failed to resolve heatingPerformanceFactor for given year");
-    const result = resolveRangeBand(byYear, ctx.get("usableFloorArea"));
-    if (result == null) throw new Error("Failed to resolve heatingPerformanceFactor for given floor area");
-    return result;
+    return resolveInterpolatedNumber(byYear, ctx.get("usableFloorArea"));
   },
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "heatingPerformanceFactor">;
 

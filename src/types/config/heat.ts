@@ -1,7 +1,9 @@
 import { z } from "zod";
 import { keyedValues } from "../keyed-values.js";
-import { rangeBands, yearBands } from "../range-bands.js";
+import { yearBands } from "../range-bands.js";
+import { InterpolatedNumberSchema } from "../interpolated-number.js";
 import { HeatFlowDirectionSchema } from "../heat-flow-direction.js";
+import { BuildingTypeSchema } from "../building-type.js";
 import { SelectionSchema, selectionFilter } from "../selection.js";
 import type { DETInput } from "../input/index.js";
 
@@ -62,7 +64,7 @@ export const DETHeatConfigSchema = z.object({
   hasInternalGains: keyedValues(z.string(), z.boolean()),
   internalGainsFactorByBuildingType: keyedValues(z.string(), z.number()),
 
-  hotWaterEnergyDemandFromAreaFactor: z.number(),
+  hotWaterEnergyDemandFromAreaFactor: keyedValues(BuildingTypeSchema, z.number()),
   electricalBaseLoadFromFloorAreaFactor: z.number(),
   ventilationHeatLossCorrectionFactor: z.number(),
   heatingDegreeDays: z.number(),
@@ -71,7 +73,7 @@ export const DETHeatConfigSchema = z.object({
   defaultHeatingSurfaceType: z.string(),
   globalDefaultSource: z.string(),
   globalDefaultDate: z.string(),
-  heatingPerformanceFactor: keyedValues(z.string(), yearBands(rangeBands(z.number()))),
+  heatingPerformanceFactor: keyedValues(z.string(), yearBands(InterpolatedNumberSchema)),
   temperatureControlPerformanceFactor: keyedValues(z.string(), yearBands(keyedValues(z.string(), z.number()))),
   primaryEnergyCarrierData: keyedValues(z.string(), PrimaryEnergyCarrierDataSchema),
   innerSurfaceThermalResistance: keyedValues(HeatFlowDirectionSchema, z.number()),

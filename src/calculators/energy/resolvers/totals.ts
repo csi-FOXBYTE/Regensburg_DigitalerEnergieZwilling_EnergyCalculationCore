@@ -1,7 +1,6 @@
 import type { Resolver } from "../../../engine/index.js";
 import type { DETCalculatorRegistry, DETCalculatorContext } from "../";
 import type { EnergyEfficiencyClass } from "../../../types/energy-efficiency-class.js";
-import { resolveRangeBand } from "../../../types/range-bands.js";
 
 declare module "../" {
   interface DETCalculatorRegistry {
@@ -57,10 +56,11 @@ export const totalCo2Emissions = {
 export const energyEfficiencyClass = {
   key: "energyEfficiencyClass",
   resolve: (ctx) => {
-    const result = resolveRangeBand(
-      ctx.input.config.general.energyEfficiencyClasses,
-      ctx.get("totalEnergyDemandPerSquareMeter"),
-    );
+    const demand = ctx.get("totalEnergyDemandPerSquareMeter");
+    const result = ctx.input.config.general.energyEfficiencyClasses.find((band) => {
+      const upperBound = "to" in band ? band.to : undefined;
+      return typeof upperBound !== "number" || demand <= upperBound;
+    })?.value;
     if (result == null) throw new Error("Failed to resolve energyEfficiencyClass");
     return result;
   },

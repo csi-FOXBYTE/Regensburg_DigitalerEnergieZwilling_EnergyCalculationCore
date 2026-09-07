@@ -124,7 +124,7 @@ describe("validateInput — heat", () => {
     localCfg.heat.heatingSystemTypes.push({ value: "heatPump", localization: {} });
     localCfg.heat.heatingPerformanceFactor.push({
       key: "heatPump",
-      value: [{ to: 2000, value: [{ value: 3.0 }] }, { from: 2000, value: [{ value: 3.2 }] }],
+      value: [{ to: 2000, value: 3.0 }, { from: 2000, value: 3.2 }],
     });
     localCfg.heat.temperatureControlPerformanceFactor.push({
       key: "heatPump",

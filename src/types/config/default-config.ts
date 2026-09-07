@@ -319,7 +319,10 @@ export const DEFAULT_CONFIG: DETConfig = {
     // kHv
     ventilationHeatLossCorrectionFactor: 0.79,
     // kQwb
-    hotWaterEnergyDemandFromAreaFactor: 9.84,
+    hotWaterEnergyDemandFromAreaFactor: [
+      { key: BuildingType.SINGLE_FAMILY, value: 11 },
+      { key: BuildingType.MULTI_FAMILY, value: 15 },
+    ],
     electricalBaseLoadFromFloorAreaFactor: 23,
 
     // bheiz, barb, bgrund, xco2, fp
@@ -490,28 +493,34 @@ export const DEFAULT_CONFIG: DETConfig = {
         value: [
           {
             to: 1986,
-            value: [
-              { to: 150, value: 1.47 },
-              { from: 150, to: 500, value: 1.36 },
-              { from: 500, value: 1.28 },
-            ],
+            value: {
+              points: [
+                { at: 150, value: 1.47 },
+                { at: 500, value: 1.36 },
+                { at: 2500, value: 1.28 },
+              ],
+            },
           },
           {
             from: 1987,
             to: 1994,
-            value: [
-              { to: 150, value: 1.34 },
-              { from: 150, to: 500, value: 1.26 },
-              { from: 500, value: 1.19 },
-            ],
+            value: {
+              points: [
+                { at: 150, value: 1.34 },
+                { at: 500, value: 1.26 },
+                { at: 2500, value: 1.19 },
+              ],
+            },
           },
           {
             from: 1995,
-            value: [
-              { to: 150, value: 1.33 },
-              { from: 150, to: 500, value: 1.23 },
-              { from: 500, value: 1.16 },
-            ],
+            value: {
+              points: [
+                { at: 150, value: 1.33 },
+                { at: 500, value: 1.23 },
+                { at: 2500, value: 1.16 },
+              ],
+            },
           },
         ],
       },
@@ -520,28 +529,34 @@ export const DEFAULT_CONFIG: DETConfig = {
         value: [
           {
             to: 1986,
-            value: [
-              { to: 150, value: 1.24 },
-              { from: 150, to: 500, value: 1.21 },
-              { from: 500, value: 1.18 },
-            ],
+            value: {
+              points: [
+                { at: 150, value: 1.24 },
+                { at: 500, value: 1.21 },
+                { at: 2500, value: 1.18 },
+              ],
+            },
           },
           {
             from: 1987,
             to: 1994,
-            value: [
-              { to: 150, value: 1.19 },
-              { from: 150, to: 500, value: 1.15 },
-              { from: 500, value: 1.13 },
-            ],
+            value: {
+              points: [
+                { at: 150, value: 1.19 },
+                { at: 500, value: 1.15 },
+                { at: 2500, value: 1.13 },
+              ],
+            },
           },
           {
             from: 1995,
-            value: [
-              { to: 150, value: 1.14 },
-              { from: 150, to: 500, value: 1.11 },
-              { from: 500, value: 1.09 },
-            ],
+            value: {
+              points: [
+                { at: 150, value: 1.14 },
+                { at: 500, value: 1.11 },
+                { at: 2500, value: 1.09 },
+              ],
+            },
           },
         ],
       },
@@ -550,28 +565,34 @@ export const DEFAULT_CONFIG: DETConfig = {
         value: [
           {
             to: 1986,
-            value: [
-              { to: 150, value: 1.11 },
-              { from: 150, to: 500, value: 1.09 },
-              { from: 500, value: 1.07 },
-            ],
+            value: {
+              points: [
+                { at: 150, value: 1.11 },
+                { at: 500, value: 1.09 },
+                { at: 2500, value: 1.07 },
+              ],
+            },
           },
           {
             from: 1987,
             to: 1994,
-            value: [
-              { to: 150, value: 1.09 },
-              { from: 150, to: 500, value: 1.06 },
-              { from: 500, value: 1.04 },
-            ],
+            value: {
+              points: [
+                { at: 150, value: 1.09 },
+                { at: 500, value: 1.06 },
+                { at: 2500, value: 1.04 },
+              ],
+            },
           },
           {
             from: 1995,
-            value: [
-              { to: 150, value: 1.07 },
-              { from: 150, to: 500, value: 1.05 },
-              { from: 500, value: 1.04 },
-            ],
+            value: {
+              points: [
+                { at: 150, value: 1.07 },
+                { at: 500, value: 1.05 },
+                { at: 2500, value: 1.04 },
+              ],
+            },
           },
         ],
       },
@@ -579,11 +600,13 @@ export const DEFAULT_CONFIG: DETConfig = {
         key: "improved_condensing_boiler_55_45",
         value: [
           {
-            value: [
-              { to: 150, value: 0.99 },
-              { from: 150, to: 500, value: 0.98 },
-              { from: 500, value: 0.97 },
-            ],
+            value: {
+              points: [
+                { at: 150, value: 0.99 },
+                { at: 500, value: 0.98 },
+                { at: 2500, value: 0.97 },
+              ],
+            },
           },
         ],
       },
@@ -591,7 +614,7 @@ export const DEFAULT_CONFIG: DETConfig = {
         key: "district_heating_all_temperatures",
         value: [
           {
-            value: [{ value: 1.02 }],
+            value: 1.02,
           },
         ],
       },
@@ -600,11 +623,11 @@ export const DEFAULT_CONFIG: DETConfig = {
         value: [
           {
             to: 1994,
-            value: [{ value: 0.45 }],
+            value: 0.45,
           },
           {
             from: 1995,
-            value: [{ value: 0.43 }],
+            value: 0.43,
           },
         ],
       },
@@ -613,11 +636,11 @@ export const DEFAULT_CONFIG: DETConfig = {
         value: [
           {
             to: 1994,
-            value: [{ value: 0.4 }],
+            value: 0.4,
           },
           {
             from: 1995,
-            value: [{ value: 0.38 }],
+            value: 0.38,
           },
         ],
       },
@@ -626,11 +649,11 @@ export const DEFAULT_CONFIG: DETConfig = {
         value: [
           {
             to: 1994,
-            value: [{ value: 0.36 }],
+            value: 0.36,
           },
           {
             from: 1995,
-            value: [{ value: 0.3 }],
+            value: 0.3,
           },
         ],
       },
@@ -639,11 +662,11 @@ export const DEFAULT_CONFIG: DETConfig = {
         value: [
           {
             to: 1994,
-            value: [{ value: 0.32 }],
+            value: 0.32,
           },
           {
             from: 1995,
-            value: [{ value: 0.27 }],
+            value: 0.27,
           },
         ],
       },
@@ -651,7 +674,7 @@ export const DEFAULT_CONFIG: DETConfig = {
         key: "oil_fired_single_stove",
         value: [
           {
-            value: [{ value: 1.4 }],
+            value: 1.4,
           },
         ],
       },
@@ -659,7 +682,7 @@ export const DEFAULT_CONFIG: DETConfig = {
         key: "gas_space_heater",
         value: [
           {
-            value: [{ value: 1.47 }],
+            value: 1.47,
           },
         ],
       },
@@ -667,7 +690,7 @@ export const DEFAULT_CONFIG: DETConfig = {
         key: "electric_direct_heater",
         value: [
           {
-            value: [{ value: 1.02 }],
+            value: 1.02,
           },
         ],
       },
@@ -675,7 +698,7 @@ export const DEFAULT_CONFIG: DETConfig = {
         key: "gas_heat_pump_hybrid",
         value: [
           {
-            value: [{ value: 0.62 }],
+            value: 0.62,
           },
         ],
       },

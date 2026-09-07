@@ -1,5 +1,6 @@
 import type { Resolver } from "../../../engine/index.js";
 import type { DETCalculatorRegistry, DETCalculatorContext } from "../";
+import { resolveKeyedValue } from "../../../types/keyed-values.js";
 
 declare module "../" {
   interface DETCalculatorRegistry {
@@ -38,7 +39,11 @@ export const spaceHeatingDemand = {
 
 export const hotWaterEnergyDemandFromAreaFactor = {
   key: "hotWaterEnergyDemandFromAreaFactor",
-  resolve: (ctx) => ctx.input.config.heat.hotWaterEnergyDemandFromAreaFactor,
+  resolve: (ctx) =>
+    resolveKeyedValue(
+      ctx.input.config.heat.hotWaterEnergyDemandFromAreaFactor,
+      ctx.get("buildingType"),
+    ),
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "hotWaterEnergyDemandFromAreaFactor">;
 
 export const hotWaterEnergyDemand = {

@@ -1,0 +1,168 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:30fe5ee3-9c3e-45fc-ab6a-1fbfa215eb1b",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-09-07T15:12:38.834Z",
+    "lifecycles": [
+      {
+        "phase": "build"
+      }
+    ],
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "name": "pnpm",
+          "version": "10.7.1"
+        },
+        {
+          "type": "application",
+          "name": "repository SBOM scoping script",
+          "version": "1"
+        }
+      ]
+    },
+    "component": {
+      "type": "library",
+      "group": "@csi-foxbyte",
+      "name": "regensburg_digitalerenergiezwilling_energycalculationcore",
+      "version": "0.19.0",
+      "bom-ref": "pkg:npm/%40csi-foxbyte/regensburg_digitalerenergiezwilling_energycalculationcore@0.19.0",
+      "purl": "pkg:npm/%40csi-foxbyte/regensburg_digitalerenergiezwilling_energycalculationcore@0.19.0",
+      "description": "Domain-based TypeScript energy calculation core with JSON-configurable catalogs and rules for building envelope and heating evaluation.",
+      "licenses": [
+        {
+          "license": {
+            "id": "LGPL-3.0-or-later"
+          }
+        }
+      ],
+      "copyright": "Copyright (c) 2026 csi FOXBYTE",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/csi-FOXBYTE/Regensburg_DigitalerEnergieZwilling_EnergyCalculationCore.git"
+        }
+      ],
+      "properties": [
+        {
+          "name": "sbom:repository",
+          "value": "Regensburg_DigitalerEnergieZwilling_EnergyCalculationCore"
+        },
+        {
+          "name": "sbom:ecosystem",
+          "value": "first-party"
+        },
+        {
+          "name": "sbom:relationship",
+          "value": "root component"
+        },
+        {
+          "name": "sbom:metadata-source",
+          "value": "Regensburg_DigitalerEnergieZwilling_EnergyCalculationCore/package.json and NOTICE"
+        },
+        {
+          "name": "sbom:notes",
+          "value": "Published first-party npm library."
+        },
+        {
+          "name": "vcs:commit",
+          "value": "44c4e678ad68bd0785e6a2f8f327f8d6fc37ce25"
+        },
+        {
+          "name": "sbom:source-state",
+          "value": "modified working tree"
+        }
+      ]
+    },
+    "properties": [
+      {
+        "name": "sbom:scope",
+        "value": "The published first-party library and its resolved runtime peer-dependency closure"
+      },
+      {
+        "name": "sbom:excluded-scope",
+        "value": "Build, test, lint, formatting, documentation, editor, and local-development-only dependencies"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "library",
+      "name": "zod",
+      "version": "3.25.76",
+      "scope": "required",
+      "bom-ref": "pkg:npm/zod@3.25.76",
+      "purl": "pkg:npm/zod@3.25.76",
+      "description": "TypeScript-first schema declaration and validation library with static type inference",
+      "authors": [
+        {
+          "name": "Colin McDonnell"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "copyright": "Copyright (c) 2025 Colin McDonnell",
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://registry.npmjs.org/zod/-/zod-3.25.76.tgz"
+        },
+        {
+          "type": "website",
+          "url": "https://zod.dev"
+        },
+        {
+          "type": "vcs",
+          "url": "git+https://github.com/colinhacks/zod.git"
+        },
+        {
+          "type": "issue-tracker",
+          "url": "https://github.com/colinhacks/zod/issues"
+        }
+      ],
+      "properties": [
+        {
+          "name": "sbom:repository",
+          "value": "Regensburg_DigitalerEnergieZwilling_EnergyCalculationCore"
+        },
+        {
+          "name": "sbom:ecosystem",
+          "value": "npm"
+        },
+        {
+          "name": "sbom:relationship",
+          "value": "direct runtime peer dependency"
+        },
+        {
+          "name": "sbom:metadata-source",
+          "value": "Regensburg_DigitalerEnergieZwilling_EnergyCalculationCore/pnpm-lock.yaml and installed package metadata"
+        },
+        {
+          "name": "sbom:notes",
+          "value": "Generated from the resolved peer-dependency graph and local package metadata."
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "pkg:npm/%40csi-foxbyte/regensburg_digitalerenergiezwilling_energycalculationcore@0.19.0",
+      "dependsOn": [
+        "pkg:npm/zod@3.25.76"
+      ]
+    },
+    {
+      "ref": "pkg:npm/zod@3.25.76",
+      "dependsOn": []
+    }
+  ]
+}

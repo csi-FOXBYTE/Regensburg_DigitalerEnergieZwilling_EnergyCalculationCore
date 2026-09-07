@@ -5,6 +5,7 @@ import { DETEnergyCaluclator } from "../../src/calculators/energy/index.js";
 import {
   hasGasSupply,
   hasGeothermalAvailability,
+  heatingPerformanceFactor,
 } from "../../src/calculators/energy/resolvers/heatingSystem.js";
 import { DEFAULT_CONFIG } from "../../src/types/config/default-config.js";
 import { mockCtx } from "../helpers/mock-ctx.js";
@@ -40,5 +41,19 @@ describe("heating system defaults", () => {
 
     assert.equal(ctx.get("primaryEnergyCarrier"), "natural_gas");
     assert.equal(ctx.get("heatingSystemType"), "standard_boiler_70_55");
+  });
+
+  test("interpolates the heating performance factor by usable floor area", () => {
+    const ctx = mockCtx(
+      {},
+      {
+        heatingSystemType: "standard_boiler_70_55",
+        heatingSystemConstructionYear: 1980,
+        usableFloorArea: 325,
+      },
+    );
+    ctx.input.config = DEFAULT_CONFIG;
+
+    assert.equal(heatingPerformanceFactor.resolve(ctx), 1.415);
   });
 });
