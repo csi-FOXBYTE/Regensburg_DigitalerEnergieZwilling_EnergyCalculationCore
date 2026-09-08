@@ -5,6 +5,8 @@ import type { RangeKey } from "../../../../types/range-bands.js";
 declare module "../../" {
   interface DETCalculatorRegistry {
     outerWallYear: number | RangeKey;
+    outerWallAreaWithoutAttic: number;
+    outerWallAtticArea: number;
     outerWallArea: number;
     adjacentWallArea: number;
     outerWallHasInsulation: boolean;
@@ -24,8 +26,25 @@ export const outerWallYear = {
 
 export const outerWallArea = {
   key: "outerWallArea",
-  resolve: (ctx) => ctx.input.input.outerWall.area,
+  resolve: (ctx) => {
+    const override = ctx.input.input.outerWall.area;
+    if (override != null) return override;
+    return (
+      ctx.get("outerWallAreaWithoutAttic") +
+      (ctx.get("isAtticHeated") ? ctx.get("outerWallAtticArea") : 0)
+    );
+  },
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "outerWallArea">;
+
+export const outerWallAreaWithoutAttic = {
+  key: "outerWallAreaWithoutAttic",
+  resolve: (ctx) => ctx.input.input.outerWall.areaWithoutAttic,
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "outerWallAreaWithoutAttic">;
+
+export const outerWallAtticArea = {
+  key: "outerWallAtticArea",
+  resolve: (ctx) => ctx.input.input.outerWall.atticArea,
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "outerWallAtticArea">;
 
 export const adjacentWallArea = {
   key: "adjacentWallArea",
@@ -58,6 +77,8 @@ export const outerWallAllowsAdditionalInsulation = {
 
 export default [
   outerWallYear,
+  outerWallAreaWithoutAttic,
+  outerWallAtticArea,
   outerWallArea,
   adjacentWallArea,
   outerWallHasInsulation,

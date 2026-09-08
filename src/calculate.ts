@@ -4,8 +4,14 @@ import type { PreRenovationValues } from "./types/input/preRenovation.js";
 import type { EnergyEfficiencyClass } from "./types/energy-efficiency-class.js";
 import { DETEnergyCaluclator } from "./calculators/energy/index.js";
 
-export type ResolvedDETInput = Omit<DETInput, "outerWall"> & {
-  outerWall: DETInput["outerWall"] & {
+export type ResolvedDETInput = Omit<DETInput, "general" | "outerWall"> & {
+  general: DETInput["general"] & {
+    numberOfApartments: number;
+    numberOfPeople: number;
+    averagePeoplePerApartment: number;
+  };
+  outerWall: Omit<DETInput["outerWall"], "area"> & {
+    area: number;
     allowsAdditionalInsulation: boolean;
   };
 };
@@ -100,8 +106,12 @@ export function calculate(
         buildingYear: ctx.get("buildingYear"),
         numberOfStories: ctx.get("numberOfStories"),
         buildingHeight: ctx.get("buildingHeight"),
+        lowestEaveHeight: ctx.get("lowestEaveHeight"),
         buildingBaseArea: ctx.get("buildingBaseArea"),
         livingArea: ctx.get("livingArea") ?? ctx.get("netFloorArea") / ctx.get("netFloorAreaFromLivingAreaFactor"),
+        numberOfApartments: ctx.get("numberOfApartments"),
+        numberOfPeople: ctx.get("numberOfPeople"),
+        averagePeoplePerApartment: ctx.get("averagePeoplePerApartment"),
         type: ctx.get("buildingType"),
       },
       heat: {
@@ -154,6 +164,8 @@ export function calculate(
       },
       outerWall: {
         area: ctx.get("outerWallArea"),
+        areaWithoutAttic: ctx.get("outerWallAreaWithoutAttic"),
+        atticArea: ctx.get("outerWallAtticArea"),
         adjacentWallArea: ctx.get("adjacentWallArea"),
         year: ctx.get("outerWallYear"),
         hasInsulation: ctx.get("outerWallHasInsulation"),

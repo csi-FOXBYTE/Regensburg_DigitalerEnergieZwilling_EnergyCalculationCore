@@ -23,6 +23,7 @@ function baseInput(): DETInput {
       buildingYear: 1968,
       numberOfStories: 2,
       buildingHeight: 5.9,
+      lowestEaveHeight: 5.9,
       buildingBaseArea: 77,
       type: BuildingType.SINGLE_FAMILY,
     },
@@ -55,6 +56,8 @@ function baseInput(): DETInput {
     },
     outerWall: {
       area: 212,
+      areaWithoutAttic: 180,
+      atticArea: 32,
       adjacentWallArea: 0,
       year: 1968,
       hasInsulation: false,

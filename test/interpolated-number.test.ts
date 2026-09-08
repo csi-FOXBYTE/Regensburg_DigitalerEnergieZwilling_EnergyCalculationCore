@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 
 import {
+  fitLinearRegression,
   InterpolatedNumberSchema,
   resolveInterpolatedNumber,
   type InterpolatedNumber,
@@ -34,6 +35,38 @@ describe("resolveInterpolatedNumber", () => {
   test("clamps values outside the point range", () => {
     assert.equal(resolveInterpolatedNumber(definition, 0), 1.47);
     assert.equal(resolveInterpolatedNumber(definition, 3000), 1.28);
+  });
+});
+
+describe("fitLinearRegression", () => {
+  test("reconstructs the EFH/ZFH household-electricity coefficients", () => {
+    assert.deepEqual(
+      fitLinearRegression({
+        points: [
+          { at: 1, value: 1800 },
+          { at: 2, value: 2700 },
+          { at: 3, value: 3500 },
+          { at: 4, value: 3800 },
+          { at: 5, value: 4500 },
+        ],
+      }),
+      { a: 1310, b: 650 },
+    );
+  });
+
+  test("reconstructs the MFH household-electricity coefficients", () => {
+    assert.deepEqual(
+      fitLinearRegression({
+        points: [
+          { at: 1, value: 1200 },
+          { at: 2, value: 1900 },
+          { at: 3, value: 2400 },
+          { at: 4, value: 2600 },
+          { at: 5, value: 3100 },
+        ],
+      }),
+      { a: 890, b: 450 },
+    );
   });
 });
 

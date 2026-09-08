@@ -5,6 +5,7 @@ import {
   isCarrierCompatible,
   isHeatingSystemCompatible,
 } from "../types/config/heat.js";
+import { BuildingType } from "../types/building-type.js";
 import { mapZodError, type ValidationIssue, type ValidationResult } from "./types.js";
 
 export function validateInput(data: unknown, config: DETConfig): ValidationResult<DETInput> {
@@ -26,6 +27,20 @@ export function validateInput(data: unknown, config: DETConfig): ValidationResul
   const outerWallConstructionTypeValues = outerWall.constructionTypes.map((c) => c.value);
   const bottomFloorConstructionTypeValues = bottomFloor.constructionTypes.map((c) => c.value);
   const windowTypeValues = windows.windowTypes.map((w) => w.value);
+
+  // ── General cross-checks ──────────────────────────────────────────────────────
+
+  if (
+    input.general.type === BuildingType.SINGLE_FAMILY &&
+    input.general.numberOfApartments != null &&
+    input.general.numberOfApartments !== 1 &&
+    input.general.numberOfApartments !== 2
+  ) {
+    issues.push({
+      path: "general.numberOfApartments",
+      message: "numberOfApartments must be 1, 2, or omitted for a single-family home",
+    });
+  }
 
   // ── Heat cross-checks ─────────────────────────────────────────────────────────
 

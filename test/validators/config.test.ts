@@ -65,6 +65,38 @@ describe("validateConfig — shape failures", () => {
   });
 });
 
+// ── General defaults ─────────────────────────────────────────────────────────
+
+describe("validateConfig — general defaults", () => {
+  test("fails when a building type has no apartment default", () => {
+    const cfg = fresh();
+    cfg.general.defaultNumberOfApartments = [{ key: "singleFamily", value: 1 }];
+    assertFailed(validateConfig(cfg), "general.defaultNumberOfApartments");
+  });
+
+  test("fails when a default apartment count is not a positive integer", () => {
+    const cfg = fresh();
+    cfg.general.defaultNumberOfApartments[0]!.value = 1.5;
+    assertFailed(validateConfig(cfg), "general.defaultNumberOfApartments.0.value");
+  });
+
+  test("fails when defaultPeoplePerApartment is not positive", () => {
+    const cfg = fresh();
+    cfg.general.defaultPeoplePerApartment = 0;
+    assertFailed(validateConfig(cfg), "general.defaultPeoplePerApartment");
+  });
+});
+
+describe("validateConfig — household electricity", () => {
+  test("fails when a building type has no household-electricity interpolation", () => {
+    const cfg = fresh();
+    cfg.heat.householdElectricityPerApartment = [
+      cfg.heat.householdElectricityPerApartment[0]!,
+    ];
+    assertFailed(validateConfig(cfg), "heat.householdElectricityPerApartment");
+  });
+});
+
 // ── Multiple issues accumulate ────────────────────────────────────────────────
 
 describe("validateConfig — multiple simultaneous issues", () => {

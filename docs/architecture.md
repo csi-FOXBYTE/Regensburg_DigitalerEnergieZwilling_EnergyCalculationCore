@@ -30,7 +30,7 @@ Every value in the system flows through a **resolver** — an object with a `key
    resolve: (ctx) => {
      const override = ctx.input.input.general.numberOfStories;
      if (override != null) return override;
-     return Math.round(ctx.get("buildingHeight") / (ctx.get("interiorStoryHeight") + ctx.get("floorSlabThickness")));
+     return Math.round(ctx.get("lowestEaveHeight") / (ctx.get("interiorStoryHeight") + ctx.get("floorSlabThickness")));
    }
    ```
 

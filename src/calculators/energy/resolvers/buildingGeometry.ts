@@ -39,7 +39,7 @@ export const numberOfStories = {
     return Math.max(
       1,
       Math.round(
-        ctx.get("buildingHeight") /
+        ctx.get("lowestEaveHeight") /
           (ctx.get("interiorStoryHeight") + ctx.get("floorSlabThickness")),
       ),
     );

@@ -2,6 +2,7 @@ import { DETConfigSchema } from "../types/config/index.js";
 import type { DETConfig } from "../types/config/index.js";
 import { resolveRangeBand } from "../types/range-bands.js";
 import type { RangeBands, RangeKey, Ranges } from "../types/range-bands.js";
+import { BuildingType } from "../types/building-type.js";
 import { mapZodError, type ValidationIssue, type ValidationResult } from "./types.js";
 
 function toRangeKeys(ranges: Ranges): RangeKey[] {
@@ -34,6 +35,15 @@ export function validateConfig(data: unknown): ValidationResult<DETConfig> {
   const issues: ValidationIssue[] = [];
 
   const generalRangeKeys = toRangeKeys(general.generalYearBands);
+
+  for (const buildingType of Object.values(BuildingType)) {
+    if (!general.defaultNumberOfApartments.some((entry) => entry.key === buildingType)) {
+      issues.push({ path: "general.defaultNumberOfApartments", message: `No defaultNumberOfApartments entry for building type "${buildingType}"` });
+    }
+    if (!heat.householdElectricityPerApartment.some((entry) => entry.key === buildingType)) {
+      issues.push({ path: "heat.householdElectricityPerApartment", message: `No householdElectricityPerApartment entry for building type "${buildingType}"` });
+    }
+  }
 
   const carrierValues = heat.primaryEnergyCarriers.map((c) => c.value);
   const systemTypeValues = heat.heatingSystemTypes.map((s) => s.value);

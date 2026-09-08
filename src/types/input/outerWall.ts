@@ -2,7 +2,9 @@ import { z } from "zod";
 import { YearInputSchema } from "../range-bands.js";
 
 export const DETOuterWallInputSchema = z.object({
-  area: z.number(),
+  area: z.number().nullable().optional(),
+  areaWithoutAttic: z.number(),
+  atticArea: z.number(),
   adjacentWallArea: z.number().nullable().optional(),
   year: YearInputSchema.nullable().optional(),
   hasInsulation: z.boolean().nullable().optional(),

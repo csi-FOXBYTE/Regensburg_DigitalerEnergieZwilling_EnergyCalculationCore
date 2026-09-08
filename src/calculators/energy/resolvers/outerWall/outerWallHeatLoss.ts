@@ -22,15 +22,11 @@ export const adjacentWallUValue = {
 export const outerWallHeatLoss = {
   key: "outerWallHeatLoss",
   resolve: (ctx) => {
-    const adjacentArea = ctx.get("adjacentWallArea");
     const freeArea = Math.max(
       0,
-      ctx.get("outerWallArea") - ctx.get("exteriorWallWindowsArea") - adjacentArea,
+      ctx.get("outerWallArea") - ctx.get("exteriorWallWindowsArea"),
     );
-    return (
-      freeArea * ctx.get("outerWallUValue") +
-      adjacentArea * ctx.get("adjacentWallUValue")
-    ) * ctx.get("outerWallHeatLossFactor");
+    return freeArea * ctx.get("outerWallUValue") * ctx.get("outerWallHeatLossFactor");
   },
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "outerWallHeatLoss">;
 

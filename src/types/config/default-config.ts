@@ -55,6 +55,11 @@ export const DEFAULT_CONFIG: DETConfig = {
     ],
     assumedFloorSlabThickness: 0.2,
     assumedInteriorStoryHeight: 2.75,
+    defaultNumberOfApartments: [
+      { key: BuildingType.SINGLE_FAMILY, value: 1 },
+      { key: BuildingType.MULTI_FAMILY, value: 2 },
+    ],
+    defaultPeoplePerApartment: 3,
     heatedAirVolumeCorrectionFactor: [
       { to: 3, value: 0.76 },
       { from: 3, value: 0.8 },
@@ -323,7 +328,32 @@ export const DEFAULT_CONFIG: DETConfig = {
       { key: BuildingType.SINGLE_FAMILY, value: 11 },
       { key: BuildingType.MULTI_FAMILY, value: 15 },
     ],
-    electricalBaseLoadFromFloorAreaFactor: 23,
+    householdElectricityPerApartment: [
+      {
+        key: BuildingType.SINGLE_FAMILY,
+        value: {
+          points: [
+            { at: 1, value: 1800 },
+            { at: 2, value: 2700 },
+            { at: 3, value: 3500 },
+            { at: 4, value: 3800 },
+            { at: 5, value: 4500 },
+          ],
+        },
+      },
+      {
+        key: BuildingType.MULTI_FAMILY,
+        value: {
+          points: [
+            { at: 1, value: 1200 },
+            { at: 2, value: 1900 },
+            { at: 3, value: 2400 },
+            { at: 4, value: 2600 },
+            { at: 5, value: 3100 },
+          ],
+        },
+      },
+    ],
 
     // bheiz, barb, bgrund, xco2, fp
     primaryEnergyCarrierData: [

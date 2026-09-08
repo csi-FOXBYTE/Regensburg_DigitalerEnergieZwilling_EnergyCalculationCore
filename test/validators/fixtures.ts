@@ -11,6 +11,11 @@ export function baseConfig(): DETConfig {
       energyEfficiencyClassColors: [{ key: "A", value: "#00ff00" }],
       assumedFloorSlabThickness: 0.2,
       assumedInteriorStoryHeight: 2.8,
+      defaultNumberOfApartments: [
+        { key: "singleFamily", value: 1 },
+        { key: "multiFamily", value: 2 },
+      ],
+      defaultPeoplePerApartment: 3,
       heatedAirVolumeCorrectionFactor: [{ value: 0.8 }],
       usableFloorAreaFactor: 0.85,
       netFloorAreaFromUsableFloorAreaFactor: [
@@ -34,7 +39,32 @@ export function baseConfig(): DETConfig {
         { key: "singleFamily", value: 20 },
         { key: "multiFamily", value: 25 },
       ],
-      electricalBaseLoadFromFloorAreaFactor: 23,
+      householdElectricityPerApartment: [
+        {
+          key: "singleFamily",
+          value: {
+            points: [
+              { at: 1, value: 1800 },
+              { at: 2, value: 2700 },
+              { at: 3, value: 3500 },
+              { at: 4, value: 3800 },
+              { at: 5, value: 4500 },
+            ],
+          },
+        },
+        {
+          key: "multiFamily",
+          value: {
+            points: [
+              { at: 1, value: 1200 },
+              { at: 2, value: 1900 },
+              { at: 3, value: 2400 },
+              { at: 4, value: 2600 },
+              { at: 5, value: 3100 },
+            ],
+          },
+        },
+      ],
       ventilationHeatLossCorrectionFactor: 0.8,
       heatingDegreeDays: 3000,
       defaultPrimaryEnergyCarrier: "gas",
@@ -158,6 +188,7 @@ export function baseInput(): DETInput {
     general: {
       buildingYear: 2005,
       buildingHeight: 6,
+      lowestEaveHeight: 6,
       buildingBaseArea: 100,
       type: "singleFamily",
     },
@@ -167,7 +198,7 @@ export function baseInput(): DETInput {
     roofWindows: {},
     exteriorWallWindows: {},
     topFloor: { area: 100 },
-    outerWall: { area: 200 },
+    outerWall: { area: 200, areaWithoutAttic: 180, atticArea: 20 },
     bottomFloor: { area: 100 },
     preRenovationValues: null,
   };

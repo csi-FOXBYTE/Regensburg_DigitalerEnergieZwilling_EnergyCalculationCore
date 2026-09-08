@@ -12,6 +12,8 @@ export const DETGeneralConfigSchema = z.object({
 
   assumedFloorSlabThickness: z.number(),
   assumedInteriorStoryHeight: z.number(),
+  defaultNumberOfApartments: keyedValues(BuildingTypeSchema, z.number().int().positive()),
+  defaultPeoplePerApartment: z.number().positive(),
 
   heatedAirVolumeCorrectionFactor: rangeBands(z.number()),
   usableFloorAreaFactor: z.number(),

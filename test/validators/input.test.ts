@@ -52,7 +52,12 @@ describe("validateInput — happy paths", () => {
     input.electricity = { electricityType: "grid" };
     input.roof = { area: 100, constructionType: "rafter" };
     input.topFloor = { area: 100, topFloorType: "flatRoof" };
-    input.outerWall = { area: 200, constructionType: "brick" };
+    input.outerWall = {
+      area: 200,
+      areaWithoutAttic: 180,
+      atticArea: 20,
+      constructionType: "brick",
+    };
     input.bottomFloor = { area: 100, constructionType: "concrete" };
     input.exteriorWallWindows = { windowType: "double" };
     input.roofWindows = { windowType: "double" };
@@ -70,10 +75,22 @@ describe("validateInput — happy paths", () => {
     input.electricity = { electricityType: null };
     input.roof = { area: 100, constructionType: null };
     input.topFloor = { area: 100, topFloorType: null };
-    input.outerWall = { area: 200, constructionType: null };
+    input.outerWall = {
+      area: 200,
+      areaWithoutAttic: 180,
+      atticArea: 20,
+      constructionType: null,
+    };
     input.bottomFloor = { area: 100, constructionType: null };
     input.exteriorWallWindows = { windowType: null };
     input.roofWindows = { windowType: null };
+    assertPassed(validateInput(input, cfg));
+  });
+
+  test("passes without a total outer-wall area", () => {
+    const input = freshInput();
+    delete input.outerWall.area;
+
     assertPassed(validateInput(input, cfg));
   });
 
@@ -99,8 +116,73 @@ describe("validateInput — shape failures", () => {
 
   test("fails when general.buildingHeight is missing", () => {
     const input = freshInput() as Record<string, unknown>;
-    input.general = { buildingYear: 2005, buildingBaseArea: 100, type: "singleFamily" };
+    input.general = {
+      buildingYear: 2005,
+      lowestEaveHeight: 6,
+      buildingBaseArea: 100,
+      type: "singleFamily",
+    };
     assert.strictEqual(validateInput(input, cfg).success, false);
+  });
+
+  test("fails when general.lowestEaveHeight is missing", () => {
+    const input = freshInput() as Record<string, unknown>;
+    input.general = {
+      buildingYear: 2005,
+      buildingHeight: 6,
+      buildingBaseArea: 100,
+      type: "singleFamily",
+    };
+
+    assertFailed(validateInput(input, cfg), "general.lowestEaveHeight");
+  });
+
+  test("fails when either split outer-wall area is missing", () => {
+    const withoutAtticArea = freshInput() as unknown as {
+      outerWall: Record<string, unknown>;
+    };
+    delete withoutAtticArea.outerWall.areaWithoutAttic;
+    assertFailed(validateInput(withoutAtticArea, cfg), "outerWall.areaWithoutAttic");
+
+    const withoutWallAtticArea = freshInput() as unknown as {
+      outerWall: Record<string, unknown>;
+    };
+    delete withoutWallAtticArea.outerWall.atticArea;
+    assertFailed(validateInput(withoutWallAtticArea, cfg), "outerWall.atticArea");
+  });
+});
+
+// ── General cross-checks ─────────────────────────────────────────────────────
+
+describe("validateInput — general", () => {
+  test("passes when a single-family apartment count is omitted, null, one, or two", () => {
+    const omitted = freshInput();
+    assertPassed(validateInput(omitted, cfg));
+
+    const nullCount = freshInput();
+    nullCount.general.numberOfApartments = null;
+    assertPassed(validateInput(nullCount, cfg));
+
+    const oneApartment = freshInput();
+    oneApartment.general.numberOfApartments = 1;
+    assertPassed(validateInput(oneApartment, cfg));
+
+    const twoApartments = freshInput();
+    twoApartments.general.numberOfApartments = 2;
+    assertPassed(validateInput(twoApartments, cfg));
+  });
+
+  test("fails when a single-family home specifies more than two apartments", () => {
+    const input = freshInput();
+    input.general.numberOfApartments = 3;
+    assertFailed(validateInput(input, cfg), "general.numberOfApartments");
+  });
+
+  test("allows multiple apartments for a multi-family home", () => {
+    const input = freshInput();
+    input.general.type = "multiFamily";
+    input.general.numberOfApartments = 4;
+    assertPassed(validateInput(input, cfg));
   });
 });
 
@@ -311,13 +393,23 @@ describe("validateInput — components", () => {
 
   test("fails when outerWall.constructionType is not in config outerWall.constructionTypes", () => {
     const input = freshInput();
-    input.outerWall = { area: 200, constructionType: "timber" };
+    input.outerWall = {
+      area: 200,
+      areaWithoutAttic: 180,
+      atticArea: 20,
+      constructionType: "timber",
+    };
     assertFailed(validateInput(input, cfg), "outerWall.constructionType");
   });
 
   test("passes when outerWall.constructionType is valid", () => {
     const input = freshInput();
-    input.outerWall = { area: 200, constructionType: "brick" };
+    input.outerWall = {
+      area: 200,
+      areaWithoutAttic: 180,
+      atticArea: 20,
+      constructionType: "brick",
+    };
     assertPassed(validateInput(input, cfg));
   });
 
@@ -394,6 +486,31 @@ describe("validateInput — basic numeric constraints", () => {
     input.general.buildingBaseArea = 0;
 
     assertFailed(validateInput(input, cfg), "general.buildingBaseArea");
+  });
+
+  test("fails when numberOfApartments is zero or not an integer", () => {
+    const zero = freshInput();
+    zero.general.numberOfApartments = 0;
+    assertFailed(validateInput(zero, cfg), "general.numberOfApartments");
+
+    const fraction = freshInput();
+    fraction.general.type = "multiFamily";
+    fraction.general.numberOfApartments = 1.5;
+    assertFailed(validateInput(fraction, cfg), "general.numberOfApartments");
+  });
+
+  test("accepts zero people but rejects negative or fractional counts", () => {
+    const zero = freshInput();
+    zero.general.numberOfPeople = 0;
+    assertPassed(validateInput(zero, cfg));
+
+    const negative = freshInput();
+    negative.general.numberOfPeople = -1;
+    assertFailed(validateInput(negative, cfg), "general.numberOfPeople");
+
+    const fraction = freshInput();
+    fraction.general.numberOfPeople = 1.5;
+    assertFailed(validateInput(fraction, cfg), "general.numberOfPeople");
   });
 
   test("fails when a numeric calendar year is not an integer", () => {

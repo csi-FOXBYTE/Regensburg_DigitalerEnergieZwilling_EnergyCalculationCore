@@ -20,11 +20,11 @@ Requires an `.npmrc` pointing to GitHub Packages:
 import { calculate, DEFAULT_CONFIG } from "@csi-foxbyte/regensburg_digitalerenergiezwilling_energycalculationcore";
 
 const result = calculate(DEFAULT_CONFIG, {
-  general: { /* ... */ },
+  general: { lowestEaveHeight: 6, /* ... */ },
   heat: { isBasementHeated: false },
   roof: { area: 120 },
   topFloor: { area: 80 },
-  outerWall: { area: 200 },
+  outerWall: { area: 200, areaWithoutAttic: 180, atticArea: 20 },
   baseSlab: { area: 80 },
   roofWindows: { area: 4 },
   exteriorWallWindows: { area: 24 },

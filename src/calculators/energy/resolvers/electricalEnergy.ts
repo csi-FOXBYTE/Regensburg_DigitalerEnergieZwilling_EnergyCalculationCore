@@ -2,6 +2,22 @@ import type { Resolver } from "../../../engine/index.js";
 import type { DETCalculatorRegistry, DETCalculatorContext } from "../";
 import type { ElectricityTypeData } from "../../../types/config/heat.js";
 import { resolveKeyedValue } from "../../../types/keyed-values.js";
+import {
+  fitLinearRegression,
+  resolveInterpolatedNumber,
+  type LinearInterpolation,
+  type LinearRegression,
+} from "../../../types/interpolated-number.js";
+import { BuildingType } from "../../../types/building-type.js";
+
+export const OccupancyWarning = {
+  AVERAGE_PEOPLE_PER_APARTMENT_ABOVE_SIX:
+    "averagePeoplePerApartmentAboveSix",
+  POSSIBLE_VACANCY: "possibleVacancy",
+} as const;
+
+export type OccupancyWarning =
+  (typeof OccupancyWarning)[keyof typeof OccupancyWarning];
 
 declare module "../" {
   interface DETCalculatorRegistry {
@@ -10,7 +26,10 @@ declare module "../" {
     electricityCo2Factor: number;
     electricityUnitRate: number;
     electricityBaseRate: number;
-    electricalBaseLoadFromFloorAreaFactor: number;
+    householdElectricityTable: LinearInterpolation;
+    householdElectricityRegression: LinearRegression;
+    householdElectricityPerApartment: number;
+    occupancyWarnings: OccupancyWarning[];
     baseElectricalLoad: number;
     baseElectricalLoadCost: number;
     electricityCost: number;
@@ -57,10 +76,60 @@ export const electricityBaseRate = {
   },
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "electricityBaseRate">;
 
-export const electricalBaseLoadFromFloorAreaFactor = {
-  key: "electricalBaseLoadFromFloorAreaFactor",
-  resolve: (ctx) => ctx.input.config.heat.electricalBaseLoadFromFloorAreaFactor,
-} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "electricalBaseLoadFromFloorAreaFactor">;
+export const householdElectricityTable = {
+  key: "householdElectricityTable",
+  resolve: (ctx) =>
+    resolveKeyedValue(
+      ctx.input.config.heat.householdElectricityPerApartment,
+      ctx.get("numberOfApartments") <= 2
+        ? BuildingType.SINGLE_FAMILY
+        : BuildingType.MULTI_FAMILY,
+    ),
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "householdElectricityTable">;
+
+export const householdElectricityRegression = {
+  key: "householdElectricityRegression",
+  resolve: (ctx) => fitLinearRegression(ctx.get("householdElectricityTable")),
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "householdElectricityRegression">;
+
+export const householdElectricityPerApartment = {
+  key: "householdElectricityPerApartment",
+  resolve: (ctx) => {
+    const numberOfApartments = ctx.get("numberOfApartments");
+    const numberOfPeople = ctx.get("numberOfPeople");
+    const table = ctx.get("householdElectricityTable");
+    const firstPoint = table.points[0];
+    const lastPoint = table.points[table.points.length - 1]!;
+
+    if (
+      numberOfApartments === 1 &&
+      numberOfPeople >= firstPoint.at &&
+      numberOfPeople <= lastPoint.at
+    ) {
+      return resolveInterpolatedNumber(table, numberOfPeople);
+    }
+    if (numberOfApartments === 1 && numberOfPeople < firstPoint.at) {
+      return firstPoint.value;
+    }
+
+    const { a, b } = ctx.get("householdElectricityRegression");
+    return a + ctx.get("averagePeoplePerApartment") * b;
+  },
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "householdElectricityPerApartment">;
+
+export const occupancyWarnings = {
+  key: "occupancyWarnings",
+  resolve: (ctx) => {
+    const warnings: OccupancyWarning[] = [];
+    if (ctx.get("averagePeoplePerApartment") > 6) {
+      warnings.push(OccupancyWarning.AVERAGE_PEOPLE_PER_APARTMENT_ABOVE_SIX);
+    }
+    if (ctx.get("numberOfPeople") < ctx.get("numberOfApartments")) {
+      warnings.push(OccupancyWarning.POSSIBLE_VACANCY);
+    }
+    return warnings;
+  },
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "occupancyWarnings">;
 
 export const baseElectricalLoad = {
   key: "baseElectricalLoad",
@@ -73,7 +142,7 @@ export const baseElectricalLoad = {
     if (userElectricityConsumption != null) {
       return userElectricityConsumption - ctx.get("electricalHeatingEnergyDemand");
     }
-    return ctx.get("netFloorArea") * ctx.get("electricalBaseLoadFromFloorAreaFactor");
+    return ctx.get("householdElectricityPerApartment") * ctx.get("numberOfApartments");
   },
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "baseElectricalLoad">;
 
@@ -107,7 +176,10 @@ export default [
   electricityCo2Factor,
   electricityUnitRate,
   electricityBaseRate,
-  electricalBaseLoadFromFloorAreaFactor,
+  householdElectricityTable,
+  householdElectricityRegression,
+  householdElectricityPerApartment,
+  occupancyWarnings,
   baseElectricalLoad,
   baseElectricalLoadCost,
   electricityCost,

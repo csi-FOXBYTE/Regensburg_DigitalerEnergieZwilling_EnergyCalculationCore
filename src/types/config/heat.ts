@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { keyedValues } from "../keyed-values.js";
 import { yearBands } from "../range-bands.js";
-import { InterpolatedNumberSchema } from "../interpolated-number.js";
+import { InterpolatedNumberSchema, LinearInterpolationSchema } from "../interpolated-number.js";
 import { HeatFlowDirectionSchema } from "../heat-flow-direction.js";
 import { BuildingTypeSchema } from "../building-type.js";
 import { SelectionSchema, selectionFilter } from "../selection.js";
@@ -65,7 +65,7 @@ export const DETHeatConfigSchema = z.object({
   internalGainsFactorByBuildingType: keyedValues(z.string(), z.number()),
 
   hotWaterEnergyDemandFromAreaFactor: keyedValues(BuildingTypeSchema, z.number()),
-  electricalBaseLoadFromFloorAreaFactor: z.number(),
+  householdElectricityPerApartment: keyedValues(BuildingTypeSchema, LinearInterpolationSchema),
   ventilationHeatLossCorrectionFactor: z.number(),
   heatingDegreeDays: z.number(),
   defaultPrimaryEnergyCarrier: z.string(),

@@ -9,6 +9,11 @@ export type LinearInterpolation = {
   points: [InterpolationPoint, InterpolationPoint, ...InterpolationPoint[]];
 };
 
+export type LinearRegression = {
+  a: number;
+  b: number;
+};
+
 export type InterpolatedNumber = number | LinearInterpolation;
 
 const InterpolationPointSchema = z.object({
@@ -52,4 +57,25 @@ export function resolveInterpolatedNumber(definition: InterpolatedNumber, input:
   const ratio = (input - lower.at) / (upper.at - lower.at);
 
   return lower.value + ratio * (upper.value - lower.value);
+}
+
+export function fitLinearRegression(definition: LinearInterpolation): LinearRegression {
+  const count = definition.points.length;
+  let sumX = 0;
+  let sumY = 0;
+  let sumXX = 0;
+  let sumXY = 0;
+
+  for (const point of definition.points) {
+    sumX += point.at;
+    sumY += point.value;
+    sumXX += point.at * point.at;
+    sumXY += point.at * point.value;
+  }
+
+  const denominator = count * sumXX - sumX * sumX;
+  const b = (count * sumXY - sumX * sumY) / denominator;
+  const a = (sumY - b * sumX) / count;
+
+  return { a, b };
 }

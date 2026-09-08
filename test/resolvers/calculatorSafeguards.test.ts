@@ -5,6 +5,7 @@ import { isBasementHeated } from "../../src/calculators/energy/resolvers/buildin
 import { numberOfStories } from "../../src/calculators/energy/resolvers/buildingGeometry.js";
 import { exteriorWallWindowsArea } from "../../src/calculators/energy/resolvers/exteriorWallWindows/exteriorWallWindowsInputs.js";
 import { outerWallHeatLoss } from "../../src/calculators/energy/resolvers/outerWall/outerWallHeatLoss.js";
+import { outerWallArea } from "../../src/calculators/energy/resolvers/outerWall/outerWallInputs.js";
 import { roofHeatLoss } from "../../src/calculators/energy/resolvers/roof/roofHeatLoss.js";
 import type {
   DETCalculatorContext,
@@ -46,7 +47,7 @@ describe("calculator input safeguards", () => {
           { general: {} },
           {},
           {
-            buildingHeight: 0.5,
+            lowestEaveHeight: 0.5,
             interiorStoryHeight: 2.5,
             floorSlabThickness: 0.3,
           },
@@ -62,7 +63,8 @@ describe("calculator input safeguards", () => {
           { general: {} },
           {},
           {
-            buildingHeight: 6,
+            buildingHeight: 12,
+            lowestEaveHeight: 6,
             interiorStoryHeight: 2.5,
             floorSlabThickness: 0.3,
           },
@@ -79,20 +81,69 @@ describe("calculator input safeguards", () => {
     });
   });
 
+  describe("outerWallArea", () => {
+    test("preserves an explicitly supplied total wall area", () => {
+      const result = outerWallArea.resolve(
+        mockContext(
+          { outerWall: { area: 250 } },
+          {},
+          {
+            outerWallAreaWithoutAttic: 180,
+            outerWallAtticArea: 20,
+            isAtticHeated: true,
+          },
+        ),
+      );
+
+      assert.equal(result, 250);
+    });
+
+    test("uses only the wall without attic when the attic is not heated", () => {
+      const result = outerWallArea.resolve(
+        mockContext(
+          { outerWall: {} },
+          {},
+          {
+            outerWallAreaWithoutAttic: 180,
+            outerWallAtticArea: 20,
+            isAtticHeated: false,
+          },
+        ),
+      );
+
+      assert.equal(result, 180);
+    });
+
+    test("adds the attic wall when the attic is heated", () => {
+      const result = outerWallArea.resolve(
+        mockContext(
+          { outerWall: {} },
+          {},
+          {
+            outerWallAreaWithoutAttic: 180,
+            outerWallAtticArea: 20,
+            isAtticHeated: true,
+          },
+        ),
+      );
+
+      assert.equal(result, 200);
+    });
+  });
+
   describe("outerWallHeatLoss", () => {
-    test("uses the remaining opaque wall area", () => {
+    test("subtracts windows but not adjacent-wall overlap", () => {
       const result = outerWallHeatLoss.resolve(
         mockContext({}, {}, {
           adjacentWallArea: 10,
           outerWallArea: 100,
           exteriorWallWindowsArea: 20,
           outerWallUValue: 2,
-          adjacentWallUValue: 0,
           outerWallHeatLossFactor: 0.5,
         }),
       );
 
-      assert.equal(result, 70);
+      assert.equal(result, 80);
     });
 
     test("clamps a negative opaque wall area to zero", () => {
@@ -100,9 +151,8 @@ describe("calculator input safeguards", () => {
         mockContext({}, {}, {
           adjacentWallArea: 30,
           outerWallArea: 100,
-          exteriorWallWindowsArea: 80,
+          exteriorWallWindowsArea: 110,
           outerWallUValue: 2,
-          adjacentWallUValue: 0,
           outerWallHeatLossFactor: 0.5,
         }),
       );
@@ -112,7 +162,7 @@ describe("calculator input safeguards", () => {
   });
 
   describe("exteriorWallWindowsArea", () => {
-    test("estimates area from the non-adjacent wall area", () => {
+    test("estimates area from the wall area without subtracting overlap", () => {
       const result = exteriorWallWindowsArea.resolve(
         mockContext(
           { exteriorWallWindows: {} },
@@ -121,7 +171,19 @@ describe("calculator input safeguards", () => {
         ),
       );
 
-      assert.equal(result, 18);
+      assert.equal(result, 20);
+    });
+
+    test("ignores adjacent wall area when estimating windows", () => {
+      const result = exteriorWallWindowsArea.resolve(
+        mockContext(
+          { exteriorWallWindows: {} },
+          { windows: { exteriorWallAreaFactor: 0.2 } },
+          { outerWallArea: 100, adjacentWallArea: 110 },
+        ),
+      );
+
+      assert.equal(result, 20);
     });
 
     test("clamps a negative estimated area to zero", () => {
@@ -129,7 +191,7 @@ describe("calculator input safeguards", () => {
         mockContext(
           { exteriorWallWindows: {} },
           { windows: { exteriorWallAreaFactor: 0.2 } },
-          { outerWallArea: 100, adjacentWallArea: 110 },
+          { outerWallArea: -100, adjacentWallArea: 0 },
         ),
       );
 
