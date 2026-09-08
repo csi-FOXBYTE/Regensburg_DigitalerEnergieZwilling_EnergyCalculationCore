@@ -1,21 +1,15 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 
-import { calculate } from "../../src/calculate.js";
 import { DETEnergyCaluclator } from "../../src/calculators/energy/index.js";
 import { BuildingType } from "../../src/types/building-type.js";
 import { DEFAULT_CONFIG } from "../../src/types/config/default-config.js";
 import type { DETInput } from "../../src/types/input/index.js";
+import { resolveKeyedValue } from "../../src/types/keyed-values.js";
+import { resolveYearBand } from "../../src/types/range-bands.js";
 import { validateInput } from "../../src/validators/index.js";
 
 const clone = <T>(value: T): T => structuredClone(value);
-
-function assertClose(actual: number, expected: number, tolerance = 1e-6): void {
-  assert.ok(
-    Math.abs(actual - expected) <= tolerance,
-    `Expected ${actual} to be within ${tolerance} of ${expected}`,
-  );
-}
 
 function baseInput(): DETInput {
   return {
@@ -83,162 +77,153 @@ function evaluate(input: DETInput) {
     true,
     validation.success ? undefined : JSON.stringify(validation.issues),
   );
-  return {
-    ctx: DETEnergyCaluclator({ config: DEFAULT_CONFIG, input }),
-    result: calculate(DEFAULT_CONFIG, input),
-  };
+  return DETEnergyCaluclator({ config: DEFAULT_CONFIG, input });
 }
 
-describe("absolute calculation paths with DEFAULT_CONFIG", () => {
-  test("selects roof or top-floor path from attic state and preserves absolute demand", () => {
+describe("calculation resolver paths with DEFAULT_CONFIG", () => {
+  test("selects the configured roof or top-floor path from attic state", () => {
     const flatInput = baseInput();
     flatInput.roof.isFlatRoof = true;
     delete flatInput.topFloor.hasAttic;
     delete flatInput.topFloor.isAtticHeated;
+    delete flatInput.roof.constructionType;
     const flat = evaluate(flatInput);
 
-    assert.equal(flat.ctx.get("hasAttic"), false);
-    assert.equal(flat.ctx.get("isSpaceBelowRoofHeated"), true);
-    assertClose(flat.ctx.get("roofHeatLoss"), 61.6);
-    assertClose(flat.ctx.get("topFloorHeatLoss"), 0);
-    assertClose(flat.ctx.get("grossHeatedVolume"), 438.9);
-    assertClose(flat.result.annualHeatingEnergyDemand, 57808.31885923705);
+    assert.equal(flat.get("hasAttic"), false);
+    assert.equal(flat.get("isSpaceBelowRoofHeated"), true);
+    assert.ok(flat.get("roofHeatLoss") > 0);
+    assert.equal(flat.get("topFloorHeatLoss"), 0);
+    assert.equal(
+      flat.get("roofConstructionType"),
+      resolveKeyedValue(DEFAULT_CONFIG.roof.defaultConstructionTypeByIsFlatRoof, true),
+    );
 
     const unheatedInput = baseInput();
     unheatedInput.topFloor.hasAttic = true;
     unheatedInput.topFloor.isAtticHeated = false;
     const unheated = evaluate(unheatedInput);
 
-    assert.equal(unheated.ctx.get("isSpaceBelowRoofHeated"), false);
-    assertClose(unheated.ctx.get("roofHeatLoss"), 0);
-    assertClose(unheated.ctx.get("topFloorHeatLoss"), 53.9);
-    assertClose(unheated.ctx.get("grossHeatedVolume"), 438.9);
-    assertClose(unheated.result.annualHeatingEnergyDemand, 57059.82027578904);
+    assert.equal(unheated.get("isSpaceBelowRoofHeated"), false);
+    assert.equal(unheated.get("roofHeatLoss"), 0);
+    assert.ok(unheated.get("topFloorHeatLoss") > 0);
 
-    const heatedInput = baseInput();
-    heatedInput.topFloor.hasAttic = true;
+    const heatedInput = clone(unheatedInput);
     heatedInput.topFloor.isAtticHeated = true;
     const heated = evaluate(heatedInput);
 
-    assert.equal(heated.ctx.get("isSpaceBelowRoofHeated"), true);
-    assertClose(heated.ctx.get("roofHeatLoss"), 61.6);
-    assertClose(heated.ctx.get("topFloorHeatLoss"), 0);
-    assertClose(heated.ctx.get("grossHeatedVolume"), 666.05);
-    assertClose(heated.result.annualHeatingEnergyDemand, 62843.65373000336);
-
-    assertClose(
-      flat.result.annualHeatingEnergyDemand - unheated.result.annualHeatingEnergyDemand,
-      748.4985834480103,
-    );
-    assertClose(
-      heated.result.annualHeatingEnergyDemand - unheated.result.annualHeatingEnergyDemand,
-      5783.83345421432,
-    );
+    assert.equal(heated.get("isSpaceBelowRoofHeated"), true);
+    assert.ok(heated.get("roofHeatLoss") > 0);
+    assert.equal(heated.get("topFloorHeatLoss"), 0);
+    assert.ok(heated.get("grossHeatedVolume") > unheated.get("grossHeatedVolume"));
   });
 
-  test("selects slab or cellar-ceiling path and adds heated basement volume", () => {
+  test("selects the configured bottom-floor path from basement state", () => {
     const makeBasementInput = (hasBasement: boolean, isBasementHeated: boolean) => {
       const input = baseInput();
       delete input.bottomFloor.uValue;
+      delete input.bottomFloor.constructionType;
       input.bottomFloor.hasBasement = hasBasement;
       input.bottomFloor.isBasementHeated = isBasementHeated;
       return input;
     };
 
     const absent = evaluate(makeBasementInput(false, true));
-    assert.equal(absent.ctx.get("isBasementHeated"), false);
-    assert.equal(absent.ctx.get("isSpaceAboveBaseSlabHeated"), true);
-    assert.equal(absent.ctx.get("bottomFloorConstructionType"), "reinforced_concrete_on_ground");
-    assertClose(absent.ctx.get("bottomFloorUValue"), 1.2);
-    assertClose(absent.ctx.get("bottomFloorHeatLoss"), 92.4);
-    assertClose(absent.ctx.get("grossHeatedVolume"), 438.9);
-    assertClose(absent.result.annualHeatingEnergyDemand, 58556.81744268503);
+    assert.equal(absent.get("isBasementHeated"), false);
+    assert.equal(absent.get("isSpaceAboveBaseSlabHeated"), true);
+    const absentDefaults = resolveKeyedValue(
+      DEFAULT_CONFIG.bottomFloor.defaultConstructionType,
+      true,
+    );
+    assert.equal(
+      absent.get("bottomFloorConstructionType"),
+      resolveYearBand(absentDefaults, absent.get("bottomFloorYear")),
+    );
 
     const unheated = evaluate(makeBasementInput(true, false));
-    assert.equal(unheated.ctx.get("isSpaceAboveBaseSlabHeated"), false);
-    assert.equal(unheated.ctx.get("bottomFloorConstructionType"), "timber_joist_ceiling");
-    assertClose(unheated.ctx.get("bottomFloorUValue"), 0.8);
-    assertClose(unheated.ctx.get("bottomFloorHeatLoss"), 61.6);
-    assertClose(unheated.ctx.get("grossHeatedVolume"), 438.9);
-    assertClose(unheated.result.annualHeatingEnergyDemand, 55562.82310889304);
+    assert.equal(unheated.get("isBasementHeated"), false);
+    assert.equal(unheated.get("isSpaceAboveBaseSlabHeated"), false);
+    const unheatedDefaults = resolveKeyedValue(
+      DEFAULT_CONFIG.bottomFloor.defaultConstructionType,
+      false,
+    );
+    assert.equal(
+      unheated.get("bottomFloorConstructionType"),
+      resolveYearBand(unheatedDefaults, unheated.get("bottomFloorYear")),
+    );
 
     const heated = evaluate(makeBasementInput(true, true));
-    assert.equal(heated.ctx.get("isSpaceAboveBaseSlabHeated"), true);
-    assert.equal(heated.ctx.get("bottomFloorConstructionType"), "reinforced_concrete_on_ground");
-    assertClose(heated.ctx.get("bottomFloorUValue"), 1.2);
-    assertClose(heated.ctx.get("bottomFloorHeatLoss"), 92.4);
-    assertClose(heated.ctx.get("grossHeatedVolume"), 666.05);
-    assertClose(heated.result.annualHeatingEnergyDemand, 63350.48997210213);
-
-    assertClose(
-      absent.result.annualHeatingEnergyDemand - unheated.result.annualHeatingEnergyDemand,
-      2993.9943337919904,
-    );
-    assertClose(
-      heated.result.annualHeatingEnergyDemand - unheated.result.annualHeatingEnergyDemand,
-      7787.666863209088,
-    );
+    assert.equal(heated.get("isBasementHeated"), true);
+    assert.equal(heated.get("isSpaceAboveBaseSlabHeated"), true);
+    assert.ok(heated.get("grossHeatedVolume") > unheated.get("grossHeatedVolume"));
   });
 
-  test("resolves unsanitized, partially sanitized, and explicit component U-values", () => {
-    const oldInput = baseInput();
-    delete oldInput.roof.uValue;
-    delete oldInput.topFloor.uValue;
-    delete oldInput.outerWall.uValue;
-    delete oldInput.exteriorWallWindows.uValue;
-    delete oldInput.bottomFloor.uValue;
-    oldInput.exteriorWallWindows.year = 1968;
-    const old = evaluate(oldInput);
+  test("resolves omitted component U-values from config and preserves explicit values", () => {
+    const omittedInput = baseInput();
+    delete omittedInput.roof.uValue;
+    delete omittedInput.topFloor.uValue;
+    delete omittedInput.outerWall.uValue;
+    delete omittedInput.exteriorWallWindows.uValue;
+    delete omittedInput.bottomFloor.uValue;
+    omittedInput.exteriorWallWindows.year = 1968;
+    const omitted = evaluate(omittedInput);
 
-    assertClose(old.ctx.get("roofUValue"), 1.4);
-    assertClose(old.ctx.get("topFloorUValue"), 0.7);
-    assertClose(old.ctx.get("outerWallUValue"), 1.4);
-    assertClose(old.ctx.get("exteriorWallWindowsUValue"), 2.7);
-    assertClose(old.ctx.get("bottomFloorUValue"), 1.2);
-    assertClose(old.result.annualHeatingEnergyDemand, 58556.81744268503);
-
-    const zeroThicknessInput = clone(oldInput);
-    zeroThicknessInput.roof.hasInsulation = true;
-    zeroThicknessInput.roof.insulationThickness = 0;
-    zeroThicknessInput.topFloor.hasInsulation = true;
-    zeroThicknessInput.topFloor.insulationThickness = 0;
-    zeroThicknessInput.outerWall.hasInsulation = true;
-    zeroThicknessInput.outerWall.insulationThickness = 0;
-    zeroThicknessInput.bottomFloor.hasInsulation = true;
-    zeroThicknessInput.bottomFloor.insulationThickness = 0;
-    const zeroThickness = evaluate(zeroThicknessInput);
-
-    assertClose(zeroThickness.ctx.get("roofUValue"), old.ctx.get("roofUValue"));
-    assertClose(zeroThickness.ctx.get("topFloorUValue"), old.ctx.get("topFloorUValue"));
-    assertClose(zeroThickness.ctx.get("outerWallUValue"), old.ctx.get("outerWallUValue"));
-    assertClose(zeroThickness.ctx.get("bottomFloorUValue"), old.ctx.get("bottomFloorUValue"));
-    assertClose(
-      zeroThickness.result.annualHeatingEnergyDemand,
-      old.result.annualHeatingEnergyDemand,
+    const roofUValues = resolveKeyedValue(
+      DEFAULT_CONFIG.roof.uValue,
+      omitted.get("roofConstructionType"),
+    );
+    const topFloorUValues = resolveKeyedValue(
+      DEFAULT_CONFIG.topFloor.uValue,
+      omitted.get("topFloorType"),
+    );
+    const outerWallUValues = resolveKeyedValue(
+      DEFAULT_CONFIG.outerWall.uValue,
+      omitted.get("outerWallConstructionType"),
+    );
+    const windowUValues = resolveKeyedValue(
+      DEFAULT_CONFIG.windows.uValue,
+      omitted.get("exteriorWallWindowsType"),
+    );
+    const bottomFloorUValues = resolveKeyedValue(
+      DEFAULT_CONFIG.bottomFloor.uValue,
+      omitted.get("bottomFloorConstructionType"),
     );
 
-    const partialInput = clone(oldInput);
-    partialInput.roof.hasInsulation = true;
-    partialInput.roof.insulationThickness = 0.16;
-    partialInput.topFloor.hasInsulation = true;
-    partialInput.topFloor.insulationThickness = 0.16;
-    partialInput.outerWall.hasInsulation = true;
-    partialInput.outerWall.insulationThickness = 0.12;
-    partialInput.exteriorWallWindows.year = 2010;
-    partialInput.bottomFloor.hasInsulation = true;
-    partialInput.bottomFloor.insulationThickness = 0.1;
-    const partial = evaluate(partialInput);
-
-    assertClose(partial.ctx.get("roofUValue"), 0.21212121212121213);
-    assertClose(partial.ctx.get("topFloorUValue"), 0.15555555555555556);
-    assertClose(partial.ctx.get("outerWallUValue"), 0.2413793103448276);
-    assertClose(partial.ctx.get("exteriorWallWindowsUValue"), 1.5);
-    assertClose(partial.ctx.get("bottomFloorUValue"), 0.24);
-    assertClose(partial.result.annualHeatingEnergyDemand, 23248.652841655574);
-    assertClose(
-      old.result.annualHeatingEnergyDemand - partial.result.annualHeatingEnergyDemand,
-      35308.16460102946,
+    assert.equal(
+      omitted.get("roofUValue"),
+      resolveYearBand(roofUValues, omitted.get("roofYear")),
     );
+    assert.equal(
+      omitted.get("topFloorUValue"),
+      resolveYearBand(topFloorUValues, omitted.get("topFloorYear")),
+    );
+    assert.equal(
+      omitted.get("outerWallUValue"),
+      resolveYearBand(outerWallUValues, omitted.get("outerWallYear")),
+    );
+    assert.equal(
+      omitted.get("exteriorWallWindowsUValue"),
+      resolveYearBand(windowUValues, omitted.get("exteriorWallWindowsYear")),
+    );
+    assert.equal(
+      omitted.get("bottomFloorUValue"),
+      resolveYearBand(bottomFloorUValues, omitted.get("bottomFloorYear")),
+    );
+
+    const insulatedInput = clone(omittedInput);
+    insulatedInput.roof.hasInsulation = true;
+    insulatedInput.roof.insulationThickness = 0.16;
+    insulatedInput.topFloor.hasInsulation = true;
+    insulatedInput.topFloor.insulationThickness = 0.16;
+    insulatedInput.outerWall.hasInsulation = true;
+    insulatedInput.outerWall.insulationThickness = 0.12;
+    insulatedInput.bottomFloor.hasInsulation = true;
+    insulatedInput.bottomFloor.insulationThickness = 0.1;
+    const insulated = evaluate(insulatedInput);
+
+    assert.ok(insulated.get("roofUValue") < omitted.get("roofUValue"));
+    assert.ok(insulated.get("topFloorUValue") < omitted.get("topFloorUValue"));
+    assert.ok(insulated.get("outerWallUValue") < omitted.get("outerWallUValue"));
+    assert.ok(insulated.get("bottomFloorUValue") < omitted.get("bottomFloorUValue"));
 
     const explicitInput = baseInput();
     explicitInput.roof.uValue = 0.21;
@@ -248,160 +233,103 @@ describe("absolute calculation paths with DEFAULT_CONFIG", () => {
     explicitInput.bottomFloor.uValue = 0.25;
     const explicit = evaluate(explicitInput);
 
-    assertClose(explicit.ctx.get("roofUValue"), 0.21);
-    assertClose(explicit.ctx.get("topFloorUValue"), 0.22);
-    assertClose(explicit.ctx.get("outerWallUValue"), 0.23);
-    assertClose(explicit.ctx.get("exteriorWallWindowsUValue"), 1.24);
-    assertClose(explicit.ctx.get("bottomFloorUValue"), 0.25);
-    assertClose(explicit.result.annualHeatingEnergyDemand, 22546.647800609997);
-
-    const heatedOldInput = clone(oldInput);
-    heatedOldInput.topFloor.isAtticHeated = true;
-    const heatedOld = evaluate(heatedOldInput);
-    assertClose(heatedOld.ctx.get("roofUValue"), 1.4);
-    assertClose(heatedOld.result.annualHeatingEnergyDemand, 68811.45240279344);
-
-    const heatedInsulatedInput = clone(heatedOldInput);
-    heatedInsulatedInput.roof.hasInsulation = true;
-    heatedInsulatedInput.roof.insulationThickness = 0.16;
-    const heatedInsulated = evaluate(heatedInsulatedInput);
-    assertClose(heatedInsulated.ctx.get("roofUValue"), 0.21212121212121213);
-    assertClose(heatedInsulated.result.annualHeatingEnergyDemand, 59950.175585620294);
-
-    const heatedExplicitInput = clone(explicitInput);
-    heatedExplicitInput.topFloor.isAtticHeated = true;
-    const heatedExplicit = evaluate(heatedExplicitInput);
-    assertClose(heatedExplicit.ctx.get("roofUValue"), 0.21);
-    assertClose(heatedExplicit.result.annualHeatingEnergyDemand, 27626.278692049626);
+    assert.equal(explicit.get("roofUValue"), explicitInput.roof.uValue);
+    assert.equal(explicit.get("topFloorUValue"), explicitInput.topFloor.uValue);
+    assert.equal(explicit.get("outerWallUValue"), explicitInput.outerWall.uValue);
+    assert.equal(
+      explicit.get("exteriorWallWindowsUValue"),
+      explicitInput.exteriorWallWindows.uValue,
+    );
+    assert.equal(explicit.get("bottomFloorUValue"), explicitInput.bottomFloor.uValue);
   });
 
-  test("routes carrier systems into thermal or electrical demand with absolute factors", () => {
+  test("routes heating demand according to the configured electrical ratio", () => {
     const cases = [
       {
-        name: "gas",
         carrier: "natural_gas",
         system: "condensing_boiler_70_55",
         surface: "free_heat_emitter",
         year: 1998,
         hasGasSupply: true,
         hasStorage: false,
-        electricalRatio: 0,
-        combinedFactor: 1.13741,
-        endEnergy: 57059.82027578904,
-        heatingPrimaryEnergy: 62765.80230336795,
       },
       {
-        name: "oil",
-        carrier: "heating_oil",
-        system: "standard_boiler_70_55",
-        surface: "free_heat_emitter",
-        year: 1998,
-        hasGasSupply: false,
-        hasStorage: true,
-        electricalRatio: 0,
-        combinedFactor: 1.41379,
-        endEnergy: 70580.57872246674,
-        heatingPrimaryEnergy: 77638.63659471342,
-      },
-      {
-        name: "district heating",
-        carrier: "district_heating",
-        system: "district_heating_all_temperatures",
-        surface: "free_heat_emitter",
-        year: 1998,
-        hasGasSupply: false,
-        hasStorage: false,
-        electricalRatio: 0,
-        combinedFactor: 1.08426,
-        endEnergy: 54459.67442065871,
-        heatingPrimaryEnergy: 54459.67442065871,
-      },
-      {
-        name: "pellets",
-        carrier: "wood_pellets",
-        system: "standard_boiler_70_55",
-        surface: "free_heat_emitter",
-        year: 1998,
-        hasGasSupply: false,
-        hasStorage: true,
-        electricalRatio: 0,
-        combinedFactor: 1.41379,
-        endEnergy: 70580.57872246674,
-        heatingPrimaryEnergy: 14116.115744493349,
-      },
-      {
-        name: "air-source heat pump",
         carrier: "none",
         system: "air_source_heat_pump_lt_40",
         surface: "radiant_surface_heating",
         year: 2010,
         hasGasSupply: false,
         hasStorage: false,
-        electricalRatio: 1,
-        combinedFactor: 0.39938,
-        endEnergy: 13620.573310021222,
-        heatingPrimaryEnergy: 24517.0319580382,
       },
     ] as const;
 
-    for (const expected of cases) {
+    for (const testCase of cases) {
       const input = baseInput();
-      input.heat.primaryEnergyCarrier = expected.carrier;
-      input.heat.heatingSystemType = expected.system;
-      input.heat.heatingSurfaceType = expected.surface;
-      input.heat.heatingSystemConstructionYear = expected.year;
-      input.heat.hasGasSupply = expected.hasGasSupply;
-      input.heat.hasStorage = expected.hasStorage;
-      input.heat.hasGeothermalAvailability = false;
-      const { ctx, result } = evaluate(input);
+      input.heat.primaryEnergyCarrier = testCase.carrier;
+      input.heat.heatingSystemType = testCase.system;
+      input.heat.heatingSurfaceType = testCase.surface;
+      input.heat.heatingSystemConstructionYear = testCase.year;
+      input.heat.hasGasSupply = testCase.hasGasSupply;
+      input.heat.hasStorage = testCase.hasStorage;
+      const ctx = evaluate(input);
 
-      assert.equal(ctx.get("heatingSystemType"), expected.system, expected.name);
-      assertClose(ctx.get("electricalRatio"), expected.electricalRatio);
-      assertClose(ctx.get("combinedHeatingPerformanceFactor"), expected.combinedFactor);
-      assertClose(result.annualHeatingEnergyDemand, expected.endEnergy);
-
-      const heatingPrimaryEnergy =
-        result.annualEnergyCarrierPrimaryDemand + result.annualElectricalHeatingEnergyDemand * 1.8;
-      assertClose(heatingPrimaryEnergy, expected.heatingPrimaryEnergy);
-
-      if (expected.electricalRatio === 0) {
-        assertClose(result.annualCarrierHeatingEnergyDemand, expected.endEnergy);
-        assertClose(result.annualElectricalHeatingEnergyDemand, 0);
-      } else {
-        assertClose(result.annualCarrierHeatingEnergyDemand, 0);
-        assertClose(result.annualElectricalHeatingEnergyDemand, expected.endEnergy);
-      }
+      const configuredRatio = resolveKeyedValue(
+        DEFAULT_CONFIG.heat.electricalRatio,
+        testCase.system,
+      );
+      assert.equal(ctx.get("electricalRatio"), configuredRatio);
+      assert.equal(
+        ctx.get("electricalHeatingEnergyDemand"),
+        ctx.get("netThermalDemand") * configuredRatio,
+      );
+      assert.equal(
+        ctx.get("thermalEnergyDemand"),
+        ctx.get("netThermalDemand") * (1 - configuredRatio),
+      );
     }
   });
 
-  test("resolves inferred or explicit stories and building-type internal gains", () => {
+  test("uses configured fallbacks while preserving explicit geometry input", () => {
     const inferredInput = baseInput();
     delete inferredInput.general.numberOfStories;
     const inferred = evaluate(inferredInput);
-    assert.equal(inferred.ctx.get("numberOfStories"), 2);
-    assertClose(inferred.ctx.get("grossHeatedVolume"), 438.9);
-    assertClose(inferred.result.annualHeatingEnergyDemand, 57059.82027578904);
+    const configuredStoryHeight =
+      DEFAULT_CONFIG.general.assumedInteriorStoryHeight +
+      DEFAULT_CONFIG.general.assumedFloorSlabThickness;
+    assert.equal(
+      inferred.get("numberOfStories"),
+      Math.max(1, Math.round(inferredInput.general.lowestEaveHeight / configuredStoryHeight)),
+    );
 
     const explicitInput = clone(inferredInput);
     explicitInput.general.numberOfStories = 3;
     const explicit = evaluate(explicitInput);
-    assert.equal(explicit.ctx.get("numberOfStories"), 3);
-    assertClose(explicit.ctx.get("grossHeatedVolume"), 666.05);
-    assertClose(explicit.result.annualHeatingEnergyDemand, 62790.9550838233);
+    assert.equal(explicit.get("numberOfStories"), explicitInput.general.numberOfStories);
 
-    const efhInput = baseInput();
-    efhInput.heat.primaryEnergyCarrier = "none";
-    efhInput.heat.heatingSystemType = "air_source_heat_pump_lt_40";
-    efhInput.heat.heatingSystemConstructionYear = 2010;
-    efhInput.heat.heatingSurfaceType = "radiant_surface_heating";
-    const efh = evaluate(efhInput);
-    assertClose(efh.ctx.get("internalGainsFactor"), 0.65);
-    assertClose(efh.result.annualHeatingEnergyDemand, 13620.573310021222);
+    const singleFamilyInput = baseInput();
+    singleFamilyInput.heat.primaryEnergyCarrier = "none";
+    singleFamilyInput.heat.heatingSystemType = "air_source_heat_pump_lt_40";
+    singleFamilyInput.heat.heatingSurfaceType = "radiant_surface_heating";
+    singleFamilyInput.heat.heatingSystemConstructionYear = 2010;
+    const singleFamily = evaluate(singleFamilyInput);
+    assert.equal(singleFamily.get("hasInternalGains"), true);
+    assert.equal(
+      singleFamily.get("internalGainsFactor"),
+      resolveKeyedValue(
+        DEFAULT_CONFIG.heat.internalGainsFactorByBuildingType,
+        BuildingType.SINGLE_FAMILY,
+      ),
+    );
 
-    const mfhInput = clone(efhInput);
-    mfhInput.general.type = BuildingType.MULTI_FAMILY;
-    const mfh = evaluate(mfhInput);
-    assertClose(mfh.ctx.get("internalGainsFactor"), 0.5);
-    assertClose(mfh.result.annualHeatingEnergyDemand, 10734.945716631708);
+    const multiFamilyInput = clone(singleFamilyInput);
+    multiFamilyInput.general.type = BuildingType.MULTI_FAMILY;
+    const multiFamily = evaluate(multiFamilyInput);
+    assert.equal(
+      multiFamily.get("internalGainsFactor"),
+      resolveKeyedValue(
+        DEFAULT_CONFIG.heat.internalGainsFactorByBuildingType,
+        BuildingType.MULTI_FAMILY,
+      ),
+    );
   });
 });

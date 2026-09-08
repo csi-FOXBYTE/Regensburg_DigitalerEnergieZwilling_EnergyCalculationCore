@@ -2,6 +2,7 @@ import { describe, test } from "node:test";
 import assert from "node:assert/strict";
 import { validateConfig } from "../../src/validators/index.js";
 import type { ValidationResult } from "../../src/validators/index.js";
+import { DEFAULT_CONFIG } from "../../src/types/config/default-config.js";
 import { baseConfig } from "./fixtures.js";
 
 function fresh() {
@@ -29,6 +30,10 @@ function assertFailed<T>(result: ValidationResult<T>, path: string): void {
 // ── Happy path ────────────────────────────────────────────────────────────────
 
 describe("validateConfig — happy path", () => {
+  test("passes for DEFAULT_CONFIG", () => {
+    assertPassed(validateConfig(DEFAULT_CONFIG));
+  });
+
   test("passes for a fully valid config", () => {
     assertPassed(validateConfig(baseConfig()));
   });
