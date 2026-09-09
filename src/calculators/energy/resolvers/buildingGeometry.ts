@@ -9,6 +9,7 @@ declare module "../" {
     interiorStoryHeight: number;
     numberOfStories: number;
     numberOfHeatedStories: number;
+    aboveGroundHeatedHeight: number;
     totalStoryHeight: number;
     grossHeatedVolume: number;
     heatedAirVolumeCorrectionFactor: number;
@@ -28,7 +29,16 @@ export const floorSlabThickness = {
 
 export const interiorStoryHeight = {
   key: "interiorStoryHeight",
-  resolve: (ctx) => ctx.input.config.general.assumedInteriorStoryHeight,
+  resolve: (ctx) => {
+    const stories = ctx.get("numberOfStories");
+    const heatedAttic = ctx.get("hasAttic") && ctx.get("isAtticHeated");
+    const heatedAboveGroundStories = stories + (heatedAttic ? 1 : 0);
+    // A heated attic has no additional slab above it.
+    return (
+      (ctx.get("aboveGroundHeatedHeight") - stories * ctx.get("floorSlabThickness")) /
+      heatedAboveGroundStories
+    );
+  },
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "interiorStoryHeight">;
 
 export const numberOfStories = {
@@ -40,7 +50,7 @@ export const numberOfStories = {
       1,
       Math.round(
         ctx.get("lowestEaveHeight") /
-          (ctx.get("interiorStoryHeight") + ctx.get("floorSlabThickness")),
+          (ctx.input.config.general.assumedInteriorStoryHeight + ctx.get("floorSlabThickness")),
       ),
     );
   },
@@ -54,11 +64,21 @@ export const numberOfHeatedStories = {
     (ctx.get("hasBasement") && ctx.get("isBasementHeated") ? 1 : 0),
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "numberOfHeatedStories">;
 
+export const aboveGroundHeatedHeight = {
+  key: "aboveGroundHeatedHeight",
+  resolve: (ctx) =>
+    ctx.get("hasAttic") && ctx.get("isAtticHeated")
+      ? ctx.get("buildingHeight")
+      : ctx.get("lowestEaveHeight"),
+} satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "aboveGroundHeatedHeight">;
+
 export const totalStoryHeight = {
   key: "totalStoryHeight",
   resolve: (ctx) => {
-    const n = ctx.get("numberOfHeatedStories");
-    return n * ctx.get("interiorStoryHeight") + (n - 1) * ctx.get("floorSlabThickness");
+    const basementHeight = ctx.get("hasBasement") && ctx.get("isBasementHeated")
+      ? ctx.get("interiorStoryHeight") + ctx.get("floorSlabThickness")
+      : 0;
+    return ctx.get("aboveGroundHeatedHeight") + basementHeight;
   },
 } satisfies Resolver<DETCalculatorContext, DETCalculatorRegistry, "totalStoryHeight">;
 
@@ -126,6 +146,7 @@ export default [
   interiorStoryHeight,
   numberOfStories,
   numberOfHeatedStories,
+  aboveGroundHeatedHeight,
   totalStoryHeight,
   grossHeatedVolume,
   heatedAirVolumeCorrectionFactor,

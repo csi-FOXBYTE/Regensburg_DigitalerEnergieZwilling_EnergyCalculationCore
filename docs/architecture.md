@@ -30,7 +30,7 @@ Every value in the system flows through a **resolver** — an object with a `key
    resolve: (ctx) => {
      const override = ctx.input.input.general.numberOfStories;
      if (override != null) return override;
-     return Math.round(ctx.get("lowestEaveHeight") / (ctx.get("interiorStoryHeight") + ctx.get("floorSlabThickness")));
+     return Math.max(1, Math.round(ctx.get("lowestEaveHeight") / (ctx.input.config.general.assumedInteriorStoryHeight + ctx.get("floorSlabThickness"))));
    }
    ```
 
@@ -97,18 +97,22 @@ DETCalculatorContext {
 
 ```
 Direct inputs:
-  buildingHeight, buildingBaseArea, buildingType, livingArea?, isBasementHeated
+  buildingHeight, lowestEaveHeight, buildingBaseArea, buildingType, livingArea?, isBasementHeated
 
 Config constants (via resolvers):
-  floorSlabThickness, interiorStoryHeight, netFloorAreaFromLivingAreaFactor,
+  floorSlabThickness, netFloorAreaFromLivingAreaFactor,
   usableFloorAreaFactor, heatedAirVolumeCorrectionFactor (RangeBands by numberOfStories)
 
 Level 1 derived:
-  numberOfStories (override or calculated from height / (interiorStoryHeight + floorSlabThickness))
-    NOTE: flowchart spec says h / hg only — current impl uses h / (hg + hd). Verify which is correct.
+  numberOfStories (override or max(1, round(lowestEaveHeight / (assumedInteriorStoryHeight + floorSlabThickness))))
+  heatedAttic = hasAttic && isAtticHeated
+  aboveGroundHeatedHeight = heatedAttic ? buildingHeight : lowestEaveHeight
 
 Level 2 derived:
-  totalStoryHeight = numberOfStories * interiorStoryHeight + (n-1) * floorSlabThickness
+  interiorStoryHeight = (aboveGroundHeatedHeight - numberOfStories * floorSlabThickness)
+                        / (numberOfStories + (heatedAttic ? 1 : 0))
+  basementHeight = hasBasement && isBasementHeated ? interiorStoryHeight + floorSlabThickness : 0
+  totalStoryHeight = aboveGroundHeatedHeight + basementHeight
   grossHeatedVolume = buildingBaseArea * totalStoryHeight
 
 Level 3 derived:

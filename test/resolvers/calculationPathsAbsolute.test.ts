@@ -16,7 +16,7 @@ function baseInput(): DETInput {
     general: {
       buildingYear: 1968,
       numberOfStories: 2,
-      buildingHeight: 5.9,
+      buildingHeight: 8.85,
       lowestEaveHeight: 5.9,
       buildingBaseArea: 77,
       type: BuildingType.SINGLE_FAMILY,
@@ -81,6 +81,74 @@ function evaluate(input: DETInput) {
 }
 
 describe("calculation resolver paths with DEFAULT_CONFIG", () => {
+  for (const attic of [
+    { name: "unheated attic", hasAttic: true, isAtticHeated: false, height: 6.4, interiorHeight: 3 },
+    { name: "heated attic", hasAttic: true, isAtticHeated: true, height: 9.4, interiorHeight: 3 },
+    { name: "absent attic", hasAttic: false, isAtticHeated: true, height: 6.4, interiorHeight: 3 },
+  ]) {
+    test(`keeps above-ground volume fixed when story count changes with ${attic.name}`, () => {
+      const input = baseInput();
+      input.general.buildingBaseArea = 100;
+      input.general.buildingHeight = 9.4;
+      input.general.lowestEaveHeight = 6.4;
+      input.topFloor.hasAttic = attic.hasAttic;
+      input.topFloor.isAtticHeated = attic.isAtticHeated;
+      const twoStories = evaluate(input);
+      const threeStoryInput = clone(input);
+      threeStoryInput.general.numberOfStories = 3;
+      const threeStories = evaluate(threeStoryInput);
+
+      assert.equal(twoStories.get("totalStoryHeight"), attic.height);
+      assert.equal(twoStories.get("grossHeatedVolume"), 100 * attic.height);
+      assert.equal(twoStories.get("interiorStoryHeight"), attic.interiorHeight);
+      assert.equal(threeStories.get("grossHeatedVolume"), twoStories.get("grossHeatedVolume"));
+      assert.equal(threeStories.get("usableFloorArea"), twoStories.get("usableFloorArea"));
+      const expectedThreeStoryHeight = attic.hasAttic && attic.isAtticHeated ? 2.2 : 5.8 / 3;
+      assert.ok(Math.abs(threeStories.get("interiorStoryHeight") - expectedThreeStoryHeight) < 1e-12);
+    });
+
+    test(`adds one derived basement story below the building height with ${attic.name}`, () => {
+      const input = baseInput();
+      input.general.buildingBaseArea = 100;
+      input.general.buildingHeight = 9.4;
+      input.general.lowestEaveHeight = 6.4;
+      input.topFloor.hasAttic = attic.hasAttic;
+      input.topFloor.isAtticHeated = attic.isAtticHeated;
+      input.bottomFloor.hasBasement = true;
+      const unheated = evaluate(input);
+      const heatedInput = clone(input);
+      heatedInput.bottomFloor.isBasementHeated = true;
+      const heated = evaluate(heatedInput);
+
+      assert.equal(heated.get("interiorStoryHeight"), unheated.get("interiorStoryHeight"));
+      assert.ok(Math.abs(heated.get("totalStoryHeight") - attic.height - 3.2) < 1e-12);
+      assert.ok(Math.abs(heated.get("grossHeatedVolume") - unheated.get("grossHeatedVolume") - 320) < 1e-12);
+      assert.equal(heated.get("numberOfHeatedStories"), unheated.get("numberOfHeatedStories") + 1);
+    });
+  }
+
+  test("uses assumed story height only to infer missing story count", () => {
+    const input = baseInput();
+    input.general.buildingHeight = 9.4;
+    input.general.lowestEaveHeight = 6.4;
+    delete input.general.numberOfStories;
+    const defaultEstimate = evaluate(input);
+    const config = clone(DEFAULT_CONFIG);
+    config.general.assumedInteriorStoryHeight = 2;
+    const shorterEstimate = DETEnergyCaluclator({ config, input });
+
+    assert.equal(defaultEstimate.get("numberOfStories"), 2);
+    assert.equal(defaultEstimate.get("interiorStoryHeight"), 3);
+    assert.equal(shorterEstimate.get("numberOfStories"), 3);
+    assert.ok(Math.abs(shorterEstimate.get("interiorStoryHeight") - 5.8 / 3) < 1e-12);
+    assert.equal(shorterEstimate.get("grossHeatedVolume"), defaultEstimate.get("grossHeatedVolume"));
+
+    const explicitInput = clone(input);
+    explicitInput.general.numberOfStories = 2;
+    const explicit = DETEnergyCaluclator({ config, input: explicitInput });
+    assert.equal(explicit.get("interiorStoryHeight"), 3);
+  });
+
   test("selects the configured roof or top-floor path from attic state", () => {
     const flatInput = baseInput();
     flatInput.roof.isFlatRoof = true;

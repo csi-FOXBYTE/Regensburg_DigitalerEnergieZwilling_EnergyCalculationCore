@@ -45,10 +45,9 @@ describe("calculator input safeguards", () => {
       const result = numberOfStories.resolve(
         mockContext(
           { general: {} },
-          {},
+          { general: { assumedInteriorStoryHeight: 2.5 } },
           {
             lowestEaveHeight: 0.5,
-            interiorStoryHeight: 2.5,
             floorSlabThickness: 0.3,
           },
         ),
@@ -61,11 +60,10 @@ describe("calculator input safeguards", () => {
       const result = numberOfStories.resolve(
         mockContext(
           { general: {} },
-          {},
+          { general: { assumedInteriorStoryHeight: 2.5 } },
           {
             buildingHeight: 12,
             lowestEaveHeight: 6,
-            interiorStoryHeight: 2.5,
             floorSlabThickness: 0.3,
           },
         ),
