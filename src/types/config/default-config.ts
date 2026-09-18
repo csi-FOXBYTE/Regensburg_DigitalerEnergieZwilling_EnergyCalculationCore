@@ -918,8 +918,8 @@ export const DEFAULT_CONFIG: DETConfig = {
         value: [
           {
             value: [
-              { key: "radiant_surface_heating", value: 0 },
-              { key: "free_heat_emitter", value: 0 },
+              { key: "radiant_surface_heating", value: 1 },
+              { key: "free_heat_emitter", value: 1 },
             ],
           },
         ],
@@ -929,8 +929,8 @@ export const DEFAULT_CONFIG: DETConfig = {
         value: [
           {
             value: [
-              { key: "radiant_surface_heating", value: 0 },
-              { key: "free_heat_emitter", value: 0 },
+              { key: "radiant_surface_heating", value: 1 },
+              { key: "free_heat_emitter", value: 1 },
             ],
           },
         ],
@@ -940,8 +940,8 @@ export const DEFAULT_CONFIG: DETConfig = {
         value: [
           {
             value: [
-              { key: "radiant_surface_heating", value: 0 },
-              { key: "free_heat_emitter", value: 0 },
+              { key: "radiant_surface_heating", value: 1 },
+              { key: "free_heat_emitter", value: 1 },
             ],
           },
         ],
