@@ -323,6 +323,8 @@ export const DEFAULT_CONFIG: DETConfig = {
     heatingDegreeDays: 3626,
     // kHv
     ventilationHeatLossCorrectionFactor: 0.79,
+    // ΔUWB [W/(m²K)]
+    thermalBridgeSurcharge: 0.1,
     // kQwb
     hotWaterEnergyDemandFromAreaFactor: [
       { key: BuildingType.SINGLE_FAMILY, value: 11 },
